@@ -33,6 +33,11 @@ Speaking of querying predictors, predictors are never literally queried. Instead
 
 Review the code, feel free to submit pull requests, review the issues for things that need to be done.
 
+### Social 
+
+web: SatoriNetwork.io
+reddit: https://www.reddit.com/r/SatoriNetwork
+
 ### Green Fields
 
 There are a lot of minor components to the system that are not yet even started, as well as major components.
