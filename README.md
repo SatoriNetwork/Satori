@@ -35,8 +35,8 @@ Review the code, feel free to submit pull requests, review the issues for things
 
 ### Social 
 
-web: SatoriNetwork.io
-reddit: https://www.reddit.com/r/SatoriNetwork
+- web: SatoriNetwork.io
+- reddit: https://www.reddit.com/r/SatoriNetwork
 
 ### Green Fields
 
