@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre:wght@300&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre:wght@300&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
+  <style>
+    iframe {
+        /*
+        #width: 100vw;
+        #height: 100vh;
+        */
+      pointer-events: none;
+    }
+    .logoFont {
+      font-family: 'Averia Sans Libre', cursive;
+      }
+    .textFont {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      }
+    .textFontButton {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      font-size: 25px;
+      }
+    button {
+      all: unset;
+      cursor: pointer;
+      margin-left: 25px;
+      margin-right: 25px;
+    }
+    button:focus {
+      /* 
+      outline: orange 5px auto;
+      text-decoration: underline;
+      */
+    }
+    a {
+      all: unset;
+    }
+  </style>
+  <style>
+    .fade-in {
+      animation: fadeIn ease 3s;
+      -webkit-animation: fadeIn ease 3s;
+      -moz-animation: fadeIn ease 3s;
+      -o-animation: fadeIn ease 3s;
+      -ms-animation: fadeIn ease 3s;
+    }
+    @keyframes fadeIn {
+      0% {opacity:0;}
+      100% {opacity:1;}
+    }
+
+    @-moz-keyframes fadeIn {
+      0% {opacity:0;}
+      100% {opacity:1;}
+    }
+
+    @-webkit-keyframes fadeIn {
+      0% {opacity:0;}
+      100% {opacity:1;}
+    }
+
+    @-o-keyframes fadeIn {
+      0% {opacity:0;}
+      100% {opacity:1;}
+    }
+
+    @-ms-keyframes fadeIn {
+      0% {opacity:0;}
+      100% {opacity:1;}
+    }
+  </style>
+  
+</head>
+<body>
+
+<center>
+  <h1 style='font-size: 200px; margin-top: 0px; margin-bottom: 0px;' class="logoFont" onclick="showContent0()">Sat<img src="./assets/enso.png" width="100" height="100">ri</h1>
+  <button id='button1' class="textFontButton" onclick="showContent1()">Vision</button>
+  <button id='button2' class="textFontButton" onclick="showContent2()">The Way</button>
+  <button id='button3' class="textFontButton" onclick="showContent3()">Join</button>
+  <div style='margin-bottom: 50px;'></div>
+  <div id="demo">
+    
+  </div>
+</center>
+
+
+<script>
+    let b1 = document.getElementById("button1");
+    let b2 = document.getElementById("button2");
+    let b3 = document.getElementById("button3");
+
+    // This handler will be executed only once when the cursor
+    // moves over the unordered list
+    b1.addEventListener("mouseenter", function( event ) {
+    // highlight the mouseenter target
+    event.target.style.color = "#2274A5";
+    showContent1();
+    //event.target.style.decoration = 'underline';
+    // reset the color after a short delay
+    //setTimeout(function() {
+    //  event.target.style.color = "";
+    //}, 500);
+    }, false);
+
+    // This handler will be executed every time the cursor
+    // is moved over a different list item
+    b1.addEventListener("mouseout", function( event ) {
+    // highlight the mouseover target
+    event.target.style.color = "black";
+    
+    }, false);
+
+    b2.addEventListener("mouseenter", function( event ) {
+    event.target.style.color = "#2274A5";
+    showContent2();
+    }, false);
+    b2.addEventListener("mouseout", function( event ) {
+    event.target.style.color = "black";
+    }, false);
+
+    b3.addEventListener("mouseenter", function( event ) {
+    event.target.style.color = "#2274A5";
+    showContent3();
+    }, false);
+    b3.addEventListener("mouseout", function( event ) {
+    event.target.style.color = "black";
+    }, false);
+</script>
+
+
+
+<template id='template0'>
+  <div class="fade-in">
+  <input type="text" id="myText" value="" placeholder="what would you like to know?" class="textFont" style='margin-top:100px; width: 500px;'>
+  </div>
+</template>
+
+<script>
+  function showContent0() {
+    var temp = document.getElementById("template0");
+    var clon = temp.content.cloneNode(true);
+    document.getElementById("demo").innerHTML = temp.innerHTML;
+  }
+  showContent0() 
+</script>
+
+
+
+
+<template id='template1'>
+  <div class="fade-in">
+    <p class="textFont">The Satori Network predicts the future of everything.</p>
+    <p class="textFont">Anyone can query the Satori Network to access those predictions and glimps the future.</p>
+  </div>
+</template>
+
+<script>
+  function showContent1() {
+    var temp = document.getElementById("template1");
+    var clon = temp.content.cloneNode(true);
+    document.getElementById("demo").innerHTML = temp.innerHTML;
+  }
+</script>
+
+<template id='template2'>
+  <div class="fade-in">
+    <p class="textFont">Satori is a Network of nodes all working together to predict the future.</p>
+    <p class="textFont">Anyone can publish a data feed to the network and the nodes will predict the future of that data feed.</p>
+    <p class="textFont">Every node is tries to make better predictions of the data feeds assigned to it.</p>
+    <img src="./assets/networkwhite.png" height=250 width=250>
+    <!--<img src="https://cdn2.vectorstock.com/i/1000x1000/94/21/wireframe-globe-sphere-connectivity-network-tech-vector-13669421.jpg" height=250 width=250>
+    <img src="https://irp-cdn.multiscreensite.com/783fafb0/dms3rep/multi/metodologia-growth-driven-thinking-white.gif">
+    <iframe src="https://giphy.com/embed/ftAyb0CG1FNAIZt4SO" width="480" height="270" frameBorder="0"></iframe>-->
+  </div>
+</template>
+
+<script>
+  function showContent2() {
+    var temp = document.getElementById("template2");
+    var clon = temp.content.cloneNode(true);
+    document.getElementById("demo").innerHTML = temp.innerHTML;
+  }
+</script>
+
+<template id='template3'>
+<div class="fade-in">
+  <img  class="textFont"><p>screenshot</p>
+  <p style='margin-top:50px;' class="textFont">Nodes are automated and help the network know the future of everything.</p>
+  <p style='margin-bottom: 50px;' class="textFont">Anyone can run a node and generate rewards.</p>
+  <!--<button class="textFontButton">Download</button>-->
+    <button class="textFontButton"><a href="https://github.com/lastmeta/Satori">Get Involved</a></button>
+  </div>
+</template>
+
+<script>
+  function showContent3() {
+    var temp = document.getElementById("template3");
+    var clon = temp.content.cloneNode(true);
+    document.getElementById("demo").innerHTML = temp.innerHTML;
+  }
+</script>
+
+
+
+
+</body>
+</html>
