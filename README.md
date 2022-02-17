@@ -1,5 +1,5 @@
 # Satori
-_A Prediction Network_
+_A Future Network_
 
 To the end user, Satori is a network they can join as a node by downloading a program and running it. Every node finds a primary data stream(s) to predict the future of and they work together to produce the best predictions possible. Every data stream that is consumed by the Satori network has a forecast that can be queried and used as a public good.
 
@@ -23,7 +23,7 @@ The DataManager is in charge of getting data for the ModelManager(s). This inclu
 
 ## Simplifying Assumptions
 
-Datastreams should have a simple format and a unique identity. They should have a time column (when the observation took place), and a value column (what the value was). Using the pub-sub network, or the blockchain metadata could be saved to describe it. Metadata is not yet primarily relied upon by the system so its format should be a simple json structure. The datetime column could be called 'dt' 'datetime' 'time' or 'date', while the value column should be called 'observation' 'value' or the same as the streams unique identifier. The datetime column should support multiple formats, but UTC time should be preferred in order to easily merge datasets on the correct timing.
+Datastreams should have a simple format and a unique identity. They should have a time column (when the observation took place), and a value column (what the observation was). Using the pub-sub network, or the blockchain, metadata could be saved to describe each datastream. Metadata is not yet primarily relied upon by the system so its format should be a simple json structure. The datetime column could be called 'dt' 'datetime' 'time' or 'date', while the value column should be called 'observation' 'value' or the same as the streams unique identifier. The datetime column should support multiple formats, but UTC time should be preferred in order to easily merge datasets on the correct timing.
 
 ModelManagers produce a prediction of the future, specifically the immediate future, the next timestep. This may sound like a limiting factor, as it seems to be a limit on versatility. However, producing a forecast of multiple observations into the future creates a substantial amount of complexity for the rest of the system. We can push that complexity into a simple structure: have multiple datastreams describing the same data on various timescales: hourly, daily, monthly, etc. With this design, to get a mid- or long-term forecast one merely needs to query multiple predictors.
 
@@ -32,6 +32,11 @@ Speaking of querying predictors, predictors are never literally queried. Instead
 ## How to get involved
 
 Review the code, feel free to submit pull requests, review the issues for things that need to be done.
+
+### Social 
+
+- SatoriNetwork.io
+- https://www.reddit.com/r/SatoriNetwork
 
 ### Green Fields
 
