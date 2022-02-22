@@ -135,9 +135,30 @@
 
 
 
-<template id='template0'>
+  <template id='templateSorry'>
+      <div class="fade-in">
+        <p class="textFont">Apologies. I am not quite live yet.</p>
+        <p class="textFont">Help me realize my potential.</p>
+        <button class="textFontButton"><a href="https://github.com/lastmeta/Satori">Get Involved</a></button>
+      </div>
+  </template>
+  
+  <script>
+    function showContentSorry() {
+      var temp = document.getElementById("templateSorry");
+      var clon = temp.content.cloneNode(true);
+      document.getElementById("demo").innerHTML = temp.innerHTML;
+    }
+  </script>
+
+
+
+
+  <template id='template0'>
   <div class="fade-in">
-  <input type="text" id="myText" value="" placeholder="what would you like to know?" class="textFont" style='margin-top:100px; width: 500px;'>
+    <form action="/action_page.php" onsubmit="showContentSorry()">
+      <input type="text" id="search" value="" placeholder="what would you like to know?" class="textFont" style='margin-top:100px; width: 500px;'>
+    </form>
   </div>
 </template>
 
@@ -170,9 +191,9 @@
 
 <template id='template2'>
   <div class="fade-in">
-    <p class="textFont">Satori is a network of nodes all working together to predict the future.</p>
+    <p class="textFont">Satori is a network of nodes, all working together to predict the future.</p>
     <p class="textFont">Anyone can publish a data feed to the network and the nodes will predict the future of that data feed.</p>
-    <p class="textFont">Every node constantly tries to make better predictions of the data feeds assigned to it.</p>
+    <p class="textFont">Each node tries to make better and better predictions of the data feeds assigned to it.</p>
     <img src="./assets/site/networkwhite.png" style='margin-top:50px;' height=250 width=250>
     <!--<img src="https://cdn2.vectorstock.com/i/1000x1000/94/21/wireframe-globe-sphere-connectivity-network-tech-vector-13669421.jpg" height=250 width=250>
     <img src="https://irp-cdn.multiscreensite.com/783fafb0/dms3rep/multi/metodologia-growth-driven-thinking-white.gif">
@@ -192,7 +213,7 @@
 <div class="fade-in">
   <!--<img  class="textFont"><p>screenshot</p>-->
   <p style='margin-top:50px;' class="textFont">Nodes are automated and help the network know the future of everything.</p>
-  <p style='margin-bottom: 50px;' class="textFont">Anyone can run a node and generate rewards.</p>
+  <p style='margin-bottom: 50px;' class="textFont">Anyone can run a node.</p>
   <!--<button class="textFontButton">Download</button>-->
     <button class="textFontButton"><a href="https://github.com/lastmeta/Satori">Get Involved</a></button>
   </div>
