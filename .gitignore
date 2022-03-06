@@ -133,3 +133,5 @@ dmypy.json
 *.json
 *.joblib
 *.parquet
+
+*node_modules
