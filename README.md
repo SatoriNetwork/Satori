@@ -1,7 +1,7 @@
 # Satori
 _A Future Network_
 
-To the end user, Satori is a network they can join as a node by downloading a program and running it. Every node finds a primary data stream(s) to predict the future of and they work together to produce the best predictions possible. Every data stream that is consumed by the Satori network has a forecast that can be queried and used as a public good.
+To the end user, Satori is a network they can join as a node by downloading a program and running it. Every node finds a primary data stream(s) to predict the future of and they work together to produce the best predictions possible. Every data stream that is consumed by the Satori network has a forecast that can be queried as a public good.
 
 ## Current State
 
