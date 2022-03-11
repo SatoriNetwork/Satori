@@ -2,15 +2,14 @@ import threading
 import time
 
 import pandas as pd
-from matplotlib import pyplot as plt
-from IPython.display import clear_output
 from .data import DataManager
 from .model import ModelManager
+from .view import View
 
 class Learner:
 
     def __init__(
-        self, 
+        self,
         data:DataManager=None,
         model:ModelManager=None,
         models:'set(ModelManager)'=None,
@@ -18,13 +17,14 @@ class Learner:
         recess:int=0,
         api:'object'=None,
         out:'function'=None,
+        view:View=None,
     ):
         '''
         data - a DataManager for the data
         model - a ModelManager for the model
         models - a list of ModelManagers
-        coolDown - to reduce the computational load, sleep for x seconds every iteration
-        recess - to reduce bandwidth load (when looking for more data), sleep for x seconds
+        coolDown - to reduce the computational load
+        recess - to reduce bandwidth load (when seeking data)
         '''
         self.data = data
         self.models = models
@@ -35,10 +35,15 @@ class Learner:
         self.cooldown = cooldown
         self.recess = recess
 
-    def run(self, cooldown:int=None, recess:int=None, view:bool=True, points:int=7):
+    def run(self, cooldown:int=None, recess:int=None):
         '''
-        most learners have one dataset, but multiple models 
-        (like predicting each feature in the dataset)
+        Main Loops - one for each model and one for the data manager.
+        cooldown: sleep for x seconds between Model exploration iterations
+        recess: number of seconds to sleep before looking for data again
+                (-1 = disable, do not fetch data (sleep indefinitely))
+        view: print out results to Jupyter notebook
+
+
         '''
 
         def dataWaiter():
@@ -49,13 +54,13 @@ class Learner:
                     while True:
                         time.sleep(60*60)
                 time.sleep(x)
-                    
-            
+
+
             while True:
                 rest()
                 self.data.runOnce(inputs)
 
-                
+
         def learner(model:ModelManager):
 
             def pretty(x:dict):
@@ -64,7 +69,7 @@ class Learner:
             def rest():
                 time.sleep(cooldown or self.cooldown)
 
-            first = True    
+            first = True
             while True:
                 print('waiting for data...  ')
                 print('building models...  ')
@@ -82,18 +87,18 @@ class Learner:
                     if first or startingPredictions != predictions:
                         first = False
                         if callable(self.out):
-                            self.out(model, points, predictions, scores)
+                            self.out(model, predictions, scores)
                         if self.api is not None:
-                            self.api.send(model, points, predictions, scores)
-                        if view:
-                            self.jupyterOut(model, points, predictions, scores)
+                            self.api.send(model, predictions, scores)
+                        if self.view is not None:
+                            self.view.view(model, predictions, scores)
                         else:
                             clear_output()
                         print(
                             'Predictions:\n', pretty(predictions),
                             '\nScores:\n', pretty(scores))
                 print('fetching new data...  ')
-        
+
         thread = threading.Thread(target=dataWaiter)
         thread.start()
         threads = {'dataWaiter': thread}
@@ -107,40 +112,3 @@ class Learner:
             predictions[model.targetKey] = ''
             scores[model.targetKey] = ''
             inputs[model.targetKey] = []
-            
-    def jupyterOut(self, model, points:int, predictions:dict, scores:dict, ):
-        
-        def lineWidth(score:str) -> float:
-            try: 
-                score = (float(score.split()[0])+1)**3
-            except:
-                score = None
-            return min(abs(score or .1), 1)
-
-        #(model.data.iloc[-1*points:]
-        #    .append(pd.DataFrame({k: [v] for k, v in predictions.items()}))
-        #    .reset_index(drop=True)
-        #    .plot(figsize=(8,5), linewidth=3))
-        ## to show confidence with linewidth:
-        ax = None
-        for ix, col in enumerate(model.data.columns.tolist()):
-            print(model.targetKey, predictions.get(col))
-            ax = (model.data.iloc[-1*points:, [ix]]
-                .append(pd.DataFrame({col: [predictions.get(col, 0)]}))
-                .reset_index(drop=True)
-                .plot(
-                    **{'ax': ax} if ax is not None else {},
-                    figsize=(8,5), 
-                    linewidth=lineWidth(scores.get(col, 0))))
-        clear_output()
-        plt.show()
-
-
-# possible improvements:
-# 1. optionally show graph of data with latest predictions
-# 2. save all (best per datapoint, or per some amount of data or time)
-#    models and predict every datapoint after them,
-#    that way what they predict can be used as additional features.
-#    this seems like a major feature that would require some archetecting.
-#    maybe it can learn to keep the best 3 or something.
-#    well, and then there's cyclical... idk

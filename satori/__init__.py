@@ -1,3 +1,5 @@
+from satori.lib.view import View
+from satori.lib.view import JupyterView
 from satori.lib import HyperParameter
 from satori.lib import DataManager
 from satori.lib import ModelManager
