@@ -1,3 +1,4 @@
+import pandas as pd
 from matplotlib import pyplot as plt
 from IPython.display import clear_output
 
@@ -10,9 +11,12 @@ class View:
         pass
 
     def view(self, *args, **kwargs):
+        self.print(*args, **kwargs)
+
+    def print(self, *args, **kwargs):
         for arg in args:
             print(arg)
-        for key, value in kwargs.items:
+        for key, value in kwargs.items():
             print(key, ':', value)
 
 
