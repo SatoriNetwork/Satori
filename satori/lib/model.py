@@ -222,7 +222,10 @@ class ModelManager:
     ### FEATURE DATA ####################################################################
 
     def produceFeatureData(self):
-        ''' produces our feature data map: {feature: (feature importance, [raw inputs])} '''
+        '''
+        produces our feature data map:
+        {feature: (feature importance, [raw inputs])}
+        '''
         for k in self.featureSet.columns:
             self.featureData[k] = (
                 self.featureImports[k],
@@ -231,7 +234,13 @@ class ModelManager:
                     or [self.features[k].keywords.get('column')]))
 
     def showFeatureData(self):
-        ''' returns true raw feature importance '''
+        '''
+        returns true raw feature importance
+        example: {
+            'Close': 0.6193444132804871,
+            'High': 0.16701968474080786,
+            'Low': 0.38159190578153357}
+        '''
         rawImportance = {}
         for importance, features in self.featureData.values():
             for name in features:

@@ -10,19 +10,23 @@ class View:
     def __init__(self):
         pass
 
+    def pretty(x:dict):
+        return ' ' + '\n '.join([f' {k}: {v}' for k, v in x.items()])
+
     def view(self, *args, **kwargs):
         self.print(*args, **kwargs)
 
     def print(self, *args, **kwargs):
         for arg in args:
-            print(arg)
+            print(View.pretty(arg) if isinstance(arg, dict) else arg)
         for key, value in kwargs.items():
-            print(key, ':', value)
+            print(key)
+            print(View.pretty(value) if isinstance(value, dict) else value)
 
 
 class JupyterView(View):
     '''
-    holds functionality for viewing model results
+    holds functionality for viewing model results in a jupyter notebook
     '''
 
     def __init__(self, points:int=7):

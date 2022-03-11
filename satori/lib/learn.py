@@ -35,12 +35,9 @@ class Learner:
     def run(self, cooldown:int=None, recess:int=None):
         '''
         Main Loops - one for each model and one for the data manager.
-        cooldown: sleep for x seconds between Model exploration iterations
+        cooldown: sleep for x seconds between model exploration iterations
         recess: number of seconds to sleep before looking for data again
                 (-1 = disable, do not fetch data (sleep indefinitely))
-        view: print out results to Jupyter notebook
-
-
         '''
 
         def dataWaiter():
@@ -60,20 +57,24 @@ class Learner:
 
         def learner(model:ModelManager):
 
-            def pretty(x:dict):
-                return '\n '.join([f' {k}: {v}' for k, v in x.items()])
-
             def rest():
                 time.sleep(cooldown or self.cooldown)
 
+            def out(data=True):
+                if self.view is not None:
+                    self.view.print(
+                        **{
+                            'Predictions:\n':predictions,
+                            '\nScores:\n':scores
+                        } if data else **{
+                            model.targetKey: 'loading... '})
+
             first = True
             while True:
-                if self.view is not None:
-                    self.view.print('waiting for data...  ', 'building models...  ')
+                out(data=False)
                 model.buildStable()
                 predictions[model.targetKey] = model.producePrediction()
-                if self.view is not None:
-                    self.view.print('Predictions:', predictions, 'Scores:', scores)
+                out()
                 while model.data.shape == self.data.data.shape and model.data.shape[0] > 0:
                     rest()
                     startingPredictions = predictions.copy()
@@ -87,13 +88,9 @@ class Learner:
                         if self.api is not None:
                             self.api.send(model, predictions, scores)
                         if self.view is not None:
-                            print('view is not None')
                             self.view.view(model, predictions, scores)
-                            self.view.print(
-                            'Predictions:\n', pretty(predictions),
-                            '\nScores:\n', pretty(scores))
-                if self.view is not None:
-                    self.view.print('fetching new data...  ')
+                            out()
+                out(data=False)
 
         thread = threading.Thread(target=dataWaiter)
         thread.start()
