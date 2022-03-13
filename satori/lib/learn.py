@@ -62,12 +62,11 @@ class Learner:
 
             def out(data=True):
                 if self.view is not None:
-                    self.view.print(
-                        **{
+                    self.view.print(**(
+                        {
                             'Predictions:\n':predictions,
                             '\nScores:\n':scores
-                        } if data else **{
-                            model.targetKey: 'loading... '})
+                        } if data else {model.targetKey: 'loading... '}))
 
             first = True
             while True:

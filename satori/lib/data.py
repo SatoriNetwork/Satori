@@ -54,9 +54,11 @@ class DataManager:
         self.appendData = appendData or DataManager.defaultAppendData
         self.run()
 
+    @staticmethod
     def defaultGetData() -> pd.DataFrame:
         return pd.DataFrame({'a': [1]})  # rest call or something
 
+    @staticmethod
     def defaultValidateData(
         data:pd.DataFrame,
         existing:pd.DataFrame,
@@ -76,6 +78,7 @@ class DataManager:
             return False
         return True
 
+    @staticmethod
     def defaultAppend(
         data:pd.DataFrame,
         existing:pd.DataFrame,

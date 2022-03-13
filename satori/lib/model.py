@@ -67,8 +67,6 @@ class ModelManager:
         self.metrics = metrics
         self.exploreFeatures = exploreFeatures
         self.testFeatures = self.chosenFeatures
-        self.originalFeatures = self.chosenFeatures
-        self.originalParameters = self.hyperParameters
         self.split = split
         self.featureData = {}
         if not override:
@@ -79,6 +77,7 @@ class ModelManager:
 
     ### STATIC FEATURES GENERATORS ###########################################################
 
+    @staticmethod
     def rawDataMetric(df:pd.DataFrame=None, column:str=None, prefix='Raw') -> pd.DataFrame:
 
         def name() -> str:
@@ -91,6 +90,7 @@ class ModelManager:
         feature.name = name()
         return feature
 
+    @staticmethod
     def dailyPercentChangeMetric(
         df:pd.DataFrame=None,
         column:str=None,
@@ -108,6 +108,7 @@ class ModelManager:
         feature.name = name()
         return feature
 
+    @staticmethod
     def rollingPercentChangeMetric(
         df:pd.DataFrame=None,
         column:str=None,
@@ -129,6 +130,7 @@ class ModelManager:
             return feature
 
         raise Exception('eval call on transformation failed, unable to create feature')
+   
 
     ### GET DATA ####################################################################
 
@@ -143,6 +145,7 @@ class ModelManager:
         series.name = ModelManager.produceTargetName(self.targetKey)
         self.target = pd.DataFrame(series)
 
+    @staticmethod
     def produceTargetName(target:str, prefix:str='Target_'):
         return f'{prefix}{target}'
 
@@ -419,7 +422,7 @@ class ModelManager:
             self.testFeatures = self.chosenFeatures
         preservePinned()
 
-    def evaluateCandidate(self, returnBoth=False) -> float:
+    def evaluateCandidate(self, returnBoth=False) -> float|tuple:
         ''' notice, model consists of the hyperParameter values and the chosenFeatures '''
         stable = self.xgb.score(self.testX, self.testY)
         test = self.xgbTest.score(self.testXtest, self.testYtest)
@@ -443,7 +446,7 @@ class ModelManager:
         self.xgb.savedChosenFeatures = self.chosenFeatures
         joblib.dump(self.xgb, self.modelPath)
 
-    def load(self) -> float:
+    def load(self) -> bool:
         ''' loads the model - happens on init so we automatically load our progress '''
         if os.path.exists(self.modelPath):
             xgb = joblib.load(self.modelPath)

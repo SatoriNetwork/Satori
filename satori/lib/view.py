@@ -8,14 +8,18 @@ class View:
     '''
 
     def __init__(self):
+        ''' no need '''
         pass
 
+    @staticmethod
     def pretty(x:dict):
         return ' ' + '\n '.join([f' {k}: {v}' for k, v in x.items()])
-
+    
+    @staticmethod
     def view(self, *args, **kwargs):
         self.print(*args, **kwargs)
-
+    
+    @staticmethod
     def print(self, *args, **kwargs):
         for arg in args:
             print(View.pretty(arg) if isinstance(arg, dict) else arg)
@@ -40,7 +44,7 @@ class JupyterView(View):
         def lineWidth(score:str) -> float:
             try:
                 score = (float(score.split()[0])+1)**3
-            except:
+            finally:
                 score = None
             return min(abs(score or .1), 1)
 
