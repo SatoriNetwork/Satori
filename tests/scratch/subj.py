@@ -21,13 +21,21 @@ class Hello2(object):
         self.count +=1
         self.events.on_next({'source': 'hellow world', 'data': 'clicked', 'count':self.count})
 
+y = 0
+def changey(thing):
+    global y 
+    y = thing
+    
 if __name__ == '__main__':
     h = Hello2()
-    h.events.subscribe(lambda x: print(f'cliked: {x["count"]}'))
+    h.events.subscribe(lambda x: changey(x))
+    
     time.sleep(1)
     h.doit()
     h.doit()
     time.sleep(1)
     h.doit()
     h.doit()
+    print( '--', y)
+    
     exit();

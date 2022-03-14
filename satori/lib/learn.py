@@ -3,6 +3,7 @@ import time
 from .data import DataManager
 from .model import ModelManager
 from .view import View
+from satori.lib import streams
 
 class Learner:
 
@@ -55,8 +56,40 @@ class Learner:
                 self.data.runOnce(inputs)
 
 
-        def learner(model:ModelManager):
+        def predictor(model:ModelManager):
 
+            def setBuildAgainFlag():
+                nonlocal buildAgain
+                buildAgain = True
+                
+
+            def rebuild():
+
+
+                def out(data=True):
+                    if self.view is not None:
+                        self.view.print(**(
+                            {
+                                'Predictions:\n':predictions,
+                                '\nScores:\n':scores
+                            } if data else {model.targetKey: 'loading... '}))
+                
+                first = True
+                while first or buildAgain:
+                    first = False
+                    setBuildAgainFlag()
+                    model.buildStable()
+                    self.predictions[model.targetKey] = model.producePrediction()
+                    out()
+
+            out(data=False)
+            buildAgain = False
+            streams.newModel.events.subscribe(lambda x: rebuild() if not streams.building.value else setBuildAgainFlag())
+            streams.newData.events.subscribe(lambda x: rebuild() if not streams.building.value else setBuildAgainFlag())
+            ## while 
+                
+        def learner(model:ModelManager):
+        
             def rest():
                 time.sleep(cooldown or self.cooldown)
 
