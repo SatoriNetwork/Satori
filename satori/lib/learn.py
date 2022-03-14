@@ -1,3 +1,4 @@
+import asyncio
 import threading
 import time
 from .data import DataManager
@@ -61,10 +62,8 @@ class Learner:
             def setBuildAgainFlag():
                 nonlocal buildAgain
                 buildAgain = True
-                
 
-            def rebuild():
-
+            async def rebuild():
 
                 def out(data=True):
                     if self.view is not None:
@@ -81,11 +80,14 @@ class Learner:
                     model.buildStable()
                     self.predictions[model.targetKey] = model.producePrediction()
                     out()
-
+            
+            async doSomething():
+                await rebuild() if not streams.building.value else setBuildAgainFlag()
+            
             out(data=False)
             buildAgain = False
-            streams.newModel.events.subscribe(lambda x: rebuild() if not streams.building.value else setBuildAgainFlag())
-            streams.newData.events.subscribe(lambda x: rebuild() if not streams.building.value else setBuildAgainFlag())
+            streams.newModel.events.subscribe(await doSomething())
+            streams.newData.events.subscribe(await doSomething())
             ## while 
                 
         def learner(model:ModelManager):
