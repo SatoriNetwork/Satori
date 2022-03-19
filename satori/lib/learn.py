@@ -93,6 +93,7 @@ class Learner:
         def learner(model:ModelManager):
         
             def rest():
+                
                 time.sleep(cooldown or self.cooldown)
 
             def out(data=True):
