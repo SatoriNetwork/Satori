@@ -16,6 +16,7 @@ class DataManager:
         self.updates = {}
         self.availableInputs = [0,1,2,3,4,5,6,7,8,9]
         self.helperTextCounter = 0
+        self.listeners = []
         
     def runSubscriber(self, models):
         self.helperTextCounter += 1 # only one stream updates 
@@ -27,12 +28,13 @@ class DataManager:
                 model.inputsUpdated.on_next(True)
 
     def runPublisher(self, models):
-        def publish(model):
-            model.predictionUpdated.on_next(False)
-            print(f'Publishing: {model.name()}: {model.prediction}')
+        def publish(modelName, prediction):
+            #model.predictionUpdated.on_next(False)
+            print(f'Publishing: {modelName}: {prediction}')
             
         for model in models:
-            model.predictionUpdated.subscribe(lambda x: publish(model) if x else None)
+            print(f'pub {model.targetKey}')
+            self.listeners.append(model.predictionUpdated.subscribe(lambda x: publish(*x) if x else None))
     
     def runScholar(self, models):
         newInput = self.availableInputs[-1] + 1
@@ -62,7 +64,7 @@ class ModelManager:
     def runPredictor(self, data):
         def makePrediction():
             self.prediction = str(dt.datetime.utcnow().second)
-            self.predictionUpdated.on_next(True)
+            self.predictionUpdated.on_next([self.targetKey, self.prediction])
             for i in self.inputs:
                 self.updates[i] = data.updates.get(i)
             print(f'{self.targetKey} using: {self.model} with: {self.updates} prediction: {self.prediction}')
@@ -116,6 +118,7 @@ class Learner:
         def subscriber():
             ''' loop for data '''
             while True:
+                time.sleep(1)
                 self.data.runSubscriber(self.models)
 
         def publisher():
@@ -125,7 +128,7 @@ class Learner:
         def scholar():
             ''' loop for data '''
             while True:
-                time.sleep(.1)
+                time.sleep(10)
                 self.data.runScholar(self.models)
 
         def predictor(model:ModelManager):
