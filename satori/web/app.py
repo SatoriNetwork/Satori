@@ -111,6 +111,58 @@ def ping():
 @app.route('/')
 @app.route('/dashboard')
 def dashboard():
+    ''' UI '''
+    resp = {}
+    return render_template('dashboard.html', **resp)
+
+###############################################################################
+## Routes - subscription ######################################################
+###############################################################################
+
+@app.route('/subscription/update')
+def update():
+    ''' from streamr - datastream has a new observation '''
+    resp = {}
+    return render_template('dashboard.html', **resp)
+
+@app.route('/subscribe')
+def subscribe():
+    ''' to streamr - subscribe to a datastream'''
+    resp = {}
+    return render_template('dashboard.html', **resp)
+
+###############################################################################
+## Routes - publication #######################################################
+###############################################################################
+
+@app.route('/publish/stream')
+def publsih():
+    ''' to streamr - create a new datastream to publish to '''
+    resp = {}
+    return render_template('dashboard.html', **resp)
+
+
+@app.route('/publish/prediction')
+def publsihMeta():
+    ''' to streamr - publish to a stream '''
+    resp = {}
+    return render_template('dashboard.html', **resp)
+
+###############################################################################
+## Routes - history ###########################################################
+# we may be able to make these reque
+###############################################################################
+
+@app.route('/history/request')
+def publsih():
+    ''' to streamr - create a new datastream to publish to '''
+    resp = {}
+    return render_template('dashboard.html', **resp)
+
+
+@app.route('/history/')
+def publsihMeta():
+    ''' to streamr - publish to a stream '''
     resp = {}
     return render_template('dashboard.html', **resp)
 
