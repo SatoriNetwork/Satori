@@ -32,13 +32,13 @@ class DataManager:
             print(f'Publishing: {model.name()}: {model.prediction}')
             
         for model in models:
-            self.predictionUpdated.subscribe(lambda x: publish(model) if x else None)
+            model.predictionUpdated.subscribe(lambda x: publish(model) if x else None)
     
     def runScholar(self, models):
         newInput = self.availableInputs[-1] + 1
         self.availableInputs.append(newInput)
         for model in models:
-            model.newAvailableInputs.on_next(newInput)
+            model.newAvailableInput.on_next(newInput)
             print(f'runScholar - {model.name()}: {model.inputs}')
 
                 
@@ -54,7 +54,7 @@ class ModelManager:
         self.modelUpdated = BehaviorSubject(False)
         self.inputsUpdated = BehaviorSubject(False)
         self.predictionUpdated = BehaviorSubject(False)
-        self.newAvailableInputs = BehaviorSubject([])
+        self.newAvailableInput = BehaviorSubject(None)
 
     def name(self): 
         return self.targetKey
@@ -72,7 +72,7 @@ class ModelManager:
             makePrediction()
         
         def makePredictionFromNewInputs():
-            self.inputUpdated.on_next(False)
+            self.inputsUpdated.on_next(False)
             makePrediction()
                 
         self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x and self.model != None else None)
@@ -80,14 +80,14 @@ class ModelManager:
         
     def runExplorer(self):
         
-        def explore():
-            self.inputs = self.inputs + self.newAvailableInputs
+        def explore(x):
+            self.inputs.append(x)
             self.model = str(dt.datetime.utcnow())
             print(f'{self.targetKey} runExplorer')
-            self.newAvailableInputs.on_next([])
+            self.newAvailableInput.on_next(None)
             self.modelUpdated.on_next(True)
         
-        self.newAvailableInputs.subscribe(lambda x: explore() if x != [] else None)
+        self.newAvailableInput.subscribe(lambda x: explore(x) if x is not None else None)
 
     
 class Learner:
@@ -115,7 +115,8 @@ class Learner:
 
         def subscriber():
             ''' loop for data '''
-            self.data.runSubscriber(self.models)
+            while True:
+                self.data.runSubscriber(self.models)
 
         def publisher():
             ''' loop for data '''
@@ -123,7 +124,9 @@ class Learner:
 
         def scholar():
             ''' loop for data '''
-            self.data.runScholar(self.models)
+            while True:
+                time.sleep(.1)
+                self.data.runScholar(self.models)
 
         def predictor(model:ModelManager):
             ''' loop for producing predictions '''
