@@ -118,7 +118,7 @@ class Learner:
         def subscriber():
             ''' loop for data '''
             while True:
-                time.sleep(1)
+                time.sleep(.1)
                 self.data.runSubscriber(self.models)
 
         def publisher():
@@ -128,7 +128,7 @@ class Learner:
         def scholar():
             ''' loop for data '''
             while True:
-                time.sleep(10)
+                time.sleep(1)
                 self.data.runScholar(self.models)
 
         def predictor(model:ModelManager):
@@ -139,19 +139,23 @@ class Learner:
             ''' loop for producing models '''
             model.runExplorer()
 
+        # non looping functions don't need to be threads... 
+        publisher()
         threads = {}
         threads['subscriber'] = threading.Thread(target=subscriber, daemon=True)
-        threads['publisher'] = threading.Thread(target=publisher, daemon=True)
+        #threads['publisher'] = threading.Thread(target=publisher, daemon=True)
         threads['scholar'] = threading.Thread(target=scholar, daemon=True)
-        predictions = {}
-        scores = {}
-        inputs = {}
+        #predictions = {}
+        #scores = {}
+        #inputs = {}
         for model in self.models:
-            threads[f'{model.targetKey}.predictor'] = threading.Thread(target=predictor, args=[model], daemon=True)
-            threads[f'{model.targetKey}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
-            predictions[model.targetKey] = ''
-            scores[model.targetKey] = ''
-            inputs[model.targetKey] = []
+            predictor(model)
+            explorer(model)
+            #threads[f'{model.targetKey}.predictor'] = threading.Thread(target=predictor, args=[model], daemon=True)
+            #threads[f'{model.targetKey}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
+            #predictions[model.targetKey] = ''
+            #scores[model.targetKey] = ''
+            #inputs[model.targetKey] = []
 
         for thread in threads.values():
             print('starting')
