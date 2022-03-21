@@ -121,30 +121,16 @@ def dashboard():
 
 @app.route('/subscription/update')
 def update():
-    ''' from streamr - datastream has a new observation '''
-    resp = {}
-    return render_template('dashboard.html', **resp)
-
-@app.route('/subscribe')
-def subscribe():
-    ''' to streamr - subscribe to a datastream'''
-    resp = {}
-    return render_template('dashboard.html', **resp)
-
-###############################################################################
-## Routes - publication #######################################################
-###############################################################################
-
-@app.route('/publish/stream')
-def publsih():
-    ''' to streamr - create a new datastream to publish to '''
-    resp = {}
-    return render_template('dashboard.html', **resp)
-
-
-@app.route('/publish/prediction')
-def publsihMeta():
-    ''' to streamr - publish to a stream '''
+    ''' from streamr - datastream has a new observation
+    upon a new observation of a datastream, the nodejs app will send this 
+    python flask app a message on this route. The flask app will then pass the
+    message to the data manager, specifically the scholar (and subscriber)
+    threads by adding it to the appropriate subject. (the scholar, will add it
+    to the correct table in the database history, notifying the subscriber who
+    will, if used by any current best models, notify that model's predictor
+    thread via a subject that a new observation is available by providing the
+    observation directly in the subject).
+    '''
     resp = {}
     return render_template('dashboard.html', **resp)
 
