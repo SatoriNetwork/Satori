@@ -62,40 +62,36 @@ class Learner:
             triggered from flask app.
             this should probably be broken out into a service
             that subscribes and a service that listens...
+            should be on demand
             '''
             while True:
                 time.sleep(.1)
                 self.data.runSubscriber(self.models)
                 
         def publisher():
-            ''' publishes predictions
+            ''' publishes predictions on demand
             this should probably be broken out into a service
             that creates a stream and a service that publishes...
             '''
             self.data.runPublisher(self.models)
 
         def scholar():
-            ''' looks for external data and compiles it '''
+            ''' always looks for external data and compiles it '''
             while True:
                 self.data.runScholar(self.models)
 
         def predictor(model:ModelManager):
-            ''' produces predictions '''
-            model.buildStable()
+            ''' produces predictions on demand '''
             model.runPredictor(self.data)
-
         
+        def sync(model:ModelManager):
+            ''' sync available inputs found and compiled by scholar on demand '''
+            model.syncAvailableInputs(self.data)
+
         def explorer(model:ModelManager):
-            ''' loop for producing models -
-            I think more ideally we'd have a loop that searches hyper params 
-            in one model object, we'd also have this explorer which is triggered
-            by new data becoming available in a different object... idk a 
-            hierarchy of model creation? weird... we'll just use a loop
-            and look for new data each iteration. '''
+            ''' always looks for a better model '''
             while True:
-                model.runExplorer(self.data)
-                #stable, test = model.evaluateCandidate(returnBoth=True)
-                #model.buildTest()
+                model.runExplorer()
 
         publisher()
         threads = {}
@@ -103,7 +99,8 @@ class Learner:
         threads['scholar'] = threading.Thread(target=scholar, daemon=True)
         for model in self.models:
             predictor(model)
-            #threads[f'{model.targetKey}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
+            sync(model)
+            threads[f'{model.targetKey}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
 
         for thread in threads.values():
             thread.start()

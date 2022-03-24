@@ -432,26 +432,22 @@ class ModelManager:
             self.testFeatures = self.chosenFeatures
         preservePinned()
 
-    def evaluateCandidate(self, returnBoth=False) -> float|tuple:
+    def evaluateCandidate(self):
         ''' notice, model consists of the hyperParameter values and the chosenFeatures '''
-        stable = self.xgb.score(self.testX, self.testY)
-        test = self.xgbTest.score(self.testXtest, self.testYtest)
+        self.stable = self.xgb.score(self.testX, self.testY)
+        self.test = self.xgbTest.score(self.testXtest, self.testYtest)
         # not sure what this score is... r2 f1? not mae I think
-        if stable < test:
+        if self.stable < self.test:
             for param in self.hyperParameters:
                 param.value = param.test
             self.chosenFeatures = self.testFeatures
             self.featureSet = self.testFeatureSet
             self.save()
-            #self.buildStable() # don't need to build stable becasue predictor does that
             self.modelUpdated.on_next(True)
-        if returnBoth:
-            return stable, test
-        return max(stable, test)
 
     ### SAVE ###########################################################################
 
-    def save(self) -> float:
+    def save(self):
         ''' save the current model '''
         self.xgb.savedHyperParameters = self.hyperParameters
         self.xgb.savedChosenFeatures = self.chosenFeatures
@@ -492,17 +488,39 @@ class ModelManager:
         self.produceTestFit()
     
     ### LIFECYCLE ######################################################################
-
-    def runExplorer(self, data):
-        
-        def explore(x):
-            #self.syncAvailableInputs(data)
-            self.buildTest()
-            self.evaluateCandidate()
-            
-        ## instead of triggering based on new data, we'll loop continually,
-        ## checking for new data each time.
-        #self.newAvailableInput.subscribe(lambda x: explore(x) if x is not None else None)
-
-
     
+    def runPredictor(self, data):
+        def makePrediction():
+            self.buildStable()
+            self.prediction = self.producePrediction()
+            self.predictionUpdated.on_next([self.targetKey, self.prediction])
+        
+        def makePredictionFromNewModel():
+            self.modelUpdated.on_next(False)
+            makePrediction()
+        
+        def makePredictionFromNewInputs(data):
+            ## add incremental updates to inmemory model dataset - something like this:
+            #for i in self.inputs:
+            #    self.updates[i] = data.updates.get(i)
+            self.inputsUpdated.on_next(False)
+            makePrediction()
+                
+        self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x is not None else None)
+        self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(data) if x is not None else None)
+        
+    def runExplorer(self):
+        self.buildTest()
+        self.evaluateCandidate()
+    
+    def syncAvailableInputs(self, data):
+        
+        def sync(data):
+            '''
+            add the new datastreams and histories to the top 
+            of the list of things to explore and evaluate 
+            '''
+            ## something like this?
+            #self.features.append(data) 
+            
+        self.newAvailableInput.subscribe(lambda x: sync(x) if x is not None else None)

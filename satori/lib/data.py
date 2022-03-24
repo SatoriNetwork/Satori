@@ -31,8 +31,8 @@ Basic Reponsibilities of the DataManager:
     E. download the datastream and notify model manager
 4. garbage collect stale datastreams
 '''
-
 import pandas as pd
+from reactivex.subject import BehaviorSubject
 
 class DataManager:
 
@@ -52,6 +52,8 @@ class DataManager:
         self.getData = getData or DataManager.defaultGetData
         self.validateData = validateData or DataManager.defaultValidateData
         self.appendData = appendData or DataManager.defaultAppendData
+        self.listeners = []
+        self.newData = BehaviorSubject(False)
         self.run()
 
     @staticmethod
@@ -160,3 +162,32 @@ class DataManager:
     def runOnce(self, inputs:dict = None) -> bool:
         ''' run denotes a loop, there's no loop but now its explicit '''
         return self.run(inputs)
+
+    def runSubscriber(self, models):
+        ''' triggered from the flask app '''
+        
+        def tell(models):
+            # maybe save the data first or something, idk.
+            for model in models:
+                #if they are listening to the stream:
+                model.inputsUpdated.on_next(True)
+        
+        self.listeners.append(self.newData.subscribe(lambda x: tell(models) if x is not None else None))
+                
+
+    def runPublisher(self, models):
+        def publish(modelName, prediction):
+            ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
+            #model.predictionUpdated.on_next(False)
+            #print(f'Publishing: {modelName}: {prediction}')
+            
+        for model in models:
+            self.listeners.append(model.predictionUpdated.subscribe(lambda x: publish(*x) if x is not None else None))
+    
+    def runScholar(self, models):
+        ''' download histories and tell model sync '''
+        ## look for new useful datastreams - something like this
+        #self.download(self.bestOf(self.compileMap(models)))
+        #self.availableInputs.append(newInput)
+        #for model in models:
+        #    model.newAvailableInput.on_next(newInput)
