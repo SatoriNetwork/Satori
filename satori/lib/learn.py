@@ -1,10 +1,8 @@
-import asyncio
 import threading
 import time
 from .data import DataManager
 from .model import ModelManager
 from .view import View
-from satori.lib import streams
 
 class Learner:
 
@@ -13,8 +11,6 @@ class Learner:
         data:DataManager=None,
         model:ModelManager=None,
         models:'set(ModelManager)'=None,
-        cooldown:int=0,
-        recess:int=0,
         api:'object'=None,
         view:View=None,
     ):
@@ -22,8 +18,6 @@ class Learner:
         data - a DataManager for the data
         model - a ModelManager for the model
         models - a list of ModelManagers
-        coolDown - to reduce the computational load
-        recess - to reduce bandwidth load (when seeking data)
         '''
         self.data = data
         self.models = models
@@ -31,112 +25,102 @@ class Learner:
         self.api = api
         if model is not None:
             self.models = {self.models + [model]}
-        self.cooldown = cooldown
-        self.recess = recess
 
-    def run(self, cooldown:int=None, recess:int=None):
+    
+    def out(self, data=True):
+        ''' old functionality that must be accounted for in new design
+        if self.view is not None:
+            self.view.print(**(
+                {
+                    'Predictions:\n':predictions,
+                    '\nScores:\n':scores
+                } if data else {model.targetKey: 'loading... '}))
         '''
-        Main Loops - one for each model and one for the data manager.
-        cooldown: sleep for x seconds between model exploration iterations
-        recess: number of seconds to sleep before looking for data again
-                (-1 = disable, do not fetch data (sleep indefinitely))
+
+    def updateView(self, data=True):
+        ''' old functionality that must be accounted for in new design
+        predictions[model.targetKey] = model.producePrediction()
+        scores[model.targetKey] = f'{round(stable, 3)} ({round(test, 3)})'
+        inputs[model.targetKey] = model.showFeatureData()
+        if first or startingPredictions != predictions:
+            first = False
+            if self.api is not None:
+                self.api.send(model, predictions, scores)
+            if self.view is not None:
+                self.view.view(model, predictions, scores)
+                out()
+        out(data=False)
         '''
+    
+    def run(self):
+        ''' Main '''
 
-        def dataWaiter():
-
-            def rest():
-                x = recess or self.recess
-                if x == -1:
-                    while True:
-                        time.sleep(60*60)
-                time.sleep(x)
-
-
+        def subscriber():
+            '''
+            listens for external updates on subscriptions - 
+            turn this into a steam rather than a loop - 
+            triggered from flask app.
+            this should probably be broken out into a service
+            that subscribes and a service that listens...
+            '''
             while True:
-                rest()
-                self.data.runOnce(inputs)
+                time.sleep(.1)
+                self.data.runSubscriber(self.models)
+                
+        def publisher():
+            ''' publishes predictions
+            this should probably be broken out into a service
+            that creates a stream and a service that publishes...
+            '''
+            self.data.runPublisher(self.models)
 
+        def scholar():
+            ''' looks for external data and compiles it '''
+            while True:
+                self.data.runScholar(self.models)
 
         def predictor(model:ModelManager):
+            ''' produces predictions '''
+            model.buildStable()
+            model.runPredictor(self.data)
 
-            def setBuildAgainFlag():
-                nonlocal buildAgain
-                buildAgain = True
-
-            async def rebuild():
-
-                def out(data=True):
-                    if self.view is not None:
-                        self.view.print(**(
-                            {
-                                'Predictions:\n':predictions,
-                                '\nScores:\n':scores
-                            } if data else {model.targetKey: 'loading... '}))
-                
-                first = True
-                while first or buildAgain:
-                    first = False
-                    setBuildAgainFlag()
-                    model.buildStable()
-                    self.predictions[model.targetKey] = model.producePrediction()
-                    out()
-            
-            async doSomething():
-                await rebuild() if not streams.building.value else setBuildAgainFlag()
-            
-            out(data=False)
-            buildAgain = False
-            streams.newModel.events.subscribe(await doSomething())
-            streams.newData.events.subscribe(await doSomething())
-            ## while 
-                
-        def learner(model:ModelManager):
         
-            def rest():
-                
-                time.sleep(cooldown or self.cooldown)
-
-            def out(data=True):
-                if self.view is not None:
-                    self.view.print(**(
-                        {
-                            'Predictions:\n':predictions,
-                            '\nScores:\n':scores
-                        } if data else {model.targetKey: 'loading... '}))
-
-            first = True
+        def explorer(model:ModelManager):
+            ''' loop for producing models -
+            I think more ideally we'd have a loop that searches hyper params 
+            in one model object, we'd also have this explorer which is triggered
+            by new data becoming available in a different object... idk a 
+            hierarchy of model creation? weird... we'll just use a loop
+            and look for new data each iteration. '''
             while True:
-                out(data=False)
-                model.buildStable()
-                predictions[model.targetKey] = model.producePrediction()
-                out()
-                while model.data.shape == self.data.data.shape and model.data.shape[0] > 0:
-                    rest()
-                    startingPredictions = predictions.copy()
-                    model.buildTest()
-                    stable, test = model.evaluateCandidate(returnBoth=True)
-                    predictions[model.targetKey] = model.producePrediction()
-                    scores[model.targetKey] = f'{round(stable, 3)} ({round(test, 3)})'
-                    inputs[model.targetKey] = model.showFeatureData()
-                    if first or startingPredictions != predictions:
-                        first = False
-                        if self.api is not None:
-                            self.api.send(model, predictions, scores)
-                        if self.view is not None:
-                            self.view.view(model, predictions, scores)
-                            out()
-                out(data=False)
+                model.runExplorer(self.data)
+                #stable, test = model.evaluateCandidate(returnBoth=True)
+                #model.buildTest()
 
-        thread = threading.Thread(target=dataWaiter)
-        thread.start()
-        threads = {'dataWaiter': thread}
-        predictions = {}
-        scores = {}
-        inputs = {}
+        publisher()
+        threads = {}
+        threads['subscriber'] = threading.Thread(target=subscriber, daemon=True)
+        threads['scholar'] = threading.Thread(target=scholar, daemon=True)
         for model in self.models:
-            thread = threading.Thread(target=learner, args=[model])
+            predictor(model)
+            #threads[f'{model.targetKey}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
+
+        for thread in threads.values():
             thread.start()
-            threads[model.targetKey] = thread
-            predictions[model.targetKey] = ''
-            scores[model.targetKey] = ''
-            inputs[model.targetKey] = []
+
+        while threading.active_count() > 0:
+            time.sleep(0)
+
+howToRun = '''
+# python .\tests\scratch\interprocess.py
+learner = Learner(
+    data=DataManager(),
+    models={
+        ModelManager(name='A', inputs=[1,2,3]),
+        ModelManager(name='B', inputs=[2,3,4]),
+        ModelManager(name='C', inputs=[3,5,6])
+        }
+    )
+
+learner.run()
+'''

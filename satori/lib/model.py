@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 from itertools import product
 from functools import partial
+from reactivex.subject import BehaviorSubject
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import ppscore
@@ -69,12 +70,21 @@ class ModelManager:
         self.testFeatures = self.chosenFeatures
         self.split = split
         self.featureData = {}
+        self.setupFlags()
         if not override:
             self.load()
         self.get()
         self.produceFeatureStructure()
         self.produceFeatureSet()
 
+    ### FLAGS ################################################################################
+    
+    def setupFlags(self):
+        self.modelUpdated = BehaviorSubject(False)
+        self.inputsUpdated = BehaviorSubject(False)
+        self.predictionUpdated = BehaviorSubject(False)
+        self.newAvailableInput = BehaviorSubject(None)
+    
     ### STATIC FEATURES GENERATORS ###########################################################
 
     @staticmethod
@@ -433,7 +443,8 @@ class ModelManager:
             self.chosenFeatures = self.testFeatures
             self.featureSet = self.testFeatureSet
             self.save()
-            self.buildStable()
+            #self.buildStable() # don't need to build stable becasue predictor does that
+            self.modelUpdated.on_next(True)
         if returnBoth:
             return stable, test
         return max(stable, test)
@@ -460,7 +471,7 @@ class ModelManager:
             return True
         return False
 
-    ### LIFECYCLE ######################################################################
+    ### MAIN PROCESSES #################################################################
 
     def buildStable(self):
         self.get()
@@ -479,3 +490,19 @@ class ModelManager:
         self.produceTestTrainingSet()
         self.produceTestHyperParameters()
         self.produceTestFit()
+    
+    ### LIFECYCLE ######################################################################
+
+    def runExplorer(self, data):
+        
+        def explore(x):
+            #self.syncAvailableInputs(data)
+            self.buildTest()
+            self.evaluateCandidate()
+            
+        ## instead of triggering based on new data, we'll loop continually,
+        ## checking for new data each time.
+        #self.newAvailableInput.subscribe(lambda x: explore(x) if x is not None else None)
+
+
+    
