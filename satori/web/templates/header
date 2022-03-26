@@ -1,0 +1,216 @@
+<!-- EXAMPLE REPLACE WITH BETTER TEMPLATE -->
+
+<body > <!--onload="getNotifications()"-->
+    <header id="header" class="page-topbar">
+          <!-- start header nav-->
+          <div class="navbar-fixed">
+            <nav class="navbar-color gradient-45deg-crimson-monarch">
+              <div class="nav-wrapper">
+                <ul class="left">
+                  <li>
+                    <h1 class="logo-wrapper">
+                      <a href="{{ url_for('home') }}" class="brand-logo darken-1">
+                        <!--img src="{{ url_for('static', filename='img/brand.png') }}" alt=""-->
+                        <span class="logo-text">Satori</span>
+                        <span class="logo-text-small"><i class="material-icons">home</i></span>
+                      </a>
+                    </h1>
+                  </li>
+                </ul>
+    
+                <div class="header-search-wrapper move-search-on-med-and-down">
+                  <i class="material-icons hide-on-med-and-down">search</i>
+                  <div class="dropdown">
+                    <input type="text" name="Search" class="header-search-input z-depth-2 padding-to-eight-on-med-and-down" placeholder="Search" onfocus="searchShow()" onkeyup="searchNavAdd(this)" />
+                    <div id="myDropdown" class="dropdown-content" style="top: 52px; width: -webkit-fill-available;"></div>
+                  </div>
+                </div>
+    
+                <ul class="right">
+                  <!--<li title='Notifications' class='hide-on-med-and-down'>
+                    <a href="{{ url_for('notifications') }}" class="waves-effect waves-block waves-light notification-button" data-activates="notifications-dropdown" onmouseenter="getNotifications()">
+                      <i class="material-icons">notifications_none
+                        <small id="new notification count" class="notification-badge black accent-2" style="display: contents;"></small>
+                      </i>
+                    </a>
+                  </li>-->
+                  <li title='User Settings'>
+                    {% if session['admin'] %}
+                    <a href="{{ url_for('admin')}}" class="waves-effect waves-block waves-light profile-button" data-activates="profile-dropdown">
+                    {% else %}
+                    <a href="{{ url_for('edit_profile_preference', name=user['username']) }}" class="waves-effect waves-block waves-light profile-button" data-activates="profile-dropdown">
+                    {% endif %}
+                      {% if preferences['show_avatar'] and user['avatar'] %}
+                      <span class="avatar-status avatar-online">
+                        <img src="{{ url_for('static', filename='''img/avatar/'''+ user['avatar'] +'''.jpg''') }}" class="profile-pic" alt={{ user['name'] }} style="height: 30px !important; object-fit: cover; width: 30px !important; top: 4px;">
+                      </span>
+                      {% else %}
+                      <i class="material-icons">face</i>
+                      {% endif %}
+                    </a>
+                  </li>
+                  <li title='Full Screen' class='hide-on-med-and-down'>
+                    <a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen">
+                      <i class="material-icons">settings_overscan</i>
+                    </a>
+                  </li>
+                </ul>
+                <ul id="notifications-dropdown" class="dropdown-content">
+                </ul>
+                <ul id="profile-dropdown" class="dropdown-content">
+                  <li>
+                    <a href="{{ url_for('edit_profile_preference', name=user['username']) }}" class="grey-text text-darken-1" title='Profile'>
+                      <i class="material-icons">settings</i> Profile</a>
+                  </li>
+    
+                  <li class="divider"></li>
+                  <li>
+                    {% if report_name %}
+                   <a href="{{ url_for('request_feature', report_name=report_name) }}" class="grey-text text-darken-1">
+                    {% else %}
+                   <a href="{{ url_for('request_feature', report_name='none') }}" class="grey-text text-darken-1">
+                    {% endif %}
+                    <i class="material-icons">cake</i> Suggestion</a>
+                  </li>
+                  <li>
+                    {% if report_name %}
+                   <a href="{{ url_for('report_bug', report_name=report_name) }}" class="grey-text text-darken-1">
+                    {% else %}
+                   <a href="{{ url_for('report_bug', report_name='none') }}" class="grey-text text-darken-1">
+                    {% endif %}
+                    <i class="material-icons">bug_report</i> Report Bug</a>
+                  </li>
+                  <li>
+                    {% if report_name %}
+                   <a href="{{ url_for('request_access', report_name=report_name) }}" class="grey-text text-darken-1">
+                    {% else %}
+                   <a href="{{ url_for('request_access', report_name='none') }}" class="grey-text text-darken-1">
+                    {% endif %}
+                    <i class="material-icons">lock_open</i> Request Access</a>
+                  </li>
+    
+                    {% if session['admin'] %}
+                  <li class="divider"></li>
+                  <li>
+                    <a href="{{ url_for('admin')}}" class="grey-text text-darken-1">
+                      <i class="material-icons">supervisor_account</i> Admin</a>
+                  </li>
+                  <li>
+                    <a href="{{ url_for('send_notification')}}" class="grey-text text-darken-1">
+                      <i class="material-icons">notifications</i> Send Notification</a>
+                  </li>
+                    {% endif %}
+                    {% if not prod %}
+                  <li class="divider"></li>
+                  <li>
+                    <a href="{{ url_for('login') }}" class="grey-text text-darken-1">
+                      <i class="material-icons">keyboard_tab</i> Login</a>
+                  </li>
+                    {% endif %}
+                  <li>
+                    <a href="{{ url_for('logout') }}" class="grey-text text-darken-1">
+                      <i class="material-icons">keyboard_tab</i> Logout</a>
+                  </li>
+                </ul>
+              </div>
+            </nav>
+          </div>
+          <!-- end header nav-->
+        </header>
+        <!-- END HEADER -->
+    
+    
+        <style>
+        .dropdown-content a {
+          color: black;
+          padding: 12px 16px;
+          text-decoration: none;
+          display: block;
+        }
+    
+        .dropdown a:hover {background-color: #ddd;}
+    
+        .show {display: block;}
+        </style>
+        <script>
+        function searchToggle() {
+          document.getElementById("myDropdown").classList.toggle("show");
+        }
+        function searchShow() {
+          document.getElementById("myDropdown").classList.add("show");
+        }
+        function searchHide() {
+          document.getElementById("myDropdown").classList.remove("show");
+        }
+        function searchNavAdd(search) {
+          if(search.value !== ""){
+            searchShow();
+            var allids = document.querySelectorAll('*[id]');
+            console.log(allids)
+            var drop_down = document.getElementById("myDropdown");
+            drop_down.innerHTML = "";
+            var children = drop_down.children;
+            cloned_ids = []
+            for(var i = 0; i < allids.length; i++){
+              if(allids[i].id.toLowerCase().includes("nav__")) {
+                if(!cloned_ids.includes(allids[i].id)) {
+                  if(allids[i].id.toLowerCase().includes(search.value.toLowerCase())) {
+                    cloned_ids.push(allids[i].id);
+                    let clone = allids[i].cloneNode(true);
+                    let div_item = clone.querySelector("#nav_item");
+                    div_item.innerHTML = clone.innerHTML.split("</i>")[1]
+                    let clone_p = document.createElement("span");
+                    clone.id = "";
+                    // this wont work now, the id doesn't know what folder this report is in:
+                    clone_p.style = "font-size: .7rem!important; color:grey!important; margin:0px 0px 0px 15px;";
+                    //clone_p.innerHTML = "(" + allids[i].id.split("__")[1]+")";
+                    clone_p.innerHTML = clone.querySelector("#lineage").innerHTML;
+                    div_item.appendChild(clone_p);
+                    drop_down.appendChild(clone);
+                  }
+                }
+              }
+            }
+          } else {
+            searchHide();
+          }
+        }
+        </script>
+    <!--
+    We are hiding Notifications so we don't need this running on the page: 
+        function getNotifications() {
+            const url = '{{ url_for("get_new_notifications") }}'
+            fetch(url)
+              .then((data)=> data.json())
+              .then(function(messages){
+                  let len = messages.length;
+                  document.getElementById("new notification count").innerHTML=len;
+                  if (len == 0){
+                      document.getElementById("new notification count").style.display="none";
+                  }
+                  else {
+                      document.getElementById("new notification count").style.display="contents";
+                  }
+                  console.log(len)
+                  let new_html = `<li>
+                    <a href="{{ url_for('notifications') }}"
+                    <h6>NOTIFICATIONS
+                      <span class="new badge">${len}</span>
+                    </h6></a>
+                  </li>
+                  <li class="divider"></li>`
+                  messages.forEach(function(message){
+                      let title = message.notification_title;
+                      let timestamp = message.created;
+                      new_html += `<li>
+                    <a href="{{ url_for('notifications') }}" class="grey-text text-darken-2">
+                      <span class="material-icons icon-bg-circle cyan small"></span>${title}</a>
+                    <time class="media-meta" datetime="${timestamp}">${timestamp}</time>
+                  </li>`
+                  });
+                  document.getElementById("notifications-dropdown").innerHTML=new_html;
+              })
+        }
+        </script>
+    -->
+    

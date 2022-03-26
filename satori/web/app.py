@@ -91,7 +91,7 @@ def test():
 
 @app.route('/kwargs')
 def kwargs():
-    ''' insight.wcf.com/kwargs?0-name=widget_name0&0-value=widget_value0&0-type=widget_type0&1-name=widget_name1&1-value=widget_value1&1-#type=widget_type1 '''
+    ''' ...com/kwargs?0-name=widget_name0&0-value=widget_value0&0-type=widget_type0&1-name=widget_name1&1-value=widget_value1&1-#type=widget_type1 '''
     kwargs = {}
     for i in range(25):
         if request.args.get(f'{i}-name') and request.args.get(f'{i}-value'):
@@ -111,7 +111,20 @@ def ping():
 @app.route('/')
 @app.route('/dashboard')
 def dashboard():
-    ''' UI '''
+    ''' 
+    UI
+    - send to setup process if first time running the app...
+    - show earnings
+    - access to wallet
+    - access metrics for published streams
+        (which streams do I have?)
+        (how often am I publishing to my streams?)
+    - access to data management (monitor storage resources)
+    - access to model metrics 
+        (show accuracy over time)
+        (model inputs and relative strengths)
+        (access to all predictions and the truth)
+    '''
     resp = {}
     return render_template('dashboard.html', **resp)
 
@@ -130,6 +143,12 @@ def update():
     will, if used by any current best models, notify that model's predictor
     thread via a subject that a new observation is available by providing the
     observation directly in the subject).
+    
+    This app needs to create the DataManager, ModelManagers, and Learner in
+    in order to have access to those objects. Specifically the DataManager,
+    we need to be able to access it's BehaviorSubjects at data.newData
+    so we can call .on_next() here to pass along the update got here from the 
+    Streamr LightClient, and trigger a new prediction.
     '''
     resp = {}
     return render_template('dashboard.html', **resp)

@@ -1,0 +1,87 @@
+<!-- EXAMPLE REPLACE WITH BETTER TEMPLATE -->
+
+<aside id="left-sidebar-nav">
+    <!--<ul id="slide-out" class="side-nav fixed leftside-navigation" style="transform: translateX(-100%);">-->
+    <ul id="slide-out" class="side-nav leftside-navigation" style="z-index : 1;">
+      <li class="no-padding" style="margin-top: 15px;">
+        <!--
+          this is where Alerts belongs:
+          we'll have to put it back here once we sub-divide alerts into groups like Policy and Claims, etc.
+          we'll want to put them as sub-categories of this Alerts header.
+          until then we're going to put them in header.html -> notifications' drop down.
+        -->
+        <ul class="collapsible" data-collapsible="accordion">
+  
+        </ul>
+  
+        <ul class="collapsible" data-collapsible="accordion">
+          {% if alert_types %}
+            <li display='hidden'>
+              <div class="collapsible-header">Alerts</div>
+              <div class="collapsible-body">
+                {% for alert_type in alert_types %}
+                  <a href="{{ url_for(alert_type.lower() + '_alerts') }}">
+                    <div id="nav_item"><i class="material-icons" style="margin-left: 16px;">email</i> {{ alert_type }}</div>
+                  </a>
+                {% endfor %}
+              </div>
+            </li>
+          {% endif %}
+            <li display='hidden'>
+              <hr />
+            </li>
+          <!-- since side navs are dynamically nested, html is generated in get_side_nav in flask -->
+          {% if sidenavs %}
+            {{ sidenavs }}
+          {% endif %}
+            <li display='hidden'>
+              <hr />
+            </li>
+            <li display='hidden'>
+              <div class="collapsible-header">Lab</div>
+              <div class="collapsible-body">
+                <!--<div class="row" style="margin-bottom: 0px;">
+                  <div class="col s12 m12">
+                    <ul class="collapsible" data-collapsible="accordion">
+                      <li>
+                        <div class="collapsible-header">Experiments</div>
+                        <div class="collapsible-body">-->
+                          <a href="{{ url_for('lab_create') }}" target="_blank">
+                            <div id="nav_item"><i class="material-icons" style="margin-left: 16px;">add</i>create</div>
+                          </a>
+                        <!--</div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>-->
+                <!--
+                <div class="row" style="margin-bottom: 0px;">
+                  <div class="col s12 m12">
+                    <ul class="collapsible" data-collapsible="accordion">
+                      <li>
+                        <div class="collapsible-header">Shared with Me</div>
+                        <div class="collapsible-body">
+                          <a href="{{ url_for('lab_create') }}" target="_blank">
+                            <div id="nav_item"><i class="material-icons" style="margin-left: 16px;">color_lens</i>...</div>
+                          </a>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                -->
+              </div>
+            </li>
+  
+        </ul>
+      </li>
+    </ul>
+    <a href="#" data-activates="slide-out" class="sidebar-collapse"><!-- btn-floating btn-small waves-effect waves-light hide-on-large-only -->
+      <i class="material-icons">menu</i>
+    </a>
+  </aside>
+  
+  
+  <!--tableau: title, text_fields-->
+  <!--iframe: crop_square-->
+  
