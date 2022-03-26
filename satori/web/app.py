@@ -20,6 +20,7 @@ import os
 import sys
 import random
 import secrets
+import satori
 import requests
 import pandas as pd
 import datetime as dt
@@ -38,6 +39,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 CWD = os.path.dirname(os.path.abspath(__file__))
 PORT = 24685
+
+ENGINE = satori.getLearner(path=None)
 
 ###############################################################################
 ## Functions ##################################################################

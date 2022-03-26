@@ -4,7 +4,7 @@ from .data import DataManager
 from .model import ModelManager
 from .view import View
 
-class Learner:
+class Engine:
 
     def __init__(
         self,
@@ -110,7 +110,7 @@ class Learner:
 
 howToRun = '''
 # python .\tests\scratch\interprocess.py
-learner = Learner(
+learner = Engine(
     data=DataManager(),
     models={
         ModelManager(name='A', inputs=[1,2,3]),

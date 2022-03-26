@@ -23,7 +23,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import ppscore
 from xgboost import XGBRegressor
-from .kind import HyperParameter
+from .structs import HyperParameter
 
 
 class ModelManager:

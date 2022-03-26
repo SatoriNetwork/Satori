@@ -4,13 +4,13 @@ import pandas as pd
 import satori
 
 # accept optional data necessary to generate models data and learner
-def getLearner(path=None):
+def getEngine(path=None):
     '''
-    called by the flask app to start the Learner.
-    returns None or Learner.
+    called by the flask app to start the Engine.
+    returns None or Engine.
     
     returns None if no memory of data or models is found (first run)
-    returns Learner if memory of data or models is found or provided.
+    returns Engine if memory of data or models is found or provided.
     ''' 
     
     def getExistingDataManager():
@@ -55,7 +55,7 @@ def getLearner(path=None):
         return data
     
     def getExistingModelManager():
-        ''' generate a set of Model(s) for Learner '''
+        ''' generate a set of Model(s) for Engine '''
         
         def generateCombinedFeature(df:pd.DataFrame=None, columns:'list(str)'=None, prefix='Diff'):
             '''
@@ -125,7 +125,7 @@ def getLearner(path=None):
                 targetKey='Close',
                 **kwargs)}
                     
-    return satori.Learner(
+    return satori.Engine(
         view=satori.View(),
         data=getExistingDataManager(),
         models=getExistingModelManager())
