@@ -11,9 +11,9 @@ def args_to_config_path(*args, root: callable) -> str:
     elif len(args) == 1:
         args = [f'{args[0]}.yaml']
     else:
-        vars = [arg for arg in args[:-1]]
-        vars.append(f'{args[-1]}.yaml')
-        args = vars
+        variables = [arg for arg in args[:-1]]
+        variables.append(f'{args[-1]}.yaml')
+        args = variables
     args.insert(0, 'config')
     return root(*args)
 

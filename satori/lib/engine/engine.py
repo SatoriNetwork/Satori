@@ -69,7 +69,8 @@ class Engine:
                 self.data.runSubscriber(self.models)
                 
         def publisher():
-            ''' publishes predictions on demand
+            '''
+            publishes predictions on demand
             this should probably be broken out into a service
             that creates a stream and a service that publishes...
             '''
@@ -93,18 +94,24 @@ class Engine:
             while True:
                 model.runExplorer()
 
+        def watcher(model:ModelManager):
+            if self.view:
+                self.view.listen(model)
+   
         publisher()
         threads = {}
         threads['subscriber'] = threading.Thread(target=subscriber, daemon=True)
         threads['scholar'] = threading.Thread(target=scholar, daemon=True)
         for model in self.models:
+            model.buildStable() # we have to run this once for each model to complete its initialization
             predictor(model)
             sync(model)
+            watcher(model)
             threads[f'{model.targetKey}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
 
         for thread in threads.values():
             thread.start()
-
+        
         while threading.active_count() > 0:
             time.sleep(0)
 

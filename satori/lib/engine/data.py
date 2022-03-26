@@ -1,4 +1,7 @@
 '''
+the DataManager should save the streams to a database on disk as a parquet file
+so that the model managers can get their data easily.
+
 the DataManager object could even run as a separate server.
 it should be as light weight as possible, handling data streams and their
 updates constantly. any downtime it has should be spent aggregating new
@@ -176,13 +179,13 @@ class DataManager:
                 
 
     def runPublisher(self, models):
-        def publish(modelName, prediction):
+        def publish(model):
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
-            #model.predictionUpdated.on_next(False)
-            #print(f'Publishing: {modelName}: {prediction}')
+            model.predictionUpdated.on_next(False)
+            print(f'Publishing: {model.targetKey}: {model.prediction}')
             
         for model in models:
-            self.listeners.append(model.predictionUpdated.subscribe(lambda x: publish(*x) if x is not None else None))
+            self.listeners.append(model.predictionUpdate.subscribe(lambda x: publish(x) if x is not None else None))
     
     def runScholar(self, models):
         ''' download histories and tell model sync '''

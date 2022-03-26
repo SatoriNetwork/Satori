@@ -35,11 +35,27 @@ class JupyterView(View):
 
     def __init__(self, points:int=7):
         self.points = points
+        self.predictions = {}
+        self.scores = {}
+        self.listeners = []
+        
+    def listen(self, model):
+        def gatherPrediction(model):
+            self.predictions[model.targetKey] = model.prediction
+            self.view(model)
+            
+        def gatherScores(model):
+            self.scores[model.targetKey] = f'{round(model.stable, 3)} ({round(model.test, 3)})'
+            self.view(model)
+            
+        self.listeners.append(model.predictionUpdate.subscribe(lambda x: gatherPrediction(x) if x else None))
+        self.listeners.append(model.modelUpdated.subscribe(lambda x: gatherScores(x) if x else None))
+        
 
-    def view(self, model, predictions:dict, scores:dict):
-        self.jupyterOut(model, predictions, scores)
+    def view(self, model):
+        self.jupyterOut(model)
 
-    def jupyterOut(self, model, predictions:dict, scores:dict):
+    def jupyterOut(self, model):
 
         def lineWidth(score:str) -> float:
             try:
@@ -55,14 +71,14 @@ class JupyterView(View):
         ## to show confidence with linewidth:
         ax = None
         for ix, col in enumerate(model.data.columns.tolist()):
-            print(model.targetKey, predictions.get(col))
+            print(model.targetKey, self.predictions.get(col))
             ax = (model.data.iloc[-1*self.points:, [ix]]
-                .append(pd.DataFrame({col: [predictions.get(col, 0)]}))
+                .append(pd.DataFrame({col: [self.predictions.get(col, 0)]}))
                 .reset_index(drop=True)
                 .plot(
                     **{'ax': ax} if ax is not None else {},
                     figsize=(8,5),
-                    linewidth=lineWidth(scores.get(col, 0))))
+                    linewidth=lineWidth(self.scores.get(col, 0))))
         clear_output()
         plt.show()
 

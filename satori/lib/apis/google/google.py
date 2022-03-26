@@ -6,7 +6,7 @@ import datetime as dt
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from honey import config
+from satori import config
 
 class Google:
     def __init__(self) -> None:

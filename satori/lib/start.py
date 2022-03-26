@@ -2,6 +2,7 @@ from itertools import product
 from functools import partial
 import pandas as pd
 import satori
+import os
 
 # accept optional data necessary to generate models data and learner
 def getEngine(path=None):
@@ -13,7 +14,7 @@ def getEngine(path=None):
     returns Engine if memory of data or models is found or provided.
     ''' 
     
-    def getExistingDataManager():
+    def getExistingDataManager(dataSettings:dict = None):
         ''' generates DataManager from data on disk '''
 
         def getNewData():
@@ -22,7 +23,7 @@ def getEngine(path=None):
                 yield pd.DataFrame(future.loc[i]).T
                 
         try:
-            df = pd.read_csv("./example/EUR=X-simpleCleaned.csv")
+            df = pd.read_csv(satori.config.dataPath(dataSettings.get('subscription database')))
         except Exception as e:
             print(e)
             # example of data:
@@ -124,8 +125,11 @@ def getEngine(path=None):
                 modelPath='modelClose.joblib',
                 targetKey='Close',
                 **kwargs)}
-                    
+    
+    dataSettings = satori.config.dataSettings()
+    if dataSettings != {}:
+        return None
     return satori.Engine(
         view=satori.View(),
-        data=getExistingDataManager(),
+        data=getExistingDataManager(dataSettings),
         models=getExistingModelManager())

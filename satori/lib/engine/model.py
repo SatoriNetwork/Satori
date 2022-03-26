@@ -82,7 +82,7 @@ class ModelManager:
     def setupFlags(self):
         self.modelUpdated = BehaviorSubject(False)
         self.inputsUpdated = BehaviorSubject(False)
-        self.predictionUpdated = BehaviorSubject(False)
+        self.predictionUpdate = BehaviorSubject(None)
         self.newAvailableInput = BehaviorSubject(None)
     
     ### STATIC FEATURES GENERATORS ###########################################################
@@ -443,8 +443,9 @@ class ModelManager:
             self.chosenFeatures = self.testFeatures
             self.featureSet = self.testFeatureSet
             self.save()
-            self.modelUpdated.on_next(True)
-
+            return True
+        return False
+    
     ### SAVE ###########################################################################
 
     def save(self):
@@ -493,7 +494,7 @@ class ModelManager:
         def makePrediction():
             self.buildStable()
             self.prediction = self.producePrediction()
-            self.predictionUpdated.on_next([self.targetKey, self.prediction])
+            self.predictionUpdate.on_next(self)
         
         def makePredictionFromNewModel():
             self.modelUpdated.on_next(False)
@@ -506,12 +507,13 @@ class ModelManager:
             self.inputsUpdated.on_next(False)
             makePrediction()
                 
-        self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x is not None else None)
-        self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(data) if x is not None else None)
+        self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x else None)
+        self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(data) if x else None)
         
     def runExplorer(self):
         self.buildTest()
-        self.evaluateCandidate()
+        if self.evaluateCandidate():
+            self.modelUpdated.on_next(self)
     
     def syncAvailableInputs(self, data):
         
