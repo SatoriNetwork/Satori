@@ -76,8 +76,8 @@ class Engine:
             should be on demand
             '''
             while True:
-                time.sleep(.1)
                 self.data.runSubscriber(self.models)
+                time.sleep(10)
                 
         def publisher():
             '''
@@ -90,6 +90,7 @@ class Engine:
         def scholar():
             ''' always looks for external data and compiles it '''
             while True:
+                time.sleep(1)
                 self.data.runScholar(self.models)
 
         def predictor(model:ModelManager):
@@ -102,11 +103,8 @@ class Engine:
 
         def explorer(model:ModelManager):
             ''' always looks for a better model '''
-            i = 0
             while True:
-                i += 1
                 model.runExplorer()
-                print(i)
 
         def watcher(model:ModelManager):
             ''' for reactive views... '''
@@ -121,25 +119,22 @@ class Engine:
             model.buildStable() # we have to run this once for each model to complete its initialization
             predictor(model)
             sync(model)
-            if self.view.isReactive:
+            if self.view and self.view.isReactive:
                 watcher(model)
             threads[f'{model.targetKey}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
-
         for thread in threads.values():
             thread.start()
-        
         while threading.active_count() > 0:
-            time.sleep(0)
-            #print('while loop')
-            #if not self.view.isReactive:
-            #    #self.updateView(
-            #    self.out(
-            #    predictions = {
-            #        model.targetKey: model.prediction
-            #        for model in self.models},
-            #    scores = {
-            #        model.targetKey: f'{round(model.stable, 3)} ({round(model.test, 3)})'
-            #        for model in self.models})
+            time.sleep(31)
+            if not self.view.isReactive:
+                #self.updateView(
+                self.out(
+                predictions = {
+                    model.targetKey: model.prediction
+                    for model in self.models},
+                scores = {
+                    model.targetKey: f'{round(model.stable, 3)} ({round(model.test, 3)})'
+                    for model in self.models})
                 
                 
 

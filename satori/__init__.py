@@ -9,3 +9,5 @@ from satori.lib.engine import ModelManager
 from satori.lib.engine import HyperParameter
 from satori.lib.engine.view import View
 from satori.lib.engine.view import JupyterView
+from satori.lib.engine.view import JupyterViewReactive
+

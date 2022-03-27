@@ -12,6 +12,8 @@ Basic Reponsibilities of the ModelManager:
 4. save the best model details and load them upon restart
 '''
 import os
+import copy
+import time
 import random
 import joblib
 import numpy as np
@@ -20,6 +22,7 @@ import datetime as dt
 from itertools import product
 from functools import partial
 from reactivex.subject import BehaviorSubject
+from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import ppscore
@@ -71,6 +74,8 @@ class ModelManager:
         self.testFeatures = self.chosenFeatures
         self.split = split
         self.featureData = {}
+        self.xgbInUse = False
+        self.xgb = None
         self.setupFlags()
         if not override:
             self.load()
@@ -207,11 +212,14 @@ class ModelManager:
                 keys=[s.name for s in producedFeatures])
 
     def produceFeatureImportance(self):
-        self.featureImports = {name: fimport for fimport, name in zip(self.xgb.feature_importances_, self.featureSet.columns)}
+        self.featureImports = {
+            name: fimport
+            for fimport, name in zip(self.xgbStable.feature_importances_, self.featureSet.columns)
+        } if self.xgbStable else {}
 
     def leastValuableFeature(self):
-        if len(self.xgb.feature_importances_) == len(self.chosenFeatures):
-            matched = [(val, idx) for idx, val in enumerate(self.xgb.feature_importances_)]
+        if len(self.xgbStable.feature_importances_) == len(self.chosenFeatures):
+            matched = [(val, idx) for idx, val in enumerate(self.xgbStable.feature_importances_)]
             candidates = []
             for pair in matched:
                 if pair[0] not in self.pinnedFeatures:
@@ -311,6 +319,7 @@ class ModelManager:
             df, self.target.iloc[0:df.shape[0], :], test_size=self.split or 0.2, shuffle=False)
 
     def produceFit(self):
+        self.xgbInUse = True
         self.xgb = XGBRegressor(**{param.name: param.value for param in self.hyperParameters})
         self.xgb.fit(
             self.trainX,
@@ -319,6 +328,9 @@ class ModelManager:
             eval_metric='mae',
             early_stopping_rounds=200,
             verbose=False)
+        #self.xgbStable = copy.deepcopy(self.xgb) ## didn't fix it.
+        self.xgbStable = self.xgb
+        self.xgbInUse = False
 
     def produceTestFit(self):
         self.xgbTest = XGBRegressor(**{param.name: param.test for param in self.hyperParameters})
@@ -483,8 +495,6 @@ class ModelManager:
         self.produceFeatureData()
 
     def buildTest(self):
-        with open('runningbuildtest.text', 'w') as f:
-            f.write(str(dt.datetime.now()))
         self.produceTestFeatures()
         self.produceTestFeatureSet()
         self.produceTestTrainingSet()
@@ -512,10 +522,29 @@ class ModelManager:
         self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(data) if x else None)
         
     def runExplorer(self):
-        print('running EXPLORER')
-        self.buildTest()
-        if self.evaluateCandidate():
-            self.modelUpdated.on_next(self)
+        try:
+            self.buildTest()
+            if self.evaluateCandidate():
+                self.modelUpdated.on_next(self)
+        except NotFittedError as e:
+            '''
+            this happens on occasion...
+            maybe making  self.xgbStable a deepcopy would fix
+            '''
+            #print('not fitted', e)
+            pass
+        except AttributeError as e:
+            ''' 
+            this happens at the beginning of running when we have not set
+            self.xgbStable yet.
+            
+            '''
+            #print('Attribute', e)
+            pass
+        except Exception as e:
+            print('UNEXPECTED', e)
+            
+            
     
     def syncAvailableInputs(self, data):
         

@@ -35,6 +35,7 @@ Basic Reponsibilities of the DataManager:
 4. garbage collect stale datastreams
 '''
 import pandas as pd
+import datetime as dt
 from reactivex.subject import BehaviorSubject
 
 class DataManager:
@@ -154,7 +155,8 @@ class DataManager:
 
     def run(self, inputs:dict = None) -> bool:
         ''' runs all three steps '''
-        self.importance(inputs)
+        if inputs:
+            self.importance(inputs)
         self.get()
         if self.validate():
             self.append()
@@ -170,10 +172,9 @@ class DataManager:
         ''' triggered from the flask app '''
         
         def tell(models):
-            # maybe save the data first or something, idk.
-            for model in models:
-                #if they are listening to the stream:
-                model.inputsUpdated.on_next(True)
+            if self.runOnce():
+                for model in models:
+                    model.inputsUpdated.on_next(True)
         
         self.listeners.append(self.newData.subscribe(lambda x: tell(models) if x is not None else None))
                 
@@ -181,7 +182,8 @@ class DataManager:
     def runPublisher(self, models):
         def publish(model):
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
-            print(f'Publishing: {model.targetKey}: {model.prediction}')
+            with open(f'{model.targetKey}.txt', 'w') as f:
+                f.write(f'{model.prediction}, {str(dt.datetime.now())} {model.prediction}')
             
         for model in models:
             self.listeners.append(model.predictionUpdate.subscribe(lambda x: publish(x) if x else None))
