@@ -139,15 +139,5 @@ class Engine:
                 
 
 howToRun = '''
-# python .\tests\scratch\interprocess.py
-learner = Engine(
-    data=DataManager(),
-    models={
-        ModelManager(name='A', inputs=[1,2,3]),
-        ModelManager(name='B', inputs=[2,3,4]),
-        ModelManager(name='C', inputs=[3,5,6])
-        }
-    )
-
-learner.run()
+# see example notebook
 '''
