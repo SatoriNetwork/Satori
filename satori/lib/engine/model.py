@@ -16,6 +16,7 @@ import random
 import joblib
 import numpy as np
 import pandas as pd
+import datetime as dt
 from itertools import product
 from functools import partial
 from reactivex.subject import BehaviorSubject
@@ -482,6 +483,8 @@ class ModelManager:
         self.produceFeatureData()
 
     def buildTest(self):
+        with open('runningbuildtest.text', 'w') as f:
+            f.write(str(dt.datetime.now()))
         self.produceTestFeatures()
         self.produceTestFeatureSet()
         self.produceTestTrainingSet()
@@ -497,20 +500,19 @@ class ModelManager:
             self.predictionUpdate.on_next(self)
         
         def makePredictionFromNewModel():
-            self.modelUpdated.on_next(False)
             makePrediction()
         
         def makePredictionFromNewInputs(data):
             ## add incremental updates to inmemory model dataset - something like this:
             #for i in self.inputs:
             #    self.updates[i] = data.updates.get(i)
-            self.inputsUpdated.on_next(False)
             makePrediction()
                 
         self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x else None)
         self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(data) if x else None)
         
     def runExplorer(self):
+        print('running EXPLORER')
         self.buildTest()
         if self.evaluateCandidate():
             self.modelUpdated.on_next(self)

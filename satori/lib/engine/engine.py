@@ -27,7 +27,7 @@ class Engine:
             self.models = {self.models + [model]}
 
     
-    def out(self, data=True):
+    def out(self, predictions, scores, data=True, model=None):
         ''' old functionality that must be accounted for in new design
         if self.view is not None:
             self.view.print(**(
@@ -36,9 +36,16 @@ class Engine:
                     '\nScores:\n':scores
                 } if data else {model.targetKey: 'loading... '}))
         '''
+        self.view.print(**(
+            {
+                'Predictions:\n':predictions,
+                '\nScores:\n':scores
+            } if data else {model.targetKey: 'loading... '}))
 
-    def updateView(self, data=True):
-        ''' old functionality that must be accounted for in new design
+    def updateView(self, predictions, scores):
+        '''
+        old functionality that must be accounted for in new design
+        non-reactive jupyter view
         predictions[model.targetKey] = model.producePrediction()
         scores[model.targetKey] = f'{round(stable, 3)} ({round(test, 3)})'
         inputs[model.targetKey] = model.showFeatureData()
@@ -51,6 +58,10 @@ class Engine:
                 out()
         out(data=False)
         '''
+        if self.view is not None:
+            self.view.view(self.data, predictions, scores)
+                #out()
+        #out(data=False)
     
     def run(self):
         ''' Main '''
@@ -91,10 +102,14 @@ class Engine:
 
         def explorer(model:ModelManager):
             ''' always looks for a better model '''
+            i = 0
             while True:
+                i += 1
                 model.runExplorer()
+                print(i)
 
         def watcher(model:ModelManager):
+            ''' for reactive views... '''
             if self.view:
                 self.view.listen(model)
    
@@ -106,7 +121,8 @@ class Engine:
             model.buildStable() # we have to run this once for each model to complete its initialization
             predictor(model)
             sync(model)
-            watcher(model)
+            if self.view.isReactive:
+                watcher(model)
             threads[f'{model.targetKey}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
 
         for thread in threads.values():
@@ -114,6 +130,18 @@ class Engine:
         
         while threading.active_count() > 0:
             time.sleep(0)
+            #print('while loop')
+            #if not self.view.isReactive:
+            #    #self.updateView(
+            #    self.out(
+            #    predictions = {
+            #        model.targetKey: model.prediction
+            #        for model in self.models},
+            #    scores = {
+            #        model.targetKey: f'{round(model.stable, 3)} ({round(model.test, 3)})'
+            #        for model in self.models})
+                
+                
 
 howToRun = '''
 # python .\tests\scratch\interprocess.py

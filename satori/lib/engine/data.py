@@ -181,11 +181,10 @@ class DataManager:
     def runPublisher(self, models):
         def publish(model):
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
-            model.predictionUpdated.on_next(False)
             print(f'Publishing: {model.targetKey}: {model.prediction}')
             
         for model in models:
-            self.listeners.append(model.predictionUpdate.subscribe(lambda x: publish(x) if x is not None else None))
+            self.listeners.append(model.predictionUpdate.subscribe(lambda x: publish(x) if x else None))
     
     def runScholar(self, models):
         ''' download histories and tell model sync '''

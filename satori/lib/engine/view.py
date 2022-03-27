@@ -9,7 +9,7 @@ class View:
 
     def __init__(self):
         ''' no need '''
-        pass
+        self.isReactive = False
 
     @staticmethod
     def pretty(x:dict):
@@ -34,6 +34,47 @@ class JupyterView(View):
     '''
 
     def __init__(self, points:int=7):
+        self.points = points
+        super().__init__()
+
+    def view(self, data, predictions:dict, scores:dict):
+        self.jupyterOut(data, predictions, scores)
+
+    def jupyterOut(self, data, predictions:dict, scores:dict):
+
+        def lineWidth(score:str) -> float:
+            try:
+                score = (float(score.split()[0])+1)**3
+            finally:
+                score = None
+            return min(abs(score or .1), 1)
+
+        #(model.data.iloc[-1*self.points:]
+        #    .append(pd.DataFrame({k: [v] for k, v in predictions.items()}))
+        #    .reset_index(drop=True)
+        #    .plot(figsize=(8,5), linewidth=3))
+        ## to show confidence with linewidth:
+        ax = None
+        for ix, col in enumerate(data.columns.tolist()):
+            ax = (data.iloc[-1*self.points:, [ix]]
+                .append(pd.DataFrame({col: [predictions.get(col, 0)]}))
+                .reset_index(drop=True)
+                .plot(
+                    **{'ax': ax} if ax is not None else {},
+                    figsize=(8,5),
+                    linewidth=lineWidth(scores.get(col, 0))))
+        clear_output()
+        plt.show()
+
+class JupyterViewReactive(View):
+    '''
+    holds functionality for viewing model results in a jupyter notebook
+    (restored the original version above because this version doesn't work
+    in the reactive architecture we have)
+    '''
+
+    def __init__(self, points:int=7):
+        self.isReactive = True
         self.points = points
         self.predictions = {}
         self.scores = {}
@@ -60,7 +101,8 @@ class JupyterView(View):
         def lineWidth(score:str) -> float:
             try:
                 score = (float(score.split()[0])+1)**3
-            finally:
+            except Exception as e:
+                print(e)
                 score = None
             return min(abs(score or .1), 1)
 
@@ -71,7 +113,7 @@ class JupyterView(View):
         ## to show confidence with linewidth:
         ax = None
         for ix, col in enumerate(model.data.columns.tolist()):
-            print(model.targetKey, self.predictions.get(col))
+            print(model.targetKey, self.predictions.get(col), col)
             ax = (model.data.iloc[-1*self.points:, [ix]]
                 .append(pd.DataFrame({col: [self.predictions.get(col, 0)]}))
                 .reset_index(drop=True)
