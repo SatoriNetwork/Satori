@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre:wght@300&display=swap" rel="stylesheet">
@@ -8,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre:wght@300&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
   <link rel="icon" href="./assets/site/favicon512.ico">
+  <link href="./assets/timeline/style.css" rel="stylesheet">
   <style>
     iframe {
         /*
@@ -199,6 +201,86 @@
     <!--<img src="https://cdn2.vectorstock.com/i/1000x1000/94/21/wireframe-globe-sphere-connectivity-network-tech-vector-13669421.jpg" height=250 width=250>
     <img src="https://irp-cdn.multiscreensite.com/783fafb0/dms3rep/multi/metodologia-growth-driven-thinking-white.gif">
     <iframe src="https://giphy.com/embed/ftAyb0CG1FNAIZt4SO" width="480" height="270" frameBorder="0"></iframe>-->
+    <p style="color:white;">✔</p>
+    <center>
+    <h1 class="textFontButton">Timeline</h1>
+    <div class="timeline">
+      <div class="heading">
+        <div class="content">
+          <h1>Progress
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Milestones</h1>
+        </div>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="containerComplete left">
+        <div class="content">
+          <h2>November 2021</h2>
+          <p><b>Satori Network conceptualized:</b> a network of computing nodes all working together to predict the future of everything.</p>
+        </div>
+      </div>
+      <div class="containerComplete right">
+        <div class="content">
+          
+          <h2>December 2021</h2>
+          <p><b>Core Proof of concept produced.</b> The core of a Satori Node is an automated all-purpose prediction engine.</p>
+        </div>
+      </div>
+      <div class="containerComplete left">
+        <div class="content">
+          <h2>February 2021</h2>
+          <p><b>Streamr chosen as publish-subscribe solution.</b> Satori Nodes need to communicate with each other and obtain real world data, they will do so using the Streamr network.</p>
+        </div>
+      </div>
+      <div class="containerComplete left">
+        <div class="content">
+          <h2>March 2021</h2>
+          <p><b>Modular Satori Node software designed.</b> Each node contains a UI, a Streamr light client, a wallet, and a generalized predictive engine.</p>
+        </div>
+      </div>
+      <div class="containerComplete left">
+        <div class="content">
+          <h2>April 2021</h2>
+          <p><b>Core proof of concept improved:</b> Single threaded proof of concept rebuilt to fit the reactive, multi-threaded modular design.</p>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <h2>Q2 2021</h2>
+          <p><b>Prediction Engine Optimized.</b> The core prediction engine needs to support all forms of data and come prebuilt with advanced automated machine learning capabilities.</p>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <h2>Q2 2021</h2>
+          <p><b>Publish-subscribe Integration.</b> The Streamr light client must be integrated in order to provide the engine with the data it needs.</p>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <h2>Q3 2021</h2>
+          <p><b>Wallet Integration.</b> Satori needs the use of distributed consensus for incentive structures as well as for purposes of coordiation such as community voting, competition, and bounties. A platform needs to be chosen, smart contracts written and communication with the DLT must be represented in the node in the form of a wallet.</p>
+        </div>
+      </div>
+      <div class="container right">
+        <div class="content">
+          <h2>Q4 2021</h2>
+          <p><b>UI Integration.</b> The user of a Satori Node needs to have a seamless and straightforward UI. It should show statistics about the node's performance, all the user to access their wallet and view their earnings as well as facilitate some basic customization. Advanced customization can be achieved through config files for power users who may want to swap out the all-purpose algorithms for specialized ones.</p>
+        </div>
+      </div>
+    </div>
+    <div class="timelineEnd">
+      <div class="heading">
+        <div class="content">
+          <h2>Q2 2022</h2>
+          <p><b>Satori Launch</b></p>
+        </div>
+      </div>
+    </div>
+  </center>
   </div>
 </template>
 
@@ -207,6 +289,10 @@
     var temp = document.getElementById("template2");
     var clon = temp.content.cloneNode(true);
     document.getElementById("demo").innerHTML = temp.innerHTML;
+    timelineApp(document.querySelectorAll('timeline'), {
+      mode: 'horizontal',
+      forceVerticalWidth: 80
+    });
   }
 </script>
 
