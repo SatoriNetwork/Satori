@@ -1,6 +1,7 @@
 from satori import config
 from satori.lib import engine
 from satori.lib import apis
+from satori.lib import spoof
 from satori.lib.engine import view
 from satori.lib.start import getEngine
 from satori.lib.engine import Engine

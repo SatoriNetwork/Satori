@@ -19,6 +19,7 @@ is easiest to implement.
 import os
 import sys
 import random
+import threading
 import secrets
 import satori
 import requests
@@ -37,10 +38,13 @@ from waitress import serve
 app = Flask(__name__)
 #Mobility(app)
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
-CWD = os.path.dirname(os.path.abspath(__file__))
-PORT = 24685
+#CWD = os.path.dirname(os.path.abspath(__file__))
+#Engine = satori.getEngine(path=None)
 
-ENGINE = satori.getLearner(path=None)
+def spoofStreamer():
+    thread = threading.Thread(target=satori.spoof.streamr, daemon=True)
+    thread.start()
+
 
 ###############################################################################
 ## Functions ##################################################################
@@ -135,8 +139,25 @@ def dashboard():
 ## Routes - subscription ######################################################
 ###############################################################################
 
-@app.route('/subscription/update')
+@app.route('/subscription/update', methods=['POST'])
 def update():
+    """
+    returns nothing
+    ---
+    post:
+      operationId: score
+      requestBody:
+        content:
+          application/json:
+            {stream-id: {
+                "observation-id": id,   # (optional, ignored)
+                "content": {
+                    key: value
+            }}}
+      responses:
+        '200':
+          json
+    """
     ''' from streamr - datastream has a new observation
     upon a new observation of a datastream, the nodejs app will send this 
     python flask app a message on this route. The flask app will then pass the
@@ -153,8 +174,9 @@ def update():
     so we can call .on_next() here to pass along the update got here from the 
     Streamr LightClient, and trigger a new prediction.
     '''
-    resp = {}
-    return render_template('dashboard.html', **resp)
+    print('POSTJSON:', request.json)
+    # Engine.data.newData.on_next(request.json)
+    return request.json
 
 ###############################################################################
 ## Routes - history ###########################################################
@@ -179,5 +201,8 @@ def publsihMeta():
 ###############################################################################
 
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=PORT)
+    spoofStreamer()
+    serve(app, host='0.0.0.0', port=satori.config.get()['port'])
+    # http://localhost:24685/
 # sudo nohup /app/anaconda3/bin/python app.py > /dev/null 2>&1 &
+# > python satori\web\app.py    
