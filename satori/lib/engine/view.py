@@ -82,11 +82,11 @@ class JupyterViewReactive(View):
         
     def listen(self, model):
         def gatherPrediction(model):
-            self.predictions[model.targetKey] = model.prediction
+            self.predictions[model.id] = model.prediction
             self.view(model)
             
         def gatherScores(model):
-            self.scores[model.targetKey] = f'{round(model.stable, 3)} ({round(model.test, 3)})'
+            self.scores[model.id] = f'{round(model.stable, 3)} ({round(model.test, 3)})'
             self.view(model)
         
         self.listeners.append(model.predictionUpdate.subscribe(
@@ -121,7 +121,7 @@ class JupyterViewReactive(View):
 
         ax = None
         for ix, col in enumerate(model.data.columns.tolist()):
-            print(model.targetKey, self.predictions.get(col), col)
+            print(model.id, self.predictions.get(col), col)
             ax = (model.data.iloc[-1*self.points:, [ix]]
                 .append(pd.DataFrame({col: [self.predictions.get(col, 0)]}))
                 .reset_index(drop=True)

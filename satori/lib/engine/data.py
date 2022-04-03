@@ -214,12 +214,12 @@ class DataManager:
     def runPublisher(self, models):
         def publish(model):
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
-            with open(f'{model.targetKey}.txt', 'w') as f:
+            with open(f'{model.id}.txt', 'w') as f:
                 f.write(f'{model.prediction}, {str(dt.datetime.now())} {model.prediction}')
         
         def publishEdge(model):
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
-            with open(f'{model.targetKey}.txt', 'w') as f:
+            with open(f'{model.id}.txt', 'w') as f:
                 f.write(f'{model.predictionEdge}, {str(dt.datetime.now())} {model.predictionEdge}')
                 
         for model in models:

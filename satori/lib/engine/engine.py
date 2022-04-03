@@ -34,21 +34,21 @@ class Engine:
                 {
                     'Predictions:\n':predictions,
                     '\nScores:\n':scores
-                } if data else {model.targetKey: 'loading... '}))
+                } if data else {model.id: 'loading... '}))
         '''
         self.view.print(**(
             {
                 'Predictions:\n':predictions,
                 '\nScores:\n':scores
-            } if data else {model.targetKey: 'loading... '}))
+            } if data else {model.id: 'loading... '}))
 
     def updateView(self, predictions, scores):
         '''
         old functionality that must be accounted for in new design
         non-reactive jupyter view
-        predictions[model.targetKey] = model.producePrediction()
-        scores[model.targetKey] = f'{round(stable, 3)} ({round(test, 3)})'
-        inputs[model.targetKey] = model.showFeatureData()
+        predictions[model.id] = model.producePrediction()
+        scores[model.id] = f'{round(stable, 3)} ({round(test, 3)})'
+        inputs[model.id] = model.showFeatureData()
         if first or startingPredictions != predictions:
             first = False
             if self.api is not None:
@@ -121,7 +121,7 @@ class Engine:
             sync(model)
             if self.view and self.view.isReactive:
                 watcher(model)
-            threads[f'{model.targetKey}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
+            threads[f'{model.id}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
         for thread in threads.values():
             thread.start()
         while threading.active_count() > 0:
@@ -130,10 +130,10 @@ class Engine:
                 #self.updateView(
                 self.out(
                 predictions = {
-                    model.targetKey: model.prediction
+                    model.id: model.prediction
                     for model in self.models},
                 scores = {
-                    model.targetKey: f'{round(model.stable, 3)} ({round(model.test, 3)})'
+                    model.id: f'{round(model.stable, 3)} ({round(model.test, 3)})'
                     for model in self.models})
                 
                 

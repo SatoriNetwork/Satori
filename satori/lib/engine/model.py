@@ -42,7 +42,8 @@ class ModelManager:
         chosenFeatures:'list(str)'=None,
         pinnedFeatures:'list(str)'=None,
         exploreFeatures:bool=True,
-        targetKey:str='',
+        streamId:str='',
+        targetId:str='',
         split:'int|float'=.2,
         override:bool=False,
     ):
@@ -57,15 +58,17 @@ class ModelManager:
         chosenFeatures: list of feature names to start with
         pinnedFeatures: list of feature names to keep in model
         exploreFeatures: change features or not
-        targetKey: column name of response variable
+        id: column name of response variable
         split: train test split percentage or count
         override: override the existing model saved to disk if there is one
         '''
         self.dataPath = dataPath
         self.modelPath = modelPath
-        self.targetKey = targetKey
+        self.streamId = streamId
+        self.targetId = targetId
+        self.id = self.streamId + '::' + self.targetId
         self.hyperParameters = hyperParameters or []
-        self.chosenFeatures = chosenFeatures or [ModelManager.rawDataMetric(column=targetKey)]
+        self.chosenFeatures = chosenFeatures or [ModelManager.rawDataMetric(column=targetId)]
         self.pinnedFeatures = pinnedFeatures or []
         self.scoredFeatures = {}
         self.features = features or {}
@@ -159,8 +162,8 @@ class ModelManager:
     ### TARGET ####################################################################
 
     def produceTarget(self):
-        series = self.data.loc[:, self.targetKey].shift(-1)
-        series.name = ModelManager.produceTargetName(self.targetKey)
+        series = self.data.loc[:, self.targetId].shift(-1)
+        series.name = ModelManager.produceTargetName(self.targetId)
         self.target = pd.DataFrame(series)
 
     @staticmethod
@@ -237,7 +240,7 @@ class ModelManager:
             v['x']: v['ppscore']
             for v in ppscore.predictors(
                 pd.concat([df, self.target], axis=1),
-                y=ModelManager.produceTargetName(self.targetKey),
+                y=ModelManager.produceTargetName(self.targetId),
                 output='df',
                 sorted=True,
                 sample=None)[['x', 'ppscore']].T.to_dict().values()}

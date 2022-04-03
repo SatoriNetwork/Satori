@@ -114,16 +114,19 @@ def getEngine(path=None):
         return {
             satori.ModelManager(
                 modelPath='modelHigh.joblib',
-                targetKey='High',
+                streamId='simpleEURCleaned',
+                targetId='High',
                 pinnedFeatures=['DiffHighLow'],
                 **kwargs),
             satori.ModelManager(
                 modelPath='modelLow.joblib',
-                targetKey='Low',
+                streamId='simpleEURCleaned',
+                targetId='Low',
                 **kwargs),
             satori.ModelManager(
                 modelPath='modelClose.joblib',
-                targetKey='Close',
+                streamId='simpleEURCleaned',
+                targetId='Close',
                 **kwargs)}
     
     dataSettings = satori.config.dataSettings()

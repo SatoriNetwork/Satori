@@ -68,11 +68,11 @@ class Google:
     def send(self, model, points:int, predictions:dict, scores:dict):
         startingRow = 2
         for ix, column in enumerate(model.data.columns.tolist()):
-            if column == model.targetKey:
+            if column == model.id:
                 row = ix + startingRow
                 rows = [row]
                 cols = [1]
-                values = [model.targetKey]
+                values = [model.id]
                 for i, (_, r) in enumerate(model.data.iloc[-1*points:, [ix]].iterrows()):
                     rows.append(row)
                     cols.append(i + 2)
