@@ -37,31 +37,11 @@ def provideIncrementalWithId():
         '"observation-id":' + str(key) +  ','
         '"content":' + content + '}}')
 
-def toJsonToDictToDataFrame():
-    key, content = provideObservation()
-    data = ('{"simpleEURCleaned":{'
-        '"observation-id":' + str(key) +  ','
-        '"content":' + content + '}}')
-    j = json.loads(data)
-    streamId = list(j.keys())[0]
-    observationId = j[streamId]['observation-id']
-    content = j[streamId]['content']
-    print(content)
-    
-    dff = pd.DataFrame(content, index=[observationId])
-    dff.index.name = streamId 
-    dff.name = streamId 
-    print(dff)
-    
-toJsonToDictToDataFrame()
-    
-#def streamr():
-#    while True:
-#        time.sleep(5)
-#        response = requests.post(
-#            url=f'http://localhost:{port}/subscription/update', 
-#            json=provideIncrementalWithId())
-#        response.raise_for_status()
-#        print('RESPONSE:', response.json())
-#        #print(requests.get(f'http://localhost:{port}/ping').json())
-#        time.sleep(25)
+def streamr():
+    while True:
+        time.sleep(5)
+        response = requests.post(
+            url=f'http://localhost:{port}/subscription/update', 
+            json=provideIncrementalWithId())
+        response.raise_for_status()
+        time.sleep(25)

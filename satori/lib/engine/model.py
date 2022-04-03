@@ -87,8 +87,10 @@ class ModelManager:
     
     def setupFlags(self):
         self.modelUpdated = BehaviorSubject(False)
+        self.targetUpdated = BehaviorSubject(False)
         self.inputsUpdated = BehaviorSubject(False)
         self.predictionUpdate = BehaviorSubject(None)
+        self.predictionEdgeUpdate = BehaviorSubject(None)
         self.newAvailableInput = BehaviorSubject(None)
     
     ### STATIC FEATURES GENERATORS ###########################################################
@@ -504,10 +506,17 @@ class ModelManager:
     ### LIFECYCLE ######################################################################
     
     def runPredictor(self, data):
-        def makePrediction():
-            self.buildStable()
-            self.prediction = self.producePrediction()
-            self.predictionUpdate.on_next(self)
+        def makePrediction(isTarget=False):
+            if isTarget:
+                self.buildStable()
+                self.prediction = self.producePrediction()
+                self.predictionUpdate.on_next(self)
+                if self.edge: 
+                    self.predictionEdgeUpdate.on_next(self)
+            elif self.edge:
+                self.buildStable()
+                self.predictionEdge = self.producePrediction()
+                self.predictionEdgeUpdate.on_next(self)
         
         def makePredictionFromNewModel():
             makePrediction()
@@ -517,9 +526,16 @@ class ModelManager:
             #for i in self.inputs:
             #    self.updates[i] = data.updates.get(i)
             makePrediction()
+            
+        def makePredictionFromNewTarget(data):
+            ## add incremental updates to inmemory model dataset - something like this:
+            #for i in self.inputs:
+            #    self.updates[i] = data.updates.get(i)
+            makePrediction(isTarget=True)
                 
         self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x else None)
         self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(data) if x else None)
+        self.targetUpdated.subscribe(lambda x: makePredictionFromNewTarget(data) if x else None)
         
     def runExplorer(self):
         try:
