@@ -19,6 +19,7 @@ is easiest to implement.
 import os
 import sys
 import random
+import json
 import threading
 import secrets
 import satori
@@ -39,7 +40,7 @@ app = Flask(__name__)
 #Mobility(app)
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 #CWD = os.path.dirname(os.path.abspath(__file__))
-#Engine = satori.getEngine(path=None)
+Engine = satori.getEngine(path=None)
 
 def spoofStreamer():
     thread = threading.Thread(target=satori.spoof.streamr, daemon=True)
@@ -150,7 +151,7 @@ def update():
         content:
           application/json:
             {stream-id: {
-                "observation-id": id,   # (optional, ignored)
+                "observation-id": id,
                 "content": {
                     key: value
             }}}
@@ -175,7 +176,7 @@ def update():
     Streamr LightClient, and trigger a new prediction.
     '''
     print('POSTJSON:', request.json)
-    # Engine.data.newData.on_next(request.json)
+    # Engine.data.newData.on_next(Observation(request.json))
     return request.json
 
 ###############################################################################
@@ -206,3 +207,5 @@ if __name__ == '__main__':
     # http://localhost:24685/
 # sudo nohup /app/anaconda3/bin/python app.py > /dev/null 2>&1 &
 # > python satori\web\app.py    
+
+

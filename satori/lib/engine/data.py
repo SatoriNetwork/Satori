@@ -38,26 +38,27 @@ import pandas as pd
 import datetime as dt
 from reactivex.subject import BehaviorSubject
 
+from satori.lib.engine.structs import Observation
+
 class DataManager:
 
     def __init__(
         self,
         dataPath:str='data.parquet',
-        data:pd.DataFrame=pd.DataFrame(),
         getData:'function'=None,
         validateData:'function'=None,
         appendData:'function'=None,
     ):
         self.dataPath = dataPath
-        self.dataOriginal = data
-        self.data = data
+        self.dataOriginal = pd.DataFrame()
+        self.streams = {} # dictionary of dataframes
         self.everything = {}  # a set of all the column names (stream ids) I've seen before.
         self.resetIncremental()
         self.getData = getData or DataManager.defaultGetData
         self.validateData = validateData or DataManager.defaultValidateData
         self.appendData = appendData or DataManager.defaultAppendData
         self.listeners = []
-        self.newData = BehaviorSubject(False)
+        self.newData = BehaviorSubject(Observation)
         self.run()
 
     @staticmethod
@@ -96,9 +97,6 @@ class DataManager:
             return x.reset_index(drop=True)
         return x
 
-    def resetIncremental(self):
-        self.incremental = pd.DataFrame(columns=self.data.columns)
-
     def importance(self, inputs:dict = None):
         inputs = inputs or {}
         totaled = {}
@@ -111,7 +109,11 @@ class DataManager:
         return [i[0] for i in self.imports]
 
     def get(self):
-        ''' gets the latest update for the data '''
+        ''' gets the latest update for the data 
+        * this function is no longer used. it was used for
+          pulling data, now we're on a reactive system where
+          we get the data pushed to us as soon as its avilable
+        '''
         self.getOriginal()
         self.getExploratory()
         self.getPurge()
@@ -144,39 +146,69 @@ class DataManager:
         self.resetIncremental()
         return False
 
-    def append(self):
-        ''' appends the latest change to data '''
-        self.data = self.appendData(self.incremental, self.data)
-        self.resetIncremental()
-
     def save(self):
         ''' gets the latest update for the data '''
         self.data.to_parquet(self.dataPath)
 
-    def run(self, inputs:dict = None) -> bool:
+    def run(self, inputs:dict = None):# -> bool:
         ''' runs all three steps '''
-        if inputs:
-            self.importance(inputs)
+        #if inputs:
+        #    self.importance(inputs)
         self.get()
-        if self.validate():
-            self.append()
-            self.save()
-            return True
-        return False
-
-    def runOnce(self, inputs:dict = None) -> bool:
+        self.append()
+        self.save()
+        return True
+        
+    def runOnce(self, inputs:dict = None):# -> bool:
         ''' run denotes a loop, there's no loop but now its explicit '''
         return self.run(inputs)
-
-    def runSubscriber(self, models):
+    
+    #################################################################################
+    ### most of the fuctions above this point are made obsolete by the new design ###
+    #################################################################################
+    
+    def runSubscriber(self, models: list):
         ''' triggered from the flask app '''
         
-        def tell(models):
-            if self.runOnce():
-                for model in models:
-                    model.inputsUpdated.on_next(True)
+        def handleNewData(models, observation: Observation):
+            ''' append to existing datastream, save to disk, notify models '''
+            
+            def append():
+                ''' appends the latest change to in memory datastream '''
+                if observation.streamId in self.streams.keys():
+                    if observation.observationId in self.streams[observation.streamId].index.values:
+                        for col in observation.df.columns:
+                            self.streams[observation.streamId].loc[observation.streamId, col] = observation.df.iloc[0, col]
+                    else:
+                        self.streams[observation.streamId] = self.streams[observation.streamId].append(observation.df)
+                else: 
+                    self.streams[observation.streamId] = observation.df
         
-        self.listeners.append(self.newData.subscribe(lambda x: tell(models) if x is not None else None))
+            def saveIncremental():
+                ''' save these observations to the right parquet file on disk '''
+                pass
+            
+            def tellModels():
+                ''' tell the modesl that listen to this stream and these targets '''
+                for model in models:
+                    # if model predicts on any of the targets in this observation:
+                    # model.targetUpdated.on_next(True) # doesn't exist yet
+                    # elif model uses any of the targets in this observation as inputs:
+                    model.inputsUpdated.on_next(True)
+                    ## note: a model does not publish a prediction if inputs
+                    ## are updated, only if the target has a new observaiton.
+                    ## what we do instead is have the option to publish "edge"
+                    ## streams that are published everytime an inputs is updated
+                    ## as well as each time the target is updated.
+                    ## this is because for some datastreams you always want to
+                    ## know the best prediction of the future, like if the actual
+                    ## target gets updated rarely like a weekly price.
+            
+            append()
+            saveIncremental()
+            tellModels()
+            
+        self.listeners.append(self.newData.subscribe(lambda x: handleNewData(models, x) if x is not None else None))
                 
 
     def runPublisher(self, models):

@@ -26,21 +26,42 @@ def provideIncremental():
     ''' observation with row id '''
     return next(incremental).T.to_json()
     
-def provideObservation():
+def provideObservation(): # -> int, string:
     d = next(incremental).T.to_dict()
     index = list(d.keys())[0]
-    return json.dumps(d[index])
+    return index, json.dumps(d[index])
 
 def provideIncrementalWithId():
-    return '{"simpleEURCleaned":{"content":' + provideObservation() + '}}'
+    key, content = provideObservation()
+    return ('{"simpleEURCleaned":{'
+        '"observation-id":' + str(key) +  ','
+        '"content":' + content + '}}')
 
-def streamr():
-    while True:
-        time.sleep(5)
-        response = requests.post(
-            url=f'http://localhost:{port}/subscription/update', 
-            json=provideIncrementalWithId())
-        response.raise_for_status()
-        print('RESPONSE:', response.json())
-        #print(requests.get(f'http://localhost:{port}/ping').json())
-        time.sleep(25)
+def toJsonToDictToDataFrame():
+    key, content = provideObservation()
+    data = ('{"simpleEURCleaned":{'
+        '"observation-id":' + str(key) +  ','
+        '"content":' + content + '}}')
+    j = json.loads(data)
+    streamId = list(j.keys())[0]
+    observationId = j[streamId]['observation-id']
+    content = j[streamId]['content']
+    print(content)
+    
+    dff = pd.DataFrame(content, index=[observationId])
+    dff.index.name = streamId 
+    dff.name = streamId 
+    print(dff)
+    
+toJsonToDictToDataFrame()
+    
+#def streamr():
+#    while True:
+#        time.sleep(5)
+#        response = requests.post(
+#            url=f'http://localhost:{port}/subscription/update', 
+#            json=provideIncrementalWithId())
+#        response.raise_for_status()
+#        print('RESPONSE:', response.json())
+#        #print(requests.get(f'http://localhost:{port}/ping').json())
+#        time.sleep(25)
