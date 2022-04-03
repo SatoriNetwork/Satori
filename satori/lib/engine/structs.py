@@ -1,5 +1,6 @@
 import json
 import pandas as pd 
+import datetime as dt
 
 class HyperParameter:
     
@@ -30,23 +31,23 @@ class Observation:
         ''' {
             'simpleEURCleaned': {
                 'observation-id': 3675, 
+                'observed-time': 2022-02-16 02:52:45.794120, 
                 'content': {
                     'High': 0.81856, 
                     'Low': 0.81337, 
-                    'Close': 0.81512}}}'''
+                    'Close': 0.81512}}}
+            note: if observed-time is missing, define it here.
+        '''
         j = json.loads(data)
         self.streamId = list(j.keys())[0]
+        self.observedTime = j[self.streamId].get('observed-time', str(dt.datetime.utcnow()))
         self.observationId = j[self.streamId]['observation-id']
         self.content = j[self.streamId]['content']
         if isinstance(self.content, dict):
             self.df = pd.DataFrame(
-                self.content, 
-                index=[self.observationId])
-            self.df.index.name = self.streamId  # perhaps the index name should be the type of index it is (datetime, str, other?)
-            #self.df.name = self.streamId  # perhaps we should monkeypatch the name of the stream here instead.
+                {(self.streamId, target): values for target, values in self.content.items}, 
+                index=[self.observedTime])
         elif not isinstance(self.content, dict):
             self.df = pd.DataFrame(
-                {self.streamId: [self.content]}, 
-                index=[self.observationId])
-            self.df.index.name = self.streamId  # perhaps the index name should be the type of index it is (datetime, str, other?)
-            #self.df.name = self.streamId  # perhaps we should monkeypatch the name of the stream here instead.
+                {(self.streamId, self.streamId): [self.content]}, 
+                index=[self.observedTime])

@@ -2,6 +2,7 @@
 
 import time 
 import requests
+import datetime as dt
 import pandas as pd
 import satori
 import json
@@ -32,8 +33,13 @@ def provideObservation(): # -> int, string:
     return index, json.dumps(d[index])
 
 def provideIncrementalWithId():
+    # todo: in the real stream, if the observationId is obviously
+    #       a datetime in UTC, we could use that as the observed
+    #       time, otherwise, we'll just use our own on update.
     key, content = provideObservation()
-    return ('{"simpleEURCleaned":{'
+    return (
+        '{"simpleEURCleaned":{'
+        '"observed-time":' + str(dt.datetime.utcnow()) +  ','
         '"observation-id":' + str(key) +  ','
         '"content":' + content + '}}')
 

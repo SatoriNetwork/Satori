@@ -51,7 +51,7 @@ class DataManager:
     ):
         self.dataPath = dataPath
         self.dataOriginal = pd.DataFrame()
-        self.streams = {} # dictionary of dataframes
+        self.streams = {} # dictionary of streams and their latest incremental
         self.everything = {}  # a set of all the column names (stream ids) I've seen before.
         self.resetIncremental()
         self.getData = getData or DataManager.defaultGetData
@@ -173,16 +173,9 @@ class DataManager:
         def handleNewData(models, observation: Observation):
             ''' append to existing datastream, save to disk, notify models '''
             
-            def append():
-                ''' appends the latest change to in memory datastream '''
-                if observation.streamId in self.streams.keys():
-                    if observation.observationId in self.streams[observation.streamId].index.values:
-                        for col in observation.df.columns:
-                            self.streams[observation.streamId].loc[observation.streamId, col] = observation.df.iloc[0, col]
-                    else:
-                        self.streams[observation.streamId] = self.streams[observation.streamId].append(observation.df)
-                else: 
-                    self.streams[observation.streamId] = observation.df
+            def remember():
+                ''' cache latest observation for each stream as DataFrame with observed-time '''
+                self.streams[observation.streamId] = observation.df
         
             def saveIncremental():
                 ''' save these observations to the right parquet file on disk '''
@@ -197,7 +190,7 @@ class DataManager:
                     #elif any([key in observation.df.columns for key in model.feature.keys()]): 
                     #    model.inputsUpdated.on_next(True)
                     
-            append()
+            remember()
             saveIncremental()
             tellModels()
             
