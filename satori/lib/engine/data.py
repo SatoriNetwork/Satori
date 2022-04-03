@@ -180,10 +180,7 @@ class DataManager:
         
             def saveIncremental():
                 ''' save these observations to the right parquet file on disk '''
-                disk.write(
-                    observation.df, 
-                    stream=observation.streamId,
-                    append=True)
+                disk.write(observation.df, stream=observation.streamId)
             
             def tellModels():
                 ''' tell the modesl that listen to this stream and these targets '''
