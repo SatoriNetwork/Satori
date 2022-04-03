@@ -46,7 +46,7 @@ class Observation:
             #self.df.name = self.streamId  # perhaps we should monkeypatch the name of the stream here instead.
         elif not isinstance(self.content, dict):
             self.df = pd.DataFrame(
-                {'observations': [self.content]}, 
+                {self.streamId: [self.content]}, 
                 index=[self.observationId])
             self.df.index.name = self.streamId  # perhaps the index name should be the type of index it is (datetime, str, other?)
             #self.df.name = self.streamId  # perhaps we should monkeypatch the name of the stream here instead.

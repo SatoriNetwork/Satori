@@ -191,19 +191,12 @@ class DataManager:
             def tellModels():
                 ''' tell the modesl that listen to this stream and these targets '''
                 for model in models:
-                    # if model predicts on any of the targets in this observation:
-                    # model.targetUpdated.on_next(True) # doesn't exist yet
-                    # elif model uses any of the targets in this observation as inputs:
-                    model.inputsUpdated.on_next(True)
-                    ## note: a model does not publish a prediction if inputs
-                    ## are updated, only if the target has a new observaiton.
-                    ## what we do instead is have the option to publish "edge"
-                    ## streams that are published everytime an inputs is updated
-                    ## as well as each time the target is updated.
-                    ## this is because for some datastreams you always want to
-                    ## know the best prediction of the future, like if the actual
-                    ## target gets updated rarely like a weekly price.
-            
+                    if model.targetId in observation.df.columns:
+                        model.targetUpdated.on_next(True)
+                    # not right, close. features really needs to be a streamId + targetId...
+                    #elif any([key in observation.df.columns for key in model.feature.keys()]): 
+                    #    model.inputsUpdated.on_next(True)
+                    
             append()
             saveIncremental()
             tellModels()
