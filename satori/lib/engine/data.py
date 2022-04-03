@@ -39,6 +39,7 @@ import datetime as dt
 from reactivex.subject import BehaviorSubject
 
 from satori.lib.engine.structs import Observation
+from satori.lib.apis import disk
 
 class DataManager:
 
@@ -179,7 +180,10 @@ class DataManager:
         
             def saveIncremental():
                 ''' save these observations to the right parquet file on disk '''
-                pass
+                disk.write(
+                    observation.df, 
+                    stream=observation.streamId,
+                    append=True)
             
             def tellModels():
                 ''' tell the modesl that listen to this stream and these targets '''
