@@ -38,7 +38,9 @@ def provideIncrementalWithId():
     #       time, otherwise, we'll just use our own on update.
     key, content = provideObservation()
     return (
-        '{"simpleEURCleaned":{'
+        '{'
+        '"source-id":"streamrSpoof"'
+        '"stream-id":"simpleEURCleaned"'
         '"observed-time":' + str(dt.datetime.utcnow()) +  ','
         '"observation-id":' + str(key) +  ','
         '"content":' + content + '}}')

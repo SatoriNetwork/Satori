@@ -1,4 +1,5 @@
 from .fx import fx
 from .google import Google
-import disk
+from . import disk
+from . import memory
 #from .disk import write, read, merge, gather

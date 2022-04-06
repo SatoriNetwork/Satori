@@ -27,7 +27,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import ppscore
 from xgboost import XGBRegressor
-from .structs import HyperParameter
+
+from satori.lib.apis import disk, memory
+from .structs import HyperParameter, SourceStreamTargets
 
 
 class ModelManager:
@@ -42,6 +44,7 @@ class ModelManager:
         chosenFeatures:'list(str)'=None,
         pinnedFeatures:'list(str)'=None,
         exploreFeatures:bool=True,
+        sourceId:str='',
         streamId:str='',
         targetId:str='',
         split:'int|float'=.2,
@@ -64,8 +67,11 @@ class ModelManager:
         '''
         self.dataPath = dataPath
         self.modelPath = modelPath
+        self.sourceId = sourceId
         self.streamId = streamId
         self.targetId = targetId
+        #self.sources = {'source': {'stream':['targets']}}
+        self.targets:list[SourceStreamTargets] = []  # todo: set targets
         self.id = self.streamId + '::' + self.targetId
         self.hyperParameters = hyperParameters or []
         self.chosenFeatures = chosenFeatures or [ModelManager.rawDataMetric(column=targetId)]
@@ -157,7 +163,8 @@ class ModelManager:
 
     def get(self):
         ''' gets the raw data from disk '''
-        self.data = pd.read_parquet(self.dataPath)
+        self.data = disk.Api.gather(sourceStreamTargetss=self.targets)
+        #self.data = pd.read_parquet(self.dataPath)
 
     ### TARGET ####################################################################
 
@@ -524,21 +531,26 @@ class ModelManager:
         def makePredictionFromNewModel():
             makePrediction()
         
-        def makePredictionFromNewInputs(data):
-            ## add incremental updates to inmemory model dataset - something like this:
-            #for i in self.inputs:
-            #    self.updates[i] = data.updates.get(i)
+        def makePredictionFromNewInputs(incremental):
+            self.data = memory.appdendInsert(
+                merged=self.data, 
+                incremental=incremental)
             makePrediction()
             
-        def makePredictionFromNewTarget(data):
+        def makePredictionFromNewTarget(incremental):
             ## add incremental updates to inmemory model dataset - something like this:
             #for i in self.inputs:
             #    self.updates[i] = data.updates.get(i)
+            self.data = memory.appdendInsert(
+                merged=self.data, 
+                # be cool if the incremental were in the stream...
+                #incremental=data.sources[self.sourceId][self.streamId]) 
+                incremental=incremental)
             makePrediction(isTarget=True)
                 
         self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x else None)
-        self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(data) if x else None)
-        self.targetUpdated.subscribe(lambda x: makePredictionFromNewTarget(data) if x else None)
+        self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(x) if x else None)
+        self.targetUpdated.subscribe(lambda x: makePredictionFromNewTarget(x) if x else None)
         
     def runExplorer(self):
         try:

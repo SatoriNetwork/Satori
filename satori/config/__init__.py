@@ -10,6 +10,7 @@ put = partial(put, root=root)
 env = partial(env, get=get, root=root)
 
 settingsPathName = 'SATORI_SETTINGS_PATH'
+defaultSource = 'streamr'
 
 def settingsPath():
     '''

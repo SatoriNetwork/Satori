@@ -52,7 +52,7 @@ class DataManager:
     ):
         self.dataPath = dataPath
         self.dataOriginal = pd.DataFrame()
-        self.streams = {} # dictionary of streams and their latest incremental
+        self.sources = {} # dictionary of streams by source and their latest incremental
         self.everything = {}  # a set of all the column names (stream ids) I've seen before.
         self.resetIncremental()
         self.getData = getData or DataManager.defaultGetData
@@ -176,20 +176,39 @@ class DataManager:
             
             def remember():
                 ''' cache latest observation for each stream as DataFrame with observed-time '''
-                self.streams[observation.streamId] = observation.df
+                if observation.sourceId not in self.sources.keys():
+                    self.sources[observation.sourceId] = {observation.streamId: None}
+                self.sources[observation.sourceId][observation.streamId] = observation.df
         
             def saveIncremental():
                 ''' save these observations to the right parquet file on disk '''
-                disk.write(observation.df, stream=observation.streamId)
+                disk.Api(source=observation.sourceId, stream=observation.streamId).write(observation.df)
             
             def tellModels():
                 ''' tell the modesl that listen to this stream and these targets '''
                 for model in models:
                     if model.targetId in observation.df.columns:
-                        model.targetUpdated.on_next(True)
+                        model.targetUpdated.on_next(observation.df)
                     # not right, close. features really needs to be a streamId + targetId...
                     #elif any([key in observation.df.columns for key in model.feature.keys()]): 
                     #    model.inputsUpdated.on_next(True)
+                    # reference model.targets:
+                    if (
+                        model.targets.sourceId == observation.sourceId and
+                        model.targets.streamId == observation.streamId 
+                    ):
+                        sendUpdates = []
+                        for modelTarget in model.targets.targets:
+                            for obsTarget in observation.targets:
+                                if modelTarget == obsTarget:
+                                    sendUpdates.append(obsTarget)
+                        model.inputsUpdated.on_next(
+                            observation.df.loc[:, [
+                                (observation.sourceId, observation.streamId, update) 
+                                for update in sendUpdates]])
+                                    
+                        
+                    
                     
             remember()
             saveIncremental()

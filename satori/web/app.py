@@ -150,11 +150,13 @@ def update():
       requestBody:
         content:
           application/json:
-            {stream-id: {
-                "observation-id": id,
-                "content": {
-                    key: value
-            }}}
+            {
+            "source-id": id,
+            "stream-id": id,
+            "observation-id": id,
+            "content": {
+                key: value
+            }}
       responses:
         '200':
           json
