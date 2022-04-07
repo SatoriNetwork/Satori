@@ -2,6 +2,7 @@ import json
 import pandas as pd 
 import datetime as dt
 from satori import config
+
 class SourceStreamTargets:
     
     def __init__(
@@ -13,6 +14,10 @@ class SourceStreamTargets:
         self.stream = stream
         self.targets = targets or [stream] 
         self.source = source or config.defaultSource
+
+    def id(self):
+        ''' id has one target '''
+        return (self.source, self.stream, self.targets[0])
 
     def get(self):
         ''' easy to combine '''

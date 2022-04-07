@@ -54,10 +54,13 @@ class ModelManager:
         dataPath: the path of the raw data
         modelPath: the path of the model
         hyperParameters: a list of HyperParameter objects
-        metrics: a dictionary of functions that each produce a feature (from 1 dynamic column)
-                 example: year over year, rolling average
-        features: a dictionary of functions that each take in the raw data and ouput a feature (cols known ahead of time)
-                  example: high minus low, x if y > 1 else 2**z
+        metrics: a dictionary of functions that each produce
+                    a feature (from 1 dynamic column)
+                    example: year over year, rolling average
+        features: a dictionary of functions that each take in
+                    multiple columns of the raw data and ouput
+                    a feature (cols known ahead of time)
+                    example: high minus low, x if y > 1 else 2**z
         chosenFeatures: list of feature names to start with
         pinnedFeatures: list of feature names to keep in model
         exploreFeatures: change features or not
@@ -72,7 +75,7 @@ class ModelManager:
         self.targetId = targetId
         #self.sources = {'source': {'stream':['targets']}}
         self.targets:list[SourceStreamTargets] = []  # todo: set targets
-        self.id = self.streamId + '::' + self.targetId
+        self.id = SourceStreamTargets(source=sourceId, stream=streamId, targets=[targetId])
         self.hyperParameters = hyperParameters or []
         self.chosenFeatures = chosenFeatures or [ModelManager.rawDataMetric(column=targetId)]
         self.pinnedFeatures = pinnedFeatures or []
@@ -96,8 +99,8 @@ class ModelManager:
     
     def setupFlags(self):
         self.modelUpdated = BehaviorSubject(False)
-        self.targetUpdated = BehaviorSubject(False)
-        self.inputsUpdated = BehaviorSubject(False)
+        self.targetUpdated = BehaviorSubject(None)
+        self.inputsUpdated = BehaviorSubject(None)
         self.predictionUpdate = BehaviorSubject(None)
         self.predictionEdgeUpdate = BehaviorSubject(None)
         self.newAvailableInput = BehaviorSubject(None)
