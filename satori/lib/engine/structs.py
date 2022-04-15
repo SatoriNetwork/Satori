@@ -80,10 +80,10 @@ class Observation:
 
     def parse(self, data):
         ''' {
-                'source-id:streamrSpoof,'
-                'stream-id:simpleEURCleaned,'
+                'source-id:"streamrSpoof",'
+                'stream-id:"simpleEURCleaned",'
                 'observation-id': 3675, 
-                'observed-time': 2022-02-16 02:52:45.794120, 
+                'observed-time': "2022-02-16 02:52:45.794120", 
                 'content': {
                     'High': 0.81856, 
                     'Low': 0.81337, 
@@ -98,9 +98,9 @@ class Observation:
         self.content = j['content']
         if isinstance(self.content, dict):
             self.df = pd.DataFrame(
-                {(self.sourceId, self.streamId, target): values for target, values in self.content.items}, 
+                {(self.sourceId, self.streamId, target): values for target, values in list(self.content.items()) + [('StreamObservationId', self.observationId)]},
                 index=[self.observedTime])
         elif not isinstance(self.content, dict):
             self.df = pd.DataFrame(
-                {(self.sourceId, self.streamId, self.streamId): [self.content]}, 
+                {(self.sourceId, self.streamId, self.streamId): [self.content] + [('StreamObservationId', self.observationId)]}, 
                 index=[self.observedTime])

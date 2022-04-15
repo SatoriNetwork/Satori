@@ -46,57 +46,12 @@ class DataManager:
     def __init__(
         self,
         dataPath:str='data.parquet',
-        getData:'function'=None,
-        validateData:'function'=None,
-        appendData:'function'=None,
     ):
         self.dataPath = dataPath
-        self.dataOriginal = pd.DataFrame()
         self.sources = {} # dictionary of streams by source and their latest incremental
         self.everything = {}  # a set of all the column names (stream ids) I've seen before.
-        self.resetIncremental()
-        self.getData = getData or DataManager.defaultGetData
-        self.validateData = validateData or DataManager.defaultValidateData
-        self.appendData = appendData or DataManager.defaultAppendData
         self.listeners = []
-        self.newData = BehaviorSubject(Observation)
-        self.run()
-
-    @staticmethod
-    def defaultGetData() -> pd.DataFrame:
-        return pd.DataFrame({'a': [1]})  # rest call or something
-
-    @staticmethod
-    def defaultValidateData(
-        data:pd.DataFrame,
-        existing:pd.DataFrame,
-        resetIndex=True,
-    ) -> bool:
-        ''' you may not want to reset index if it's a date you'd like to compare against '''
-        def lastRow():
-            if resetIndex:
-                return existing.iloc[-1:,:].reset_index(drop=True)
-            return existing.iloc[-1:,:]
-
-        if (
-            data.empty
-            or not (0 < data.iloc[0,0] < 2) or not (0 < data.iloc[0,0] < 2) or not (0 < data.iloc[0,0] < 2)
-            or lastRow().equals(data)  # perhaps you're calling before the data has changed...
-        ):
-            return False
-        return True
-
-    @staticmethod
-    def defaultAppend(
-        data:pd.DataFrame,
-        existing:pd.DataFrame,
-        resetIndex=True,
-    ) -> pd.DataFrame:
-        ''' you may not want to reset index if it's a date you'd like to compare against '''
-        x = existing.append(data)
-        if resetIndex:
-            return x.reset_index(drop=True)
-        return x
+        self.newData = BehaviorSubject(None)
 
     def importance(self, inputs:dict = None):
         inputs = inputs or {}
@@ -108,20 +63,6 @@ class DataManager:
 
     def showImportance(self):
         return [i[0] for i in self.imports]
-
-    def get(self):
-        ''' gets the latest update for the data 
-        * this function is no longer used. it was used for
-          pulling data, now we're on a reactive system where
-          we get the data pushed to us as soon as its avilable
-        '''
-        self.getOriginal()
-        self.getExploratory()
-        self.getPurge()
-
-    def getOriginal(self):
-        ''' gets the latest update for the data '''
-        self.incremental = self.getData()
 
     def getExploratory(self):
         '''
@@ -140,29 +81,6 @@ class DataManager:
         ''' in charge of removing columns that aren't useful to our models '''
         pass
 
-    def validate(self) -> bool:
-        ''' appends the latest change to data '''
-        if self.validateData(self.incremental, self.data):
-            return True
-        self.resetIncremental()
-        return False
-
-    def save(self):
-        ''' gets the latest update for the data '''
-        self.data.to_parquet(self.dataPath)
-
-    def run(self, inputs:dict = None):# -> bool:
-        ''' runs all three steps '''
-        #if inputs:
-        #    self.importance(inputs)
-        self.get()
-        self.append()
-        self.save()
-        return True
-        
-    def runOnce(self, inputs:dict = None):# -> bool:
-        ''' run denotes a loop, there's no loop but now its explicit '''
-        return self.run(inputs)
     
     #################################################################################
     ### most of the fuctions above this point are made obsolete by the new design ###
@@ -182,8 +100,14 @@ class DataManager:
         
             def saveIncremental():
                 ''' save these observations to the right parquet file on disk '''
-                disk.Api(source=observation.sourceId, stream=observation.streamId).write(observation.df)
+                disk.Api(source=observation.sourceId, stream=observation.streamId).append(observation.df)
             
+            def compress():
+                ''' compress if the number of incrementals is high '''
+                x = disk.Api(source=observation.sourceId, stream=observation.streamId)
+                if len(x.incrementals()) > 3:
+                    x.compress()
+                
             def tellModels():
                 ''' tell the modesl that listen to this stream and these targets '''
                 for model in models:
@@ -206,15 +130,14 @@ class DataManager:
                             observation.df.loc[:, [
                                 (observation.sourceId, observation.streamId, update) 
                                 for update in sendUpdates]])
-                                    
-                        
-                    
-                    
+            
             remember()
             saveIncremental()
-            tellModels()
+            compress()
+            #tellModels()
             
         self.listeners.append(self.newData.subscribe(lambda x: handleNewData(models, x) if x is not None else None))
+        #self.listeners.append(self.newData.subscribe(lambda x: print('triggered')))
                 
 
     def runPublisher(self, models):

@@ -1,1 +1,1 @@
-from .streamr import streamr
+from .streamr import Streamr

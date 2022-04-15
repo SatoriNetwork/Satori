@@ -166,7 +166,7 @@ class ModelManager:
 
     def get(self):
         ''' gets the raw data from disk '''
-        self.data = disk.Api.gather(sourceStreamTargetss=self.targets)
+        self.data = disk.Api().gather(sourceStreamTargetss=self.targets)
         #self.data = pd.read_parquet(self.dataPath)
 
     ### TARGET ####################################################################

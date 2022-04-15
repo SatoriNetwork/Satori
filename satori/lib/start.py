@@ -16,43 +16,7 @@ def getEngine(path=None):
     
     def getExistingDataManager(dataSettings:dict = None):
         ''' generates DataManager from data on disk '''
-
-        def getNewData():
-            ''' incrementally returns mock future data to simulate the passage of time '''
-            for i in future.index:
-                yield pd.DataFrame(future.loc[i]).T
-                
-        try:
-            df = pd.read_csv(satori.config.dataPath(dataSettings.get('subscription database')))
-        except Exception as e:
-            print(e)
-            # example of data:
-            df = pd.DataFrame({
-                'High': [
-                    0.837240,
-                    0.837100,
-                    0.828020,
-                    0.830290,
-                    0.828780,], 
-                'Low': [
-                    0.830560,
-                    0.825830,
-                    0.824400,
-                    0.823450,
-                    0.820280,],
-                'Close': [
-                    0.835770,
-                    0.827200,
-                    0.824880,
-                    0.827750,
-                    0.820550,],})
-        past = df.iloc[:round(df.shape[0]*.8)]
-        future = df.iloc[round(df.shape[0]*.8):]
-        data = satori.DataManager(
-            data=past,
-            getData=partial(next, getNewData()),
-            validateData=satori.DataManager.defaultValidateData,
-            appendData=satori.DataManager.defaultAppend)
+        data = satori.DataManager()
         return data
     
     def getExistingModelManager():
@@ -135,4 +99,5 @@ def getEngine(path=None):
     return satori.Engine(
         view=satori.View(),
         data=getExistingDataManager(dataSettings),
-        models=getExistingModelManager())
+        #models=getExistingModelManager()
+        )

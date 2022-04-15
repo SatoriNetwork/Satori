@@ -31,6 +31,8 @@ from flask import send_from_directory, session, request, flash, Markup
 #from flask_mobility import Mobility
 from waitress import serve
 
+from satori.lib.engine.structs import Observation
+
 
 ###############################################################################
 ## Globals ####################################################################
@@ -41,11 +43,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 #CWD = os.path.dirname(os.path.abspath(__file__))
 Engine = satori.getEngine(path=None)
+Engine.run()
 
 def spoofStreamer():
-    thread = threading.Thread(target=satori.spoof.streamr, daemon=True)
+    thread = threading.Thread(target=satori.spoof.Streamr().run, daemon=True)
     thread.start()
-
 
 ###############################################################################
 ## Functions ##################################################################
@@ -178,12 +180,12 @@ def update():
     Streamr LightClient, and trigger a new prediction.
     '''
     print('POSTJSON:', request.json)
-    # Engine.data.newData.on_next(Observation(request.json))
+    Engine.data.newData.on_next(Observation(request.json))
     return request.json
 
 ###############################################################################
 ## Routes - history ###########################################################
-# we may be able to make these reque
+# we may be able to make these requests
 ###############################################################################
 
 @app.route('/history/request')

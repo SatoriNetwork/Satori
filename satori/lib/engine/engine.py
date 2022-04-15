@@ -66,6 +66,14 @@ class Engine:
     def run(self):
         ''' Main '''
 
+        def publisher():
+            '''
+            publishes predictions on demand
+            this should probably be broken out into a service
+            that creates a stream and a service that publishes...
+            '''
+            self.data.runPublisher(self.models)
+
         def subscriber():
             '''
             listens for external updates on subscriptions - 
@@ -75,18 +83,8 @@ class Engine:
             that subscribes and a service that listens...
             should be on demand
             '''
-            while True:
-                self.data.runSubscriber(self.models)
-                time.sleep(10)
+            self.data.runSubscriber(self.models)
                 
-        def publisher():
-            '''
-            publishes predictions on demand
-            this should probably be broken out into a service
-            that creates a stream and a service that publishes...
-            '''
-            self.data.runPublisher(self.models)
-
         def scholar():
             ''' always looks for external data and compiles it '''
             while True:
@@ -111,30 +109,30 @@ class Engine:
             if self.view:
                 self.view.listen(model)
    
-        publisher()
-        threads = {}
-        threads['subscriber'] = threading.Thread(target=subscriber, daemon=True)
-        threads['scholar'] = threading.Thread(target=scholar, daemon=True)
-        for model in self.models:
-            model.buildStable() # we have to run this once for each model to complete its initialization
-            predictor(model)
-            sync(model)
-            if self.view and self.view.isReactive:
-                watcher(model)
-            threads[f'{model.id}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
-        for thread in threads.values():
-            thread.start()
-        while threading.active_count() > 0:
-            time.sleep(31)
-            if not self.view.isReactive:
-                #self.updateView(
-                self.out(
-                predictions = {
-                    model.id: model.prediction
-                    for model in self.models},
-                scores = {
-                    model.id: f'{round(model.stable, 3)} ({round(model.test, 3)})'
-                    for model in self.models})
+        #publisher()
+        subscriber()
+        #threads = {}
+        #threads['scholar'] = threading.Thread(target=scholar, daemon=True)
+        #for model in self.models:
+        #    model.buildStable() # we have to run this once for each model to complete its initialization
+        #    predictor(model)
+        #    sync(model)
+        #    if self.view and self.view.isReactive:
+        #        watcher(model)
+        #    threads[f'{model.id}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
+        #for thread in threads.values():
+        #    thread.start()
+        #while threading.active_count() > 0:
+        #    time.sleep(31)
+        #    if not self.view.isReactive:
+        #        #self.updateView(
+        #        self.out(
+        #        predictions = {
+        #            model.id: model.prediction
+        #            for model in self.models},
+        #        scores = {
+        #            model.id: f'{round(model.stable, 3)} ({round(model.test, 3)})'
+        #            for model in self.models})
                 
                 
 

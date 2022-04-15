@@ -3,62 +3,154 @@
 
 ''' an api for reading and writing to disk '''
 
+import shutil
 import pyarrow.parquet as pq
 import pandas as pd
 from satori import config
 import os
 import pyarrow as pa
-from satori.lib.apis.memory import merge
+from satori.lib.apis import memory
 from satori.lib.engine.structs import SourceStreamTargets
 
 class Api(object):
-    def __init__(self, df:pd.DataFrame, source:str=None, stream:str=None, location:str=None, append:bool=None, ext:str='parquet'):
-        self.df = df
+    def __init__(self, df:pd.DataFrame=None, source:str=None, stream:str=None, location:str=None, append:bool=None, ext:str='parquet'):
+        self.df = df if df is not None else pd.DataFrame();
         self.source = source
         self.stream = stream
         self.location = location
         self.ext = ext
         
-    def path(self):
+    def path(self, source:str=None, stream:str=None, permanent:bool=False):
         ''' Layer 0 get the path of a file '''
+        source = source or self.source or config.defaultSource
+        stream = stream or self.stream
         return os.path.join(
                 self.location or config.dataPath(),
-                self.source or config.defaultSource,  
-                f'{self.stream}.{self.ext}'),
+                'permanent' if permanent else '',
+                source,
+                f'{stream}.{self.ext}')
 
-    def exists(self):
+    def exists(self, source:str=None, stream:str=None, permanent:bool=False,):
         ''' Layer 0 return True if file exists at path, else False '''
-        return os.path.exists(self.path())
+        return os.path.exists(self.path(source, stream, permanent))
 
-    def write(self, df:pd.DataFrame,  append:bool=None):
+    def dropSourceStream(self, df:pd.DataFrame):
+        ''' Layer 0 '''
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.droplevel() # source
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.droplevel() # stream
+        return df
+
+    def toTable(self, df:pd.DataFrame=None):
+        ''' Layer 0 '''
+        return pa.Table.from_pandas(self.dropSourceStream(df if df is not None else self.df))
+
+    def incrementals(self, source:str=None, stream:str=None):
+        ''' Layer 0 '''
+        return os.listdir(self.path(source, stream))
+
+    def append(self, df:pd.DataFrame=None):
         ''' Layer 1
         writes a dataframe to a parquet file.
         must remove multiindex column first.
         must use write_to_dataset rather than write_to_table to support append.
         streamId is the name of file.
         '''
-        append = append or self.exists()
-        df = df or self.df
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = df.columns.droplevel() # source
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = df.columns.droplevel() # stream
-        pq.write_to_dataset((
-                pa.Table.from_pandas(df) if append else
-                pa.Table.from_pandas(df).replace_schema_metadata(None)),
-            self.path())
+        pq.write_to_dataset(self.toTable(df), self.path())
 
-    def read(self, source:str, stream:str, **kwargs):
+    def write(self, df:pd.DataFrame=None):
+        ''' Layer 1
+        writes a dataframe to a parquet file.
+        must remove multiindex column first.
+        streamId is the name of file.
+        '''
+        pq.write_table(self.toTable(df), self.path(permanent=True))        
+        
+    def compress(self, source:str=None, stream:str=None):
+        ''' Layer 1
+        assumes columns are always the same...
+        this function is used on rare occasion to compress the on disk 
+        incrementally saved data to long term storage. The compressed
+        table takes up less room than the dataset because the dataset
+        is partitioned into many files, allowing us to easily append
+        to it. So we normally append observations to the dataset, and
+        occasionally, like daily or weekly, run this compress function
+        to save it to long term storage. We can still query long term
+        storage the same way.
+        '''
+        source = source or self.source
+        stream = stream or self.stream
+        df = self.readBoth(source, stream)
+        if df is not None:
+            self.remove(source, stream, True)
+            self.write(df)
+            self.remove(source, stream, False)
+
+    def remove(self, source:str=None, stream:str=None, permanent:bool=None):
+        ''' Layer 1 when we don't use a stream anymore we'll remove it '''
+        source = source or self.source
+        stream = stream or self.stream
+        if permanent is None:
+            self.remove(source, stream, True)    
+            self.remove(source, stream, False)    
+        elif permanent:
+            if self.exists(source, stream, permanent):
+                os.remove(self.path(source, stream, permanent))
+        else:
+            shutil.rmtree(self.path(source, stream), ignore_errors=True)            
+                
+    def readBoth(self, source:str, stream:str):
+        ''' Layer 1 '''
+        return self.merge(
+            self.read(source, stream, permanent=False),
+            self.read(source, stream, permanent=True), 
+            source, stream)
+        
+    def merge(self, df:pd.DataFrame, long:pd.DataFrame, source:str, stream:str):
+        ''' Layer 1 
+        meant to merge long term (permanent) written tables 
+        with short term (incremental) appended datasets
+        for one stream
+        '''
+        def dropDuplicates(df:pd.DataFrame):
+            return df.drop_duplicates(subset=(source, stream, 'StreamObservationId'), keep='last').sort_index()
+        
+        if df is None and long is None:
+            return None
+        if df is None:
+            return dropDuplicates(long)
+        if long is None:
+            return dropDuplicates(df)
+        df['TempIndex'] = df.index 
+        long['TempIndex'] = long.index 
+        df = pd.merge(df, long, how='outer', on=list(df.columns)) 
+        df.index = df['TempIndex']  
+        df.index.name = None
+        df = df.drop('TempIndex', axis=1, level=0) 
+        return dropDuplicates(df)
+
+    def read(self, source:str=None, stream:str=None, permanent:bool=None, **kwargs):
         ''' Layer 1
         reads a parquet file with filtering, use columns=[targets].
         adds on the stream as first level in multiindex column on dataframe.
+        Since we compress incremental observations into long term storage we
+        really have 2 datasets per stream to look up, thus we specify permanent
+        as None in order to pull from both datasets and merge automatically.
         '''
         source = source or self.source or self.df.columns.levels[0]
         stream = stream or self.stream or self.df.columns.levels[1]
-        rdf = pq.read_table(self.path(), **kwargs).to_pandas()
+        if permanent is None:
+            return self.readBoth(source, stream)
+        if not self.exists(source, stream, permanent):
+            return None
+        rdf = pq.read_table(self.path(source, stream, permanent), **kwargs).to_pandas()
+        if '__index_level_0__' in rdf.columns:
+            rdf.index = rdf.loc[:, '__index_level_0__']
+            rdf.index.name = None
+            rdf = rdf.drop('__index_level_0__', axis=1)
         rdf.columns = pd.MultiIndex.from_product([[source], [stream], rdf.columns])
-        return rdf
-        
+        return rdf.sort_index()
     
     def gather(
         self, 
@@ -70,30 +162,44 @@ class Api(object):
         source:str=None,
         stream:str=None,
     ):
-        ''' Layer 2. retrieves the targets and merges them. '''
+        ''' Layer 2. 
+        retrieves the targets and merges them.
+        as a prime example of premature optimization I made 
+        this function callable in a myriad of various ways...
+        I don't remember why.
+        '''
         if sourceStreamTargetss is not None:
-            return merge([
+            return memory.merge([
                 self.read(source, stream, columns=targets)
                 for source, stream, targets in SourceStreamTargets.condense(sourceStreamTargetss)])
         if sourceStreamTargets is not None:
-            return merge([
+            return memory.merge([
                 self.read(source, stream, columns=targets)
                 for source, stream, targets in sourceStreamTargets])
         if targets is not None:
-            return merge([
+            return memory.merge([
                 self.read(
                     source or self.source,
                     stream or self.stream,
                     columns=targets)])
         if targetsByStream is not None:
-            return merge([
+            return memory.merge([
                 self.read(
                     source or self.source,
                     stream, columns=targets)
                 for stream, targets in targetsByStream.items()])
         if targetsByStreamBySource is not None:
-            return merge([
+            return memory.merge([
                 self.read(source, stream, columns=targets)
                 for source, values in targetsByStreamBySource.items()
                 for stream, targets in values
                 ])
+'''
+from satori.lib.apis import disk
+x = disk.Api(source='streamrSpoof', stream='simpleEURCleaned') 
+df = x.read()
+df
+x.write(df)
+exit()
+
+'''            
