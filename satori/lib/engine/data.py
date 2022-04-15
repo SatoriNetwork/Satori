@@ -43,11 +43,7 @@ from satori.lib.apis import disk
 
 class DataManager:
 
-    def __init__(
-        self,
-        dataPath:str='data.parquet',
-    ):
-        self.dataPath = dataPath
+    def __init__(self):
         self.sources = {} # dictionary of streams by source and their latest incremental
         self.everything = {}  # a set of all the column names (stream ids) I've seen before.
         self.listeners = []

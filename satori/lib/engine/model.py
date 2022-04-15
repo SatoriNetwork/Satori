@@ -47,6 +47,7 @@ class ModelManager:
         sourceId:str='',
         streamId:str='',
         targetId:str='',
+        targets:list[SourceStreamTargets]=None,
         split:'int|float'=.2,
         override:bool=False,
     ):
@@ -74,7 +75,7 @@ class ModelManager:
         self.streamId = streamId
         self.targetId = targetId
         #self.sources = {'source': {'stream':['targets']}}
-        self.targets:list[SourceStreamTargets] = []  # todo: set targets
+        self.targets:list[SourceStreamTargets] = targets
         self.id = SourceStreamTargets(source=sourceId, stream=streamId, targets=[targetId])
         self.hyperParameters = hyperParameters or []
         self.chosenFeatures = chosenFeatures or [ModelManager.rawDataMetric(column=targetId)]
@@ -93,7 +94,8 @@ class ModelManager:
             self.load()
         self.get()
         self.produceFeatureStructure()
-        self.produceFeatureSet()
+        if not self.data.empty:
+            self.produceFeatureSet()
 
     ### FLAGS ################################################################################
     
@@ -166,7 +168,11 @@ class ModelManager:
 
     def get(self):
         ''' gets the raw data from disk '''
+        print('self.targets', self.targets)
         self.data = disk.Api().gather(sourceStreamTargetss=self.targets)
+        self.data = self.data if self.data is not None else pd.DataFrame()
+        print('self.data')
+        print(self.data)
         #self.data = pd.read_parquet(self.dataPath)
 
     ### TARGET ####################################################################
@@ -189,9 +195,12 @@ class ModelManager:
             metric(column=col): partial(metric, column=col)
             for metric, col in product(self.metrics.values(), self.data.columns)}
         }
+        print('self.features', list(self.features.keys())[0:10], '...')
 
     def produceFeatureSet(self):
         producedFeatures = []
+        
+        print('self.chosenFeatures', self.chosenFeatures)
         for feature in self.chosenFeatures:
             fn = self.features.get(feature)
             if callable(fn):
@@ -201,6 +210,7 @@ class ModelManager:
                 producedFeatures,
                 axis=1,
                 keys=[s.name for s in producedFeatures])
+        print('self.featureSet', self.featureSet)
 
     def produceTestFeatureSet(self, featureNames:'list[str]'=None):
         producedFeatures = []

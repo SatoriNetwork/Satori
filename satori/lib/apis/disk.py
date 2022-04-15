@@ -100,11 +100,11 @@ class Api(object):
         else:
             shutil.rmtree(self.path(source, stream), ignore_errors=True)            
                 
-    def readBoth(self, source:str, stream:str):
+    def readBoth(self, source:str, stream:str, **kwargs):
         ''' Layer 1 '''
         return self.merge(
-            self.read(source, stream, permanent=False),
-            self.read(source, stream, permanent=True), 
+            self.read(source, stream, permanent=False, **kwargs),
+            self.read(source, stream, permanent=True, **kwargs), 
             source, stream)
         
     def merge(self, df:pd.DataFrame, long:pd.DataFrame, source:str, stream:str):
@@ -138,13 +138,21 @@ class Api(object):
         really have 2 datasets per stream to look up, thus we specify permanent
         as None in order to pull from both datasets and merge automatically.
         '''
+        def conform(**kwargs):
+            if 'columns' in kwargs.keys():
+                if 'StreamObservationId' not in kwargs.get('columns', []):
+                    kwargs['columns'].append('StreamObservationId')
+                if '__index_level_0__' not in kwargs.get('columns', []):
+                    kwargs['columns'].append('__index_level_0__')
+            return kwargs 
+        
         source = source or self.source or self.df.columns.levels[0]
         stream = stream or self.stream or self.df.columns.levels[1]
         if permanent is None:
-            return self.readBoth(source, stream)
+            return self.readBoth(source, stream, **kwargs)
         if not self.exists(source, stream, permanent):
             return None
-        rdf = pq.read_table(self.path(source, stream, permanent), **kwargs).to_pandas()
+        rdf = pq.read_table(self.path(source, stream, permanent), **conform(**kwargs)).to_pandas()
         if '__index_level_0__' in rdf.columns:
             rdf.index = rdf.loc[:, '__index_level_0__']
             rdf.index.name = None
@@ -170,27 +178,27 @@ class Api(object):
         '''
         if sourceStreamTargetss is not None:
             return memory.merge([
-                self.read(source, stream, columns=targets)
+                self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
                 for source, stream, targets in SourceStreamTargets.condense(sourceStreamTargetss)])
         if sourceStreamTargets is not None:
             return memory.merge([
-                self.read(source, stream, columns=targets)
+                self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
                 for source, stream, targets in sourceStreamTargets])
         if targets is not None:
             return memory.merge([
                 self.read(
                     source or self.source,
                     stream or self.stream,
-                    columns=targets)])
+                    columns=targets)]).drop((source, stream, 'StreamObservationId'), axis=1)
         if targetsByStream is not None:
             return memory.merge([
                 self.read(
                     source or self.source,
-                    stream, columns=targets)
+                    stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
                 for stream, targets in targetsByStream.items()])
         if targetsByStreamBySource is not None:
             return memory.merge([
-                self.read(source, stream, columns=targets)
+                self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
                 for source, values in targetsByStreamBySource.items()
                 for stream, targets in values
                 ])
@@ -199,7 +207,7 @@ from satori.lib.apis import disk
 x = disk.Api(source='streamrSpoof', stream='simpleEURCleaned') 
 df = x.read()
 df
-x.write(df)
+x.read(columns=['High'])
 exit()
 
 '''            

@@ -4,6 +4,8 @@ import pandas as pd
 import satori
 import os
 
+from satori.lib.engine.structs import SourceStreamTargets
+
 # accept optional data necessary to generate models data and learner
 def getEngine(path=None):
     '''
@@ -38,7 +40,8 @@ def getEngine(path=None):
             feature.name = name()
             return feature
     
-        kwargs = {
+        # these will be sensible defaults based upon the patterns in the data
+        kwargs = { 
             'hyperParameters': [
                 satori.HyperParameter(
                     name='n_estimators',
@@ -81,17 +84,22 @@ def getEngine(path=None):
                 streamId='simpleEURCleaned',
                 targetId='High',
                 pinnedFeatures=['DiffHighLow'],
+                targets=[SourceStreamTargets(
+                    source='streamrSpoof', 
+                    stream='simpleEURCleaned', 
+                    targets=['High', 'Low'])],
                 **kwargs),
-            satori.ModelManager(
-                modelPath='modelLow.joblib',
-                streamId='simpleEURCleaned',
-                targetId='Low',
-                **kwargs),
-            satori.ModelManager(
-                modelPath='modelClose.joblib',
-                streamId='simpleEURCleaned',
-                targetId='Close',
-                **kwargs)}
+            #satori.ModelManager(
+            #    modelPath='modelLow.joblib',
+            #    streamId='simpleEURCleaned',
+            #    targetId='Low',
+            #    **kwargs),
+            #satori.ModelManager(
+            #    modelPath='modelClose.joblib',
+            #    streamId='simpleEURCleaned',
+            #    targetId='Close',
+            #    **kwargs)
+            }
     
     dataSettings = satori.config.dataSettings()
     if dataSettings != {}:
@@ -99,5 +107,5 @@ def getEngine(path=None):
     return satori.Engine(
         view=satori.View(),
         data=getExistingDataManager(dataSettings),
-        #models=getExistingModelManager()
+        models=getExistingModelManager()
         )

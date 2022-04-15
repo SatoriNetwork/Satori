@@ -7,6 +7,10 @@ def merge(dfs:list[pd.DataFrame]):
     to support disparate frequencies, 
     outter join fills in missing values with previous value.
     '''
+    if len(dfs) == 0:
+        return None
+    if len(dfs) == 1:
+        return dfs[0]
     for df in dfs:
         df.index = pd.to_datetime(df.index)
     return reduce(
