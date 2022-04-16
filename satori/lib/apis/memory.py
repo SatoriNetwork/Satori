@@ -32,18 +32,25 @@ def mergeAllTime(dfs:list[pd.DataFrame]):
         # maybe we will bfill in model. always bfill After ffill.
         dfs)
 
-def merge(dfs:list[pd.DataFrame], target:pd.DataFrame, targetColumn:'str|tuple[str]'):
+def merge(dfs:list[pd.DataFrame], targetColumn:'str|tuple[str]'):
     ''' Layer 1
     combines multiple mutlicolumned dataframes.
     to support disparate frequencies, 
     outter join fills in missing values with previous value.
     filters down to the target column observations.
     '''
-    dfs = [target] + dfs
     if len(dfs) == 0:
         return None
     if len(dfs) == 1:
         return dfs[0]
+    for ix, item in enumerate(dfs):
+        if targetColumn in item.columns:
+            dfs.insert(0, dfs.pop(ix))
+            break
+        # if we get through this loop without hitting the if
+        # we could possibly use that as a trigger to use the
+        # other merge function, also if targetColumn is None 
+        # why would we make a dataset without target though?
     for df in dfs:
         df.index = pd.to_datetime(df.index)
     return reduce(

@@ -162,6 +162,7 @@ class Api(object):
     
     def gather(
         self, 
+        targetColumn:'str|tuple[str]',
         targetsByStreamBySource:dict[str, dict[str, list[str]]]=None,
         targetsByStream:dict[str, list[str]]=None,
         targets:list[str]=None,
@@ -180,30 +181,32 @@ class Api(object):
         stream = stream or self.stream
         if sourceStreamTargetss is not None:
             return memory.merge([
-                self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
-                for source, stream, targets in SourceStreamTargets.condense(sourceStreamTargetss)])
+                    self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
+                    for source, stream, targets in SourceStreamTargets.condense(sourceStreamTargetss)],
+                targetColumn=targetColumn)
         if sourceStreamTargets is not None:
             return memory.merge([
-                self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
-                for source, stream, targets in sourceStreamTargets])
+                    self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
+                    for source, stream, targets in sourceStreamTargets],
+                targetColumn=targetColumn)
         if targets is not None:
-            return memory.merge([
+            return memory.merge(
                 self.read(
                     source or self.source,
                     stream or self.stream,
-                    columns=targets)]).drop((source, stream, 'StreamObservationId'), axis=1)
+                    columns=targets).drop((source, stream, 'StreamObservationId'), axis=1),
+                targetColumn=targetColumn)
         if targetsByStream is not None:
             return memory.merge([
-                self.read(
-                    source or self.source,
-                    stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
-                for stream, targets in targetsByStream.items()])
+                    self.read(source or self.source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
+                    for stream, targets in targetsByStream.items()],
+                targetColumn=targetColumn)
         if targetsByStreamBySource is not None:
             return memory.merge([
-                self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
-                for source, values in targetsByStreamBySource.items()
-                for stream, targets in values
-                ])
+                    self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
+                    for source, values in targetsByStreamBySource.items()
+                    for stream, targets in values],
+                targetColumn=targetColumn)
         return self.read(source, stream).drop((source, stream, 'StreamObservationId'), axis=1)
         
 '''

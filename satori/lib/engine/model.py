@@ -183,7 +183,7 @@ class ModelManager:
             '''
             self.data = self.data if self.data is not None else pd.DataFrame()
     
-        self.data = disk.Api().gather(sourceStreamTargetss=self.targets, targetId...)
+        self.data = disk.Api().gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
         handleEmpty()
         addFeatureLevel()
         print('self.data')
