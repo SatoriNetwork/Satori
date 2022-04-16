@@ -30,7 +30,8 @@ def getEngine(path=None):
             most of the time you don't know what kinds of data you'll get...
             '''
             def name() -> str:
-                return f'{prefix}{columns[0]}{columns[1]}'
+                ''' todo: derive '''
+                return ('streamrSpoof', 'simpleEURCleaned', 'High', 'DiffLow')
 
             if df is None:
                 return name()
@@ -66,7 +67,7 @@ def getEngine(path=None):
                     maximum=2),],
             'metrics':  {
                 # raw data features
-                'raw': satori.ModelManager.rawDataMetric,
+                #'raw': satori.ModelManager.rawDataMetric,
                 # daily percentage change, 1 day ago, 2 days ago, 3 days ago... 
                 **{f'Daily{i}': partial(satori.ModelManager.dailyPercentChangeMetric, yesterday=i) for i in list(range(1, 31))},
                 # rolling period transformation percentage change, max of the last 7 days, etc... 
@@ -75,15 +76,26 @@ def getEngine(path=None):
                 # rolling period transformation percentage change, max of the last 50 or 70 days, etc... 
                 **{f'Rolling{i}{tx[0:3]}': partial(satori.ModelManager.rollingPercentChangeMetric, window=i, transformation=tx)
                     for tx, i in product('sum() max() min() mean() median() std()'.split(), list(range(22, 90, 7)))}},
-            'features': {'DiffHighLow': partial(generateCombinedFeature, columns=['High', 'Low'])},
-            'chosenFeatures': ['RawClose', 'RawHigh', 'RawLow', 'DiffHighLow'],
+            'features': {
+                ('streamrSpoof', 'simpleEURCleaned', 'High', 'DiffLow'): 
+                    partial(
+                        generateCombinedFeature, 
+                        columns=[
+                            ('streamrSpoof', 'simpleEURCleaned', 'High', 'Raw'), 
+                            ('streamrSpoof', 'simpleEURCleaned', 'Low', 'Raw')])},
+            'chosenFeatures': [
+                ('streamrSpoof', 'simpleEURCleaned', 'Close', 'Raw'), 
+                ('streamrSpoof', 'simpleEURCleaned', 'High', 'Raw'), 
+                ('streamrSpoof', 'simpleEURCleaned', 'Low', 'Raw'), 
+                ('streamrSpoof', 'simpleEURCleaned', 'High', 'DiffLow')],
             'override': False}
         return {
             satori.ModelManager(
                 modelPath='modelHigh.joblib',
+                sourceId='streamrSpoof',
                 streamId='simpleEURCleaned',
                 targetId='High',
-                pinnedFeatures=['DiffHighLow'],
+                pinnedFeatures=[('streamrSpoof', 'simpleEURCleaned', 'High', 'DiffLow')],
                 targets=[SourceStreamTargets(
                     source='streamrSpoof', 
                     stream='simpleEURCleaned', 

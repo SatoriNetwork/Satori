@@ -113,9 +113,9 @@ class Engine:
         subscriber()
         #threads = {}
         #threads['scholar'] = threading.Thread(target=scholar, daemon=True)
-        #for model in self.models:
-        #    model.buildStable() # we have to run this once for each model to complete its initialization
-        #    predictor(model)
+        for model in self.models:
+            model.buildStable() # we have to run this once for each model to complete its initialization
+            predictor(model)
         #    sync(model)
         #    if self.view and self.view.isReactive:
         #        watcher(model)

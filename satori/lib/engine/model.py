@@ -78,7 +78,7 @@ class ModelManager:
         self.targets:list[SourceStreamTargets] = targets
         self.id = SourceStreamTargets(source=sourceId, stream=streamId, targets=[targetId])
         self.hyperParameters = hyperParameters or []
-        self.chosenFeatures = chosenFeatures or [ModelManager.rawDataMetric(column=targetId)]
+        self.chosenFeatures = chosenFeatures or []
         self.pinnedFeatures = pinnedFeatures or []
         self.scoredFeatures = {}
         self.features = features or {}
@@ -108,19 +108,6 @@ class ModelManager:
         self.newAvailableInput = BehaviorSubject(None)
     
     ### STATIC FEATURES GENERATORS ###########################################################
-
-    @staticmethod
-    def rawDataMetric(df:pd.DataFrame=None, column:str=None, prefix='Raw') -> pd.DataFrame:
-
-        def name() -> str:
-            return f'{prefix}{column}'
-
-        if df is None:
-            return name()
-
-        feature = df.loc[:, column]
-        feature.name = name()
-        return feature
 
     @staticmethod
     def dailyPercentChangeMetric(
@@ -186,8 +173,7 @@ class ModelManager:
         self.data = disk.Api().gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
         handleEmpty()
         addFeatureLevel()
-        print('self.data')
-        print(self.data)
+        print('\nself.data\n', self.data)
 
     ### TARGET ####################################################################
 
@@ -209,22 +195,27 @@ class ModelManager:
             metric(column=col): partial(metric, column=col)
             for metric, col in product(self.metrics.values(), self.data.columns)}
         }
-        print('self.features', list(self.features.keys())[0:10], '...')
+        print('\nself.features\n', list(self.features.keys())[0:10], '...')
 
     def produceFeatureSet(self):
         producedFeatures = []
         
-        print('self.chosenFeatures', self.chosenFeatures)
+        print('\nself.chosenFeatures\n', self.chosenFeatures)
         for feature in self.chosenFeatures:
+            print('\nfeature\n', feature)
             fn = self.features.get(feature)
             if callable(fn):
                 producedFeatures.append(fn(self.data))
+                print('\nproducedFeatures\n', producedFeatures)
         if len(producedFeatures) > 0:
+            # doesn't the new design indicate that we should just concat this
+            # to self.data? no, actually, I think this gets regenerated each
+            # time we get updates... 
             self.featureSet = pd.concat(
                 producedFeatures,
                 axis=1,
                 keys=[s.name for s in producedFeatures])
-        print('self.featureSet', self.featureSet)
+        print('\nself.featureSet\n', self.featureSet)
 
     def produceTestFeatureSet(self, featureNames:'list[str]'=None):
         producedFeatures = []
@@ -565,6 +556,7 @@ class ModelManager:
             makePrediction()
             
         def makePredictionFromNewTarget(incremental):
+            print('\nmakePredictionFromNewTarget', incremental)
             ## add incremental updates to inmemory model dataset - something like this:
             #for i in self.inputs:
             #    self.updates[i] = data.updates.get(i)
@@ -573,6 +565,7 @@ class ModelManager:
                 # be cool if the incremental were in the stream...
                 #incremental=data.sources[self.sourceId][self.streamId]) 
                 incremental=incremental)
+            print(self.data)
             makePrediction(isTarget=True)
                 
         self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x else None)
