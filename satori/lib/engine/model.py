@@ -168,12 +168,26 @@ class ModelManager:
 
     def get(self):
         ''' gets the raw data from disk '''
-        print('self.targets', self.targets)
-        self.data = disk.Api().gather(sourceStreamTargetss=self.targets)
-        self.data = self.data if self.data is not None else pd.DataFrame()
+        
+        def addFeatureLevel():
+            ''' adds a feature level to the multiindex columns'''
+            self.data.columns = pd.MultiIndex.from_tuples([c + ('Raw',)  for c in self.data.columns])
+            
+        def handleEmpty():
+            '''
+            todo: what should we do if no data available yet? 
+            should self.data be None? or should it be an empty dataframe without our target columns?
+            or should it be an empty dataframe with our target columns?
+            It seems like it should just be None and that we should halt behavior until it has a
+            threshold amount of data.
+            '''
+            self.data = self.data if self.data is not None else pd.DataFrame()
+    
+        self.data = disk.Api().gather(sourceStreamTargetss=self.targets, targetId...)
+        handleEmpty()
+        addFeatureLevel()
         print('self.data')
         print(self.data)
-        #self.data = pd.read_parquet(self.dataPath)
 
     ### TARGET ####################################################################
 
@@ -182,7 +196,7 @@ class ModelManager:
         series.name = ModelManager.produceTargetName(self.targetId)
         self.target = pd.DataFrame(series)
 
-    @staticmethod
+    @staticmethod 
     def produceTargetName(target:str, prefix:str='Target_'):
         return f'{prefix}{target}'
 

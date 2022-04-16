@@ -1,12 +1,17 @@
 from functools import reduce
 import pandas as pd
 
-def merge(dfs:list[pd.DataFrame]):
-    ''' Layer 1
+def mergeAllTime(dfs:list[pd.DataFrame]):
+    ''' Layer 1 - not useful?
     combines multiple mutlicolumned dataframes.
     to support disparate frequencies, 
     outter join fills in missing values with previous value.
+    So this isn't really important anymore becauase I realized
+    it'll not be needed anywhere I think, maybe for the live
+    updates models and stream but that's for later.
     '''
+    if dfs is pd.DataFrame:
+        return dfs
     if len(dfs) == 0:
         return None
     if len(dfs) == 1:
@@ -19,12 +24,41 @@ def merge(dfs:list[pd.DataFrame]):
             right, 
             how='outer',
             left_index=True,
-            right_index=True).fillna(method='ffill'),
+            right_index=True)
+        # can't use this for merge because we don't want to fill the targetColumn
+        .fillna(method='ffill'), 
         #.fillna(method='bfill'),
         # don't bfill here, in many cases its fine to bfill, but not in all.
         # maybe we will bfill in model. always bfill After ffill.
         dfs)
 
+def merge(dfs:list[pd.DataFrame], targetColumn:'str|tuple[str]'):
+    ''' Layer 1
+    combines multiple mutlicolumned dataframes.
+    to support disparate frequencies, 
+    outter join fills in missing values with previous value.
+    filters down to the target column observations.
+    '''
+    if dfs is pd.DataFrame:
+        return dfs
+    if len(dfs) == 0:
+        return None
+    if len(dfs) == 1:
+        return dfs[0]
+    for df in dfs:
+        df.index = pd.to_datetime(df.index)
+    merged = reduce(
+        lambda left, right: pd.merge(
+            left, 
+            right, 
+            how='outer',
+            left_index=True,
+            right_index=True),
+        dfs)
+    for col in merged.columns:
+        if col != targetColumn:
+            merged[col] = merged[col].fillna(method='ffill')
+    return merged[merged[targetColumn].notna()]
 
 def appdendInsert(merged:pd.DataFrame, incremental:pd.DataFrame):
     ''' Layer 2

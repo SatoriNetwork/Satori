@@ -176,6 +176,8 @@ class Api(object):
         this function callable in a myriad of various ways...
         I don't remember why.
         '''
+        source = source or self.source
+        stream = stream or self.stream
         if sourceStreamTargetss is not None:
             return memory.merge([
                 self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
@@ -202,6 +204,8 @@ class Api(object):
                 for source, values in targetsByStreamBySource.items()
                 for stream, targets in values
                 ])
+        return self.read(source, stream).drop((source, stream, 'StreamObservationId'), axis=1)
+        
 '''
 from satori.lib.apis import disk
 x = disk.Api(source='streamrSpoof', stream='simpleEURCleaned') 
