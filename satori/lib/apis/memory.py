@@ -32,33 +32,24 @@ def mergeAllTime(dfs:list[pd.DataFrame]):
         # maybe we will bfill in model. always bfill After ffill.
         dfs)
 
-def merge(dfs:list[pd.DataFrame], targetColumn:'str|tuple[str]'):
+def merge(dfs:list[pd.DataFrame], target:pd.DataFrame, targetColumn:'str|tuple[str]'):
     ''' Layer 1
     combines multiple mutlicolumned dataframes.
     to support disparate frequencies, 
     outter join fills in missing values with previous value.
     filters down to the target column observations.
     '''
-    if dfs is pd.DataFrame:
-        return dfs
+    dfs = [target] + dfs
     if len(dfs) == 0:
         return None
     if len(dfs) == 1:
         return dfs[0]
     for df in dfs:
         df.index = pd.to_datetime(df.index)
-    merged = reduce(
-        lambda left, right: pd.merge(
-            left, 
-            right, 
-            how='outer',
-            left_index=True,
-            right_index=True),
+    return reduce(
+        lambda left, right: 
+            pd.merge_asof(left, right, left_index=True, right_index=True),
         dfs)
-    for col in merged.columns:
-        if col != targetColumn:
-            merged[col] = merged[col].fillna(method='ffill')
-    return merged[merged[targetColumn].notna()]
 
 def appdendInsert(merged:pd.DataFrame, incremental:pd.DataFrame):
     ''' Layer 2
