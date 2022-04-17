@@ -99,6 +99,7 @@ class Observation:
         if isinstance(self.content, dict):
             self.df = pd.DataFrame(
                 {(self.sourceId, self.streamId, target): values for target, values in list(self.content.items()) + [('StreamObservationId', self.observationId)]},
+                #columns=pd.MultiIndex.from_tuples([(self.sourceId, self.streamId, self.)]),
                 index=[self.observedTime])
         elif not isinstance(self.content, dict):
             self.df = pd.DataFrame(

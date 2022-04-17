@@ -110,19 +110,29 @@ class ModelManager:
     ### STATIC FEATURES GENERATORS ###########################################################
 
     @staticmethod
+    def rawDataMetric(df:pd.DataFrame=None, column:tuple=None) -> pd.Series:
+        def name() -> tuple:
+            return column
+        
+        if df is None:
+            return name()
+        feature = df.loc[:, column]
+        feature.name = name()
+        return feature
+
+    @staticmethod
     def dailyPercentChangeMetric(
         df:pd.DataFrame=None,
-        column:str=None,
+        column:tuple=None,
         prefix:str='Daily',
         yesterday:int=1,
-    ) -> pd.DataFrame:
+    ) -> pd.Series:
 
-        def name() -> str:
-            return f'{prefix}{column}{yesterday}'
+        def name() -> tuple:
+            return (col for col in column[0:len(column)-1]) + (prefix+str(yesterday),) 
 
         if df is None:
             return name()
-
         feature = df.loc[:, column].shift(yesterday-1) / df.loc[:, column].shift(yesterday)
         feature.name = name()
         return feature
@@ -130,17 +140,17 @@ class ModelManager:
     @staticmethod
     def rollingPercentChangeMetric(
         df:pd.DataFrame=None,
-        column:str=None,
+        column:tuple=None,
         prefix:str='Rolling',
         window:int=2,
-        transformation:str='max()',
-    ) -> pd.DataFrame:
-        def name() -> str:
-            return f'{prefix}{column}{window}{transformation[0:3]}'
+        transformation:str='max',
+    ) -> pd.Series:
+        
+        def name() -> tuple:
+            return (col for col in column[0:len(column)-1]) + (prefix+str(window)+transformation.replace('(','').replace(')',''),) 
 
         if df is None:
             return name()
-
         transactionOptions = 'sum max min mean median std count var skew kurt quantile cov corr apply'
         if (isinstance(window, int)
             and transformation.startswith(tuple(transactionOptions.split()))):
@@ -152,13 +162,15 @@ class ModelManager:
    
 
     ### GET DATA ####################################################################
+    
+    #@staticmethod
+    #def addFeatureLevel(df:pd.DataFrame):
+    #    ''' adds a feature level to the multiindex columns'''
+    #    return pd.MultiIndex.from_tuples([c + ('Raw',)  for c in df.columns])
 
     def get(self):
         ''' gets the raw data from disk '''
         
-        def addFeatureLevel():
-            ''' adds a feature level to the multiindex columns'''
-            self.data.columns = pd.MultiIndex.from_tuples([c + ('Raw',)  for c in self.data.columns])
             
         def handleEmpty():
             '''
@@ -172,15 +184,13 @@ class ModelManager:
     
         self.data = disk.Api().gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
         handleEmpty()
-        addFeatureLevel()
-        print('\nself.data\n', self.data)
 
     ### TARGET ####################################################################
 
     def produceTarget(self):
-        series = self.data.loc[:, self.targetId].shift(-1)
-        series.name = ModelManager.produceTargetName(self.targetId)
+        series = self.data.loc[:, self.id.id()].shift(-1)
         self.target = pd.DataFrame(series)
+        self.target.columns = pd.MultiIndex.from_tuples([self.id.id()+('Raw',)])
 
     @staticmethod 
     def produceTargetName(target:str, prefix:str='Target_'):
@@ -195,28 +205,19 @@ class ModelManager:
             metric(column=col): partial(metric, column=col)
             for metric, col in product(self.metrics.values(), self.data.columns)}
         }
-        print('\nself.features\n', list(self.features.keys())[0:10], '...')
 
     def produceFeatureSet(self):
         producedFeatures = []
-        
-        print('\nself.chosenFeatures\n', self.chosenFeatures)
         for feature in self.chosenFeatures:
-            print('\nfeature\n', feature)
             fn = self.features.get(feature)
             if callable(fn):
                 producedFeatures.append(fn(self.data))
-                print('\nproducedFeatures\n', producedFeatures)
         if len(producedFeatures) > 0:
-            # doesn't the new design indicate that we should just concat this
-            # to self.data? no, actually, I think this gets regenerated each
-            # time we get updates... 
             self.featureSet = pd.concat(
                 producedFeatures,
                 axis=1,
                 keys=[s.name for s in producedFeatures])
-        print('\nself.featureSet\n', self.featureSet)
-
+            
     def produceTestFeatureSet(self, featureNames:'list[str]'=None):
         producedFeatures = []
         for feature in featureNames or self.testFeatures:
@@ -304,6 +305,10 @@ class ModelManager:
     def producePredictable(self):
         if self.featureSet.shape[0] > 0:
             self.current = pd.DataFrame(self.featureSet.iloc[-1,:]).T.dropna(axis=1)
+            print('\nself.data\n', self.data.tail(2))
+            print('\nself.featureSet\n', self.featureSet.tail(2))
+            print('\nself.current\n', self.current)
+            #print('\nself.prediction\n', self.prediction)
 
     def producePrediction(self):
         return self.xgb.predict(self.current)[0]
@@ -514,7 +519,7 @@ class ModelManager:
     ### MAIN PROCESSES #################################################################
 
     def buildStable(self):
-        self.get()
+        #self.get()
         self.produceTarget()
         self.produceFeatureStructure()
         self.produceFeatureSet()
@@ -535,16 +540,20 @@ class ModelManager:
     
     def runPredictor(self, data):
         def makePrediction(isTarget=False):
+            print('\nisTarget\n', isTarget)
             if isTarget:
                 self.buildStable()
                 self.prediction = self.producePrediction()
+                print('\nself.prediction\n', self.prediction)
                 self.predictionUpdate.on_next(self)
-                if self.edge: 
-                    self.predictionEdgeUpdate.on_next(self)
-            elif self.edge:
-                self.buildStable()
-                self.predictionEdge = self.producePrediction()
-                self.predictionEdgeUpdate.on_next(self)
+            ## this is a feature to be added - a second publish stream which requires a
+            ## different dataset - one where the latest update is taken into account.
+            #    if self.edge: 
+            #        self.predictionEdgeUpdate.on_next(self)
+            #elif self.edge:
+            #    self.buildStable()
+            #    self.predictionEdge = self.producePrediction()
+            #    self.predictionEdgeUpdate.on_next(self)
         
         def makePredictionFromNewModel():
             makePrediction()
@@ -556,21 +565,18 @@ class ModelManager:
             makePrediction()
             
         def makePredictionFromNewTarget(incremental):
-            print('\nmakePredictionFromNewTarget', incremental)
-            ## add incremental updates to inmemory model dataset - something like this:
-            #for i in self.inputs:
-            #    self.updates[i] = data.updates.get(i)
+            for col in incremental.columns:
+                if col not in self.data.columns:
+                    incremental = incremental.drop(col, axis=1)
+            #incremental.columns = ModelManager.addFeatureLevel(df=incremental)
             self.data = memory.appdendInsert(
                 merged=self.data, 
-                # be cool if the incremental were in the stream...
-                #incremental=data.sources[self.sourceId][self.streamId]) 
                 incremental=incremental)
-            print(self.data)
             makePrediction(isTarget=True)
                 
-        self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x else None)
-        self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(x) if x else None)
-        self.targetUpdated.subscribe(lambda x: makePredictionFromNewTarget(x) if x else None)
+        self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x is not None else None)
+        self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(x) if x is not None else None)
+        self.targetUpdated.subscribe(lambda x: makePredictionFromNewTarget(x) if x is not None else None)
         
     def runExplorer(self):
         try:

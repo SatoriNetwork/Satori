@@ -89,14 +89,21 @@ class DataManager:
             ''' append to existing datastream, save to disk, notify models '''
             
             def remember():
-                ''' cache latest observation for each stream as DataFrame with observed-time '''
+                '''
+                cache latest observation for each stream as an Observation object with a DataFrame 
+                if it's new returns true so process can continue, if a repeat, return false
+                '''
                 if observation.sourceId not in self.sources.keys():
                     self.sources[observation.sourceId] = {observation.streamId: None}
-                self.sources[observation.sourceId][observation.streamId] = observation.df
+                x = self.sources[observation.sourceId][observation.streamId]
+                if x is not None and x.observationId == observation.observationId:
+                    return False
+                self.sources[observation.sourceId][observation.streamId] = observation
+                return True
         
             def saveIncremental():
                 ''' save these observations to the right parquet file on disk '''
-                disk.Api(source=observation.sourceId, stream=observation.streamId).append(observation.df)
+                disk.Api(source=observation.sourceId, stream=observation.streamId).append(observation.df.copy())
             
             def compress():
                 ''' compress if the number of incrementals is high '''
@@ -106,7 +113,6 @@ class DataManager:
                 
             def tellModels():
                 ''' tell the modesl that listen to this stream and these targets '''
-                print('TELL MODELS:')
                 for model in models:
                     if (model.sourceId == observation.sourceId and
                         model.streamId == observation.streamId and
@@ -130,10 +136,10 @@ class DataManager:
                     #            (observation.sourceId, observation.streamId, update) 
                     #            for update in sendUpdates]])
             
-            remember()
-            saveIncremental()
-            compress()
-            tellModels()
+            if remember():
+                saveIncremental()
+                compress()
+                tellModels()
             
         self.listeners.append(self.newData.subscribe(lambda x: handleNewData(models, x) if x is not None else None))
         #self.listeners.append(self.newData.subscribe(lambda x: print('triggered')))
@@ -142,17 +148,21 @@ class DataManager:
     def runPublisher(self, models):
         def publish(model):
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
-            with open(f'{model.id}.txt', 'w') as f:
+            with open(f'{model.id.id()}.txt', 'w') as f:
                 f.write(f'{model.prediction}, {str(dt.datetime.now())} {model.prediction}')
         
-        def publishEdge(model):
-            ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
-            with open(f'{model.id}.txt', 'w') as f:
-                f.write(f'{model.predictionEdge}, {str(dt.datetime.now())} {model.predictionEdge}')
+        ## non-implemented feature yet. as it turns out this requires the model to contain two datasets or
+        ## one dataset that is cut on two different time frames (merge_asof for the above publish and 
+        ## anti-merge_as of for the edge stream), so it introduces a lot of complexity we're not willing
+        ## to deal with right now.
+        #def publishEdge(model):
+        #    ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
+        #    with open(f'{model.id.id()}.txt', 'w') as f:
+        #        f.write(f'{model.predictionEdge}, {str(dt.datetime.now())} {model.predictionEdge}')
                 
         for model in models:
             self.listeners.append(model.predictionUpdate.subscribe(lambda x: publish(x) if x else None))
-            self.listeners.append(model.predictionEdgeUpdate.subscribe(lambda x: publishEdge(x) if x else None))
+        #    self.listeners.append(model.predictionEdgeUpdate.subscribe(lambda x: publishEdge(x) if x else None))
     
     def runScholar(self, models):
         ''' download histories and tell model sync '''

@@ -109,7 +109,7 @@ class Engine:
             if self.view:
                 self.view.listen(model)
    
-        #publisher()
+        publisher()
         subscriber()
         #threads = {}
         #threads['scholar'] = threading.Thread(target=scholar, daemon=True)
