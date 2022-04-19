@@ -53,15 +53,12 @@ class Streamr():
 
     def run(self):
         while True:
-            #time.sleep(0)
-            print('SPOOF IN', dt.datetime.utcnow())
             x = self.provideIncrementalWithId()
-            print('SPOOF OUT', dt.datetime.utcnow())
             response = requests.post(
-                url=f'http://localhost:{self.port}/subscription/update', 
+                url=f'http://127.0.0.1:{self.port}/subscription/update', 
                 json=x)
             response.raise_for_status()
-            #time.sleep(1)
+            time.sleep(2)
 
 # todo: we want this spoof to open the parquet file and see what the latest observation id is... do we save that in the parque file? probably not. actaully.
 #       then it should resume sending from that point. to spoof a real stream.   

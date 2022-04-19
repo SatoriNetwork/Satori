@@ -545,7 +545,6 @@ class ModelManager:
                 self.buildStable()
                 self.prediction = self.producePrediction()
                 print('\nself.prediction\n', self.prediction)
-                print('MODEL OUT', dt.datetime.utcnow())
                 self.predictionUpdate.on_next(self)
             ## this is a feature to be added - a second publish stream which requires a
             ## different dataset - one where the latest update is taken into account.
@@ -566,7 +565,6 @@ class ModelManager:
             makePrediction()
             
         def makePredictionFromNewTarget(incremental):
-            print('MODEL IN', dt.datetime.utcnow())
             for col in incremental.columns:
                 if col not in self.data.columns:
                     incremental = incremental.drop(col, axis=1)

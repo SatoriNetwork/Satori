@@ -179,10 +179,8 @@ def update():
     so we can call .on_next() here to pass along the update got here from the 
     Streamr LightClient, and trigger a new prediction.
     '''
-    print('FLASK IN', dt.datetime.utcnow())
     print('POSTJSON:', request.json)
     x = Observation(request.json)
-    print('FLASK OUT', dt.datetime.utcnow())
     Engine.data.newData.on_next(x)
     
     return request.json
@@ -212,7 +210,12 @@ def publsihMeta():
 if __name__ == '__main__':
     spoofStreamer()
     serve(app, host='0.0.0.0', port=satori.config.get()['port'])
-    # http://localhost:24685/
+    
+    #app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True)
+    # https://stackoverflow.com/questions/11150343/slow-requests-on-local-flask-server
+    # did not help
+    
+# http://localhost:24685/
 # sudo nohup /app/anaconda3/bin/python app.py > /dev/null 2>&1 &
 # > python satori\web\app.py    
 
