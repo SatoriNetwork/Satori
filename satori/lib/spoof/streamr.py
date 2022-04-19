@@ -54,9 +54,12 @@ class Streamr():
     def run(self):
         while True:
             #time.sleep(0)
+            print('SPOOF IN', dt.datetime.utcnow())
+            x = self.provideIncrementalWithId()
+            print('SPOOF OUT', dt.datetime.utcnow())
             response = requests.post(
                 url=f'http://localhost:{self.port}/subscription/update', 
-                json=self.provideIncrementalWithId())
+                json=x)
             response.raise_for_status()
             #time.sleep(1)
 

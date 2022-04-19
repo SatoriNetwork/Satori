@@ -42,7 +42,7 @@ app = Flask(__name__)
 #Mobility(app)
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 #CWD = os.path.dirname(os.path.abspath(__file__))
-Engine = satori.getEngine(path=None)
+Engine = satori.getEngine()
 Engine.run()
 
 def spoofStreamer():
@@ -179,8 +179,12 @@ def update():
     so we can call .on_next() here to pass along the update got here from the 
     Streamr LightClient, and trigger a new prediction.
     '''
+    print('FLASK IN', dt.datetime.utcnow())
     print('POSTJSON:', request.json)
-    Engine.data.newData.on_next(Observation(request.json))
+    x = Observation(request.json)
+    print('FLASK OUT', dt.datetime.utcnow())
+    Engine.data.newData.on_next(x)
+    
     return request.json
 
 ###############################################################################
@@ -192,14 +196,14 @@ def update():
 def publsih():
     ''' to streamr - create a new datastream to publish to '''
     resp = {}
-    return render_template('dashboard.html', **resp)
+    return render_template('unknown.html', **resp)
 
 
 @app.route('/history/')
 def publsihMeta():
     ''' to streamr - publish to a stream '''
     resp = {}
-    return render_template('dashboard.html', **resp)
+    return render_template('unknown.html', **resp)
 
 ###############################################################################
 ## Entry ######################################################################

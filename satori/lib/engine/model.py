@@ -419,7 +419,7 @@ class ModelManager:
             else:
                 self.testFeatures = list({
                     random.choice(list(self.features.keys()))
-                    for i in range(0, count)})
+                    for _ in range(0, count)})
 
         def dropOne():
             if len(self.chosenFeatures) >= 2:
@@ -455,7 +455,7 @@ class ModelManager:
         def generateEvalScores(possibleFeatures:'list[str]', count:int=None):
             count = count or min(20, round(len(possibleFeatures)*0.05))
             evalSet = self.produceEvalFeatureSet(
-                featureNames=list(set([random.choice(possibleFeatures) for i in range(0, count)])))
+                featureNames=list(set([random.choice(possibleFeatures) for _ in range(0, count)])))
             evalSet = evalSet.replace([np.inf, -np.inf], np.nan)
             evalScores = self.scoreFeatures(evalSet)
             self.scoredFeatures = {**self.scoredFeatures, **evalScores}
@@ -538,13 +538,14 @@ class ModelManager:
     
     ### LIFECYCLE ######################################################################
     
-    def runPredictor(self, data):
+    def runPredictor(self):
         def makePrediction(isTarget=False):
             print('\nisTarget\n', isTarget)
             if isTarget:
                 self.buildStable()
                 self.prediction = self.producePrediction()
                 print('\nself.prediction\n', self.prediction)
+                print('MODEL OUT', dt.datetime.utcnow())
                 self.predictionUpdate.on_next(self)
             ## this is a feature to be added - a second publish stream which requires a
             ## different dataset - one where the latest update is taken into account.
@@ -565,6 +566,7 @@ class ModelManager:
             makePrediction()
             
         def makePredictionFromNewTarget(incremental):
+            print('MODEL IN', dt.datetime.utcnow())
             for col in incremental.columns:
                 if col not in self.data.columns:
                     incremental = incremental.drop(col, axis=1)
@@ -603,14 +605,14 @@ class ModelManager:
             
             
     
-    def syncAvailableInputs(self, data):
+    def syncAvailableInputs(self):
         
-        def sync(data):
+        def sync(x):
             '''
             add the new datastreams and histories to the top 
             of the list of things to explore and evaluate 
             '''
             ## something like this?
-            #self.features.append(data) 
+            #self.features.append(x) 
             
         self.newAvailableInput.subscribe(lambda x: sync(x) if x is not None else None)

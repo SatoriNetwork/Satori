@@ -7,7 +7,7 @@ import os
 from satori.lib.engine.structs import SourceStreamTargets
 
 # accept optional data necessary to generate models data and learner
-def getEngine(path=None):
+def getEngine():
     '''
     called by the flask app to start the Engine.
     returns None or Engine.
@@ -16,7 +16,7 @@ def getEngine(path=None):
     returns Engine if memory of data or models is found or provided.
     ''' 
     
-    def getExistingDataManager(dataSettings:dict = None):
+    def getExistingDataManager():
         ''' generates DataManager from data on disk '''
         data = satori.DataManager()
         return data
@@ -30,7 +30,7 @@ def getEngine(path=None):
             most of the time you don't know what kinds of data you'll get...
             '''
             def name() -> tuple:
-                return (columns[0][0], columns[0][1], 'DiffHighLow')
+                return (columns[0][0], columns[0][1], f'{prefix}{columns[0][2]}{columns[1][2]}')
 
             if df is None:
                 return name()
@@ -116,11 +116,12 @@ def getEngine(path=None):
             #    **kwargs)
             }
     
+    # todo: use settings...
     dataSettings = satori.config.dataSettings()
     if dataSettings != {}:
         return None
     return satori.Engine(
         view=satori.View(),
-        data=getExistingDataManager(dataSettings),
+        data=getExistingDataManager(),
         models=getExistingModelManager()
         )

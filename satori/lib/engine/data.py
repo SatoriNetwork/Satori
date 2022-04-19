@@ -103,12 +103,14 @@ class DataManager:
         
             def saveIncremental():
                 ''' save these observations to the right parquet file on disk '''
+                print('DATA DISK IN', dt.datetime.utcnow())
                 disk.Api(source=observation.sourceId, stream=observation.streamId).append(observation.df.copy())
+                print('DATA DISK OUT', dt.datetime.utcnow())
             
             def compress():
                 ''' compress if the number of incrementals is high '''
                 x = disk.Api(source=observation.sourceId, stream=observation.streamId)
-                if len(x.incrementals()) > 3:
+                if len(x.incrementals()) > 100:
                     x.compress()
                 
             def tellModels():
@@ -118,6 +120,7 @@ class DataManager:
                         model.streamId == observation.streamId and
                         model.targetId in observation.content.keys()
                     ):
+                        print('DATA OUT', dt.datetime.utcnow())
                         model.targetUpdated.on_next(observation.df)
                     ##elif any([key in observation.df.columns for key in model.feature.keys()]): 
                     ##    model.inputsUpdated.on_next(True)
@@ -136,6 +139,9 @@ class DataManager:
                     #            (observation.sourceId, observation.streamId, update) 
                     #            for update in sendUpdates]])
             
+            print('DATA IN', dt.datetime.utcnow())
+
+
             if remember():
                 saveIncremental()
                 compress()
@@ -148,8 +154,10 @@ class DataManager:
     def runPublisher(self, models):
         def publish(model):
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
+            print('PUBLISH IN', dt.datetime.utcnow())
             with open(f'{model.id.id()}.txt', 'w') as f:
                 f.write(f'{model.prediction}, {str(dt.datetime.now())} {model.prediction}')
+            print('PUBLISH OUT', dt.datetime.utcnow())
         
         ## non-implemented feature yet. as it turns out this requires the model to contain two datasets or
         ## one dataset that is cut on two different time frames (merge_asof for the above publish and 

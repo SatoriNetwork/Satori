@@ -93,11 +93,11 @@ class Engine:
 
         def predictor(model:ModelManager):
             ''' produces predictions on demand '''
-            model.runPredictor(self.data)
+            model.runPredictor()
         
         def sync(model:ModelManager):
             ''' sync available inputs found and compiled by scholar on demand '''
-            model.syncAvailableInputs(self.data)
+            model.syncAvailableInputs()
 
         def explorer(model:ModelManager):
             ''' always looks for a better model '''
