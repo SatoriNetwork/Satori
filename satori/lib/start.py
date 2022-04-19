@@ -77,46 +77,76 @@ def getEngine():
                     for tx, i in product('sum() max() min() mean() median() std()'.split(), list(range(22, 90, 7)))}
             },
             'features': {
-                ('streamrSpoof', 'simpleEURCleaned', 'DiffHighLow'): 
+                ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'): 
                     partial(
                         generateCombinedFeature, 
                         columns=[
-                            ('streamrSpoof', 'simpleEURCleaned', 'High'), 
-                            ('streamrSpoof', 'simpleEURCleaned', 'Low')])
+                            ('streamrSpoof', 'simpleEURCleanedHL', 'High'), 
+                            ('streamrSpoof', 'simpleEURCleanedHL', 'Low')])
             },
             'override': False}
         return {
             satori.ModelManager(
                 modelPath='modelHigh.joblib',
                 sourceId='streamrSpoof',
-                streamId='simpleEURCleaned',
+                streamId='simpleEURCleanedHL',
                 targetId='High',
-                pinnedFeatures=[('streamrSpoof', 'simpleEURCleaned', 'DiffHighLow')],
                 targets=[SourceStreamTargets(
                     source='streamrSpoof', 
-                    stream='simpleEURCleaned', 
+                    stream='simpleEURCleanedHL', 
                     targets=['High', 'Low'])],
+                pinnedFeatures=[('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow')],
                 chosenFeatures=[
-                    ('streamrSpoof', 'simpleEURCleaned', 'DailyHigh21'), 
-                    ('streamrSpoof', 'simpleEURCleaned', 'RollingHigh14std'), 
-                    ('streamrSpoof', 'simpleEURCleaned', 'RollingHigh50max'), 
-                    ('streamrSpoof', 'simpleEURCleaned', 'RollingLow50min'), 
-                    ('streamrSpoof', 'simpleEURCleaned', 'High'), 
-                    ('streamrSpoof', 'simpleEURCleaned', 'Low'), 
-                    ('streamrSpoof', 'simpleEURCleaned', 'DiffHighLow'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyHigh21'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh14std'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
+                ],
+                **kwargs),
+            satori.ModelManager(
+                modelPath='modelLow.joblib',
+                sourceId='streamrSpoof',
+                streamId='simpleEURCleanedHL',
+                targetId='Low',
+                targets=[SourceStreamTargets(
+                    source='streamrSpoof', 
+                    stream='simpleEURCleanedHL', 
+                    targets=['High', 'Low'])],
+                pinnedFeatures=[('streamrSpoof', 'simpleEURCleanedHL', 'Low')],
+                chosenFeatures=[
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyLow21'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow14std'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
                 ],
                 **kwargs),
             #satori.ModelManager(
-            #    modelPath='modelLow.joblib',
-            #    streamId='simpleEURCleaned',
-            #    targetId='Low',
-            #    chosenFeatures=[('streamrSpoof', 'simpleEURCleaned', 'Low')],
-            #    **kwargs),
-            #satori.ModelManager(
             #    modelPath='modelClose.joblib',
-            #    streamId='simpleEURCleaned',
+            #    sourceId='streamrSpoof',
+            #    streamId='simpleEURCleanedC',
             #    targetId='Close',
-            #    chosenFeatures=[('streamrSpoof', 'simpleEURCleaned', 'Close')],
+            #    targets=[
+            #        SourceStreamTargets(
+            #            source='streamrSpoof', 
+            #            stream='simpleEURCleanedHL', 
+            #            targets=['High', 'Low']),
+            #        SourceStreamTargets(
+            #            source='streamrSpoof', 
+            #            stream='simpleEURCleanedC', 
+            #            targets=['Close'])],
+            #    chosenFeatures=[
+            #        ('streamrSpoof', 'simpleEURCleanedC', 'Close'),
+            #        ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
+            #        ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
+            #        ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
+            #        ('streamrSpoof', 'simpleEURCleanedHL', 'DailyCLose7'),
+            #    ],
             #    **kwargs)
             }
     

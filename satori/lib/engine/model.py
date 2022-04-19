@@ -180,7 +180,8 @@ class ModelManager:
             It seems like it should just be None and that we should halt behavior until it has a
             threshold amount of data.
             '''
-            self.data = self.data if self.data is not None else pd.DataFrame()
+            self.data = self.data if self.data is not None else pd.DataFrame(
+                {x: [] for x in SourceStreamTargets.combine(self.targets)})
     
         self.data = disk.Api().gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
         handleEmpty()
@@ -188,6 +189,7 @@ class ModelManager:
     ### TARGET ####################################################################
 
     def produceTarget(self):
+        print(self.data)
         series = self.data.loc[:, self.id.id()].shift(-1)
         self.target = pd.DataFrame(series)
         self.target.columns = pd.MultiIndex.from_tuples([self.id.id()+('Raw',)])
@@ -520,14 +522,15 @@ class ModelManager:
 
     def buildStable(self):
         #self.get()
-        self.produceTarget()
-        self.produceFeatureStructure()
-        self.produceFeatureSet()
-        self.producePredictable()
-        self.produceTrainingSet()
-        self.produceFit()
-        self.produceFeatureImportance()
-        self.produceFeatureData()
+        if self.data is not None and not self.data.empty:
+            self.produceTarget()
+            self.produceFeatureStructure()
+            self.produceFeatureSet()
+            self.producePredictable()
+            self.produceTrainingSet()
+            self.produceFit()
+            self.produceFeatureImportance()
+            self.produceFeatureData()
 
     def buildTest(self):
         self.produceTestFeatures()

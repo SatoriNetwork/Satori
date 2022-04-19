@@ -37,10 +37,15 @@ class SourceStreamTargets:
     
     @staticmethod
     def combine(sourceStreamTargetss:list['SourceStreamTargets']):
+        ''' {('x', 'y', 'z1'), ('a', 'b', 'c'), ('x', 'y', 'z2')} '''
         return {(source, stream, targets) for sst in sourceStreamTargetss for source, stream, targets in sst.asTuples()}
 
     @staticmethod
     def condense(sourceStreamTargetss:list['SourceStreamTargets']):
+        '''
+        SourceStreamTargets.condense(targets)
+        [('x', 'y', ['z1', 'z2']), ('a', 'b', ['c'])]
+        '''
         existing = {}
         ret = []
         for sst in sourceStreamTargetss:

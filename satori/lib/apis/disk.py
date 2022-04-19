@@ -177,37 +177,46 @@ class Api(object):
         this function callable in a myriad of various ways...
         I don't remember why.
         '''
+        def dropIf(df:pd.DataFrame, column:tuple):
+            if df is not None:
+                return df.drop(column, axis=1)
+        
+        def filterNone(items:list):
+            return [x for x in items if x is not None]
+        
         source = source or self.source
         stream = stream or self.stream
         if sourceStreamTargetss is not None:
-            return memory.merge([
-                    self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
-                    for source, stream, targets in SourceStreamTargets.condense(sourceStreamTargetss)],
+            return memory.merge(filterNone([
+                    dropIf(self.read(source, stream, columns=targets), (source, stream, 'StreamObservationId'))
+                    for source, stream, targets in SourceStreamTargets.condense(sourceStreamTargetss)]),
                 targetColumn=targetColumn)
         if sourceStreamTargets is not None:
-            return memory.merge([
-                    self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
-                    for source, stream, targets in sourceStreamTargets],
+            return memory.merge(filterNone([
+                    dropIf(self.read(source, stream, columns=targets), (source, stream, 'StreamObservationId'))
+                    for source, stream, targets in sourceStreamTargets]),
                 targetColumn=targetColumn)
         if targets is not None:
             return memory.merge(
-                self.read(
-                    source or self.source,
-                    stream or self.stream,
-                    columns=targets).drop((source, stream, 'StreamObservationId'), axis=1),
+                dropIf(
+                    self.read(
+                        source or self.source,
+                        stream or self.stream,
+                        columns=targets),
+                    (source, stream, 'StreamObservationId')),
                 targetColumn=targetColumn)
         if targetsByStream is not None:
-            return memory.merge([
-                    self.read(source or self.source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
-                    for stream, targets in targetsByStream.items()],
+            return memory.merge(filterNone([
+                    dropIf(self.read(source or self.source, stream, columns=targets), (source, stream, 'StreamObservationId'))
+                    for stream, targets in targetsByStream.items()]),
                 targetColumn=targetColumn)
         if targetsByStreamBySource is not None:
-            return memory.merge([
-                    self.read(source, stream, columns=targets).drop((source, stream, 'StreamObservationId'), axis=1)
+            return memory.merge(filterNone([
+                    dropIf(self.read(source, stream, columns=targets), (source, stream, 'StreamObservationId'))
                     for source, values in targetsByStreamBySource.items()
-                    for stream, targets in values],
+                    for stream, targets in values]),
                 targetColumn=targetColumn)
-        return self.read(source, stream).drop((source, stream, 'StreamObservationId'), axis=1)
+        return dropIf(self.read(source, stream), (source, stream, 'StreamObservationId'))
         
 '''
 from satori.lib.apis import disk
