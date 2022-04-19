@@ -46,7 +46,15 @@ Engine = satori.getEngine()
 Engine.run()
 
 def spoofStreamer():
-    thread = threading.Thread(target=satori.spoof.Streamr().run, daemon=True)
+    thread = threading.Thread(target=satori.spoof.Streamr(
+        sourceId='streamrSpoof',
+        streamId='simpleEURCleanedHL',
+    ).run, daemon=True)
+    thread.start()
+    thread = threading.Thread(target=satori.spoof.Streamr(
+        sourceId='streamrSpoof',
+        streamId='simpleEURCleanedC',
+    ).run, daemon=True)
     thread.start()
 
 ###############################################################################

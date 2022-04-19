@@ -189,7 +189,6 @@ class ModelManager:
     ### TARGET ####################################################################
 
     def produceTarget(self):
-        print(self.data)
         series = self.data.loc[:, self.id.id()].shift(-1)
         self.target = pd.DataFrame(series)
         self.target.columns = pd.MultiIndex.from_tuples([self.id.id()+('Raw',)])
@@ -306,7 +305,7 @@ class ModelManager:
 
     def producePredictable(self):
         if self.featureSet.shape[0] > 0:
-            self.current = pd.DataFrame(self.featureSet.iloc[-1,:]).T.dropna(axis=1)
+            self.current = pd.DataFrame(self.featureSet.iloc[-1,:]).T#.dropna(axis=1)
             print('\nself.data\n', self.data.tail(2))
             print('\nself.featureSet\n', self.featureSet.tail(2))
             print('\nself.current\n', self.current)
@@ -522,7 +521,7 @@ class ModelManager:
 
     def buildStable(self):
         #self.get()
-        if self.data is not None and not self.data.empty:
+        if self.data is not None and not self.data.empty and self.data.shape[0] > 20:
             self.produceTarget()
             self.produceFeatureStructure()
             self.produceFeatureSet()
@@ -531,6 +530,8 @@ class ModelManager:
             self.produceFit()
             self.produceFeatureImportance()
             self.produceFeatureData()
+            return True
+        return False
 
     def buildTest(self):
         self.produceTestFeatures()
@@ -543,11 +544,9 @@ class ModelManager:
     
     def runPredictor(self):
         def makePrediction(isTarget=False):
-            print('\nisTarget\n', isTarget)
-            if isTarget:
-                self.buildStable()
+            if isTarget and self.buildStable():
                 self.prediction = self.producePrediction()
-                print('\nself.prediction\n', self.prediction)
+                print(f'\nself.prediction - {self.streamId} {self.targetId}:', self.prediction)
                 self.predictionUpdate.on_next(self)
             ## this is a feature to be added - a second publish stream which requires a
             ## different dataset - one where the latest update is taken into account.

@@ -95,6 +95,8 @@ class DataManager:
                 '''
                 if observation.sourceId not in self.sources.keys():
                     self.sources[observation.sourceId] = {observation.streamId: None}
+                if observation.streamId not in self.sources[observation.sourceId].keys():
+                    self.sources[observation.sourceId][observation.streamId] = None
                 x = self.sources[observation.sourceId][observation.streamId]
                 if x is not None and x.observationId == observation.observationId:
                     return False

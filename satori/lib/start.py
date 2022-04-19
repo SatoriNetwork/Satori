@@ -126,28 +126,28 @@ def getEngine():
                     ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
                 ],
                 **kwargs),
-            #satori.ModelManager(
-            #    modelPath='modelClose.joblib',
-            #    sourceId='streamrSpoof',
-            #    streamId='simpleEURCleanedC',
-            #    targetId='Close',
-            #    targets=[
-            #        SourceStreamTargets(
-            #            source='streamrSpoof', 
-            #            stream='simpleEURCleanedHL', 
-            #            targets=['High', 'Low']),
-            #        SourceStreamTargets(
-            #            source='streamrSpoof', 
-            #            stream='simpleEURCleanedC', 
-            #            targets=['Close'])],
-            #    chosenFeatures=[
-            #        ('streamrSpoof', 'simpleEURCleanedC', 'Close'),
-            #        ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
-            #        ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
-            #        ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
-            #        ('streamrSpoof', 'simpleEURCleanedHL', 'DailyCLose7'),
-            #    ],
-            #    **kwargs)
+            satori.ModelManager(
+                modelPath='modelClose.joblib',
+                sourceId='streamrSpoof',
+                streamId='simpleEURCleanedC',
+                targetId='Close',
+                targets=[
+                    SourceStreamTargets(
+                        source='streamrSpoof', 
+                        stream='simpleEURCleanedHL', 
+                        targets=['High', 'Low']),
+                    SourceStreamTargets(
+                        source='streamrSpoof', 
+                        stream='simpleEURCleanedC', 
+                        targets=['Close'])],
+                chosenFeatures=[
+                    ('streamrSpoof', 'simpleEURCleanedC', 'Close'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyCLose7'),
+                ],
+                **kwargs)
             }
     
     # todo: use settings...

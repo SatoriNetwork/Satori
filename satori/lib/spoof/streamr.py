@@ -9,10 +9,10 @@ from satori import config
 from satori.lib.apis import disk
 
 class Streamr():
-    def __init__(self):
-        self.sourceId = 'streamrSpoof'
-        self.streamId = 'simpleEURCleaned'
-        df = pd.read_csv(config.root('lib', 'spoof', 'simpleEURCleaned.csv'))
+    def __init__(self, sourceId:str=None, streamId:str=None):
+        self.sourceId = sourceId or 'streamrSpoof'
+        self.streamId = streamId or 'simpleEURCleaned'
+        df = pd.read_csv(config.root('lib', 'spoof', f'{streamId}.csv'))
         existing = disk.Api(source=self.sourceId, stream=self.streamId).read()
         past = existing.shape[0] if existing is not None else 0
         self.past = df.iloc[:past]

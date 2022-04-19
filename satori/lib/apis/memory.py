@@ -1,5 +1,7 @@
 from functools import reduce
 import pandas as pd
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def mergeAllTime(dfs:list[pd.DataFrame]):
     ''' Layer 1 - not useful?
