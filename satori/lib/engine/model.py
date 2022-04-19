@@ -129,7 +129,7 @@ class ModelManager:
     ) -> pd.Series:
 
         def name() -> tuple:
-            return (col for col in column[0:len(column)-1]) + (prefix+str(yesterday),) 
+            return tuple([col for col in column[0:len(column)-1]]) + (prefix+column[len(column)-1]+str(yesterday),) 
 
         if df is None:
             return name()
@@ -147,7 +147,7 @@ class ModelManager:
     ) -> pd.Series:
         
         def name() -> tuple:
-            return (col for col in column[0:len(column)-1]) + (prefix+str(window)+transformation.replace('(','').replace(')',''),) 
+            return tuple([col for col in column[0:len(column)-1]]) + (prefix+column[len(column)-1]+str(window)+transformation.replace('(','').replace(')',''),) 
 
         if df is None:
             return name()
