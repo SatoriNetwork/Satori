@@ -45,6 +45,7 @@ class DataManager:
 
     def __init__(self):
         self.sources = {} # dictionary of streams by source and their latest incremental
+        self.predictions = {} # dictionary of streams by source and their multiple predictions
         self.everything = {}  # a set of all the column names (stream ids) I've seen before.
         self.listeners = []
         self.newData = BehaviorSubject(None)

@@ -57,7 +57,34 @@ class SourceStreamTargets:
         for key, value in existing.items():
             ret.append((key[0], key[1], list(set(value))))
         return ret
-            
+    
+class PredictionMap(dict):
+    def __init__(self, predictions:dict[str, str], source:str=None, stream:str=None):
+        super(PredictionMap,self).__init__([
+            ((source,stream,k),v)
+            for k, v in predictions.items()
+                                    ])
+        self.itemlist = super(PredictionMap, self).keys()
+    #def __setitem__(self, key, value):
+    #    # TODO: what should happen to the order if
+    #    #       the key is already in the dict       
+    #    #self.itemlist.append(key)
+    #    super(PredictionMap, self).__setitem__(key, value)
+    #def __iter__(self):
+    #    return iter(self.itemlist)
+    #def keys(self):
+    #    return self.itemlist
+    #def values(self):
+    #    return [self[key] for key in self]  
+    #def itervalues(self):
+    #    return (self[key] for key in self)
+    def add(self, source, stream, target, prediction=None):
+        return self.__setitem__((source, stream, target), prediction)
+
+PredictionMap(source='a', stream='b', predictions={'c':'d','e':'f'})
+x = PredictionMap(source='a', stream='b', predictions={'c':'d','e':'f'}) 
+x.add('x', 'y', 'z', 0)  
+
 class HyperParameter:
     
     def __init__(
