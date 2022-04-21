@@ -192,7 +192,10 @@ class ModelManager:
         series = self.data.loc[:, self.id.id()].shift(-1)
         self.target = pd.DataFrame(series)
 
-    def produceTargetName(self):
+    def key(self):
+        return self.id.id()
+    
+    def streamKey(self):
         return self.id.id()
 
     ### FEATURES ####################################################################
@@ -265,7 +268,7 @@ class ModelManager:
             v['x']: v['ppscore']
             for v in ppscore.predictors(
                 pd.concat([df, self.target], axis=1),
-                y=self.produceTargetName(),
+                y=self.key(),
                 output='df',
                 sorted=True,
                 sample=None)[['x', 'ppscore']].T.to_dict().values()}

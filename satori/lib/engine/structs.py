@@ -19,6 +19,12 @@ class SourceStreamTargets:
         ''' id has one target '''
         return (self.source, self.stream, self.targets[0])
 
+    def key(self):
+        return self.id()
+    
+    def streamKey(self):
+        return (self.source, self.stream)
+    
     def get(self):
         ''' easy to combine '''
         return (self.source, self.stream, self.targets)
@@ -58,32 +64,70 @@ class SourceStreamTargets:
             ret.append((key[0], key[1], list(set(value))))
         return ret
     
-class PredictionMap(dict):
-    def __init__(self, predictions:dict[str, str], source:str=None, stream:str=None):
-        super(PredictionMap,self).__init__([
-            ((source,stream,k),v)
-            for k, v in predictions.items()
-                                    ])
-        self.itemlist = super(PredictionMap, self).keys()
-    #def __setitem__(self, key, value):
-    #    # TODO: what should happen to the order if
-    #    #       the key is already in the dict       
-    #    #self.itemlist.append(key)
-    #    super(PredictionMap, self).__setitem__(key, value)
-    #def __iter__(self):
-    #    return iter(self.itemlist)
-    #def keys(self):
-    #    return self.itemlist
-    #def values(self):
-    #    return [self[key] for key in self]  
-    #def itervalues(self):
-    #    return (self[key] for key in self)
-    def add(self, source, stream, target, prediction=None):
-        return self.__setitem__((source, stream, target), prediction)
+class SourceStreamMap(dict):
+    
+    def __init__(self, content=None, source:str=None, stream:str=None):
+        super(SourceStreamMap,self).__init__([
+            ((source, stream), content)] if source is not None and stream is not None else [])
+    
+    def add(self, source, stream, value=None):
+        return self.__setitem__((source, stream), value)
+    
+class SourceStreamTargetMap(dict):
+    def __init__(self, targetValues:dict[str, str]=None, source:str=None, stream:str=None):
+        super(SourceStreamTargetMap,self).__init__([
+            ((source, stream, k), v) for k, v in (targetValues or {}).items()])
+    def add(self, source, stream, target, value=None):
+        return self.__setitem__((source, stream, target), value)
+    def isFilled(self, source:str=None, stream:str=None, key:tuple[str, str]=None):
+        if key is not None:
+            condition = lambda x: x[1] == key[1] and x[0] == key[0]
+        if source is not None and stream is not None:
+            condition = lambda x: x[1] == stream and x[0] == source    
+        return all([self[k] is not None for k in self if condition(k)])
+    def erase(self, source:str=None, stream:str=None, key:tuple[str, str]=None):
+        for k in self:
+            if key is not None:
+                if k[1] == key[1] and k[0] == key[0]:
+                    self[k] = None
+            elif source is not None and stream is not None:
+                if k[1] == stream and k[0] == source:
+                    self[k] = None
+    def getAllAsMap(self, source:str=None, stream:str=None, key:tuple[str, str]=None):
+        if key is not None:
+            condition = lambda x: x[1] == key[1] and x[0] == key[0]
+        if source is not None and stream is not None:
+            condition = lambda x: x[1] == stream and x[0] == source    
+        return {k: self[k] for k in self if condition(k)}
+    def getAll(self, source:str=None, stream:str=None, key:tuple[str, str]=None):
+        if key is not None:
+            condition = lambda x: x[1] == key[1] and x[0] == key[0]
+        if source is not None and stream is not None:
+            condition = lambda x: x[1] == stream and x[0] == source    
+        return [(k, self[k]) for k in self if condition(k)]
 
-PredictionMap(source='a', stream='b', predictions={'c':'d','e':'f'})
-x = PredictionMap(source='a', stream='b', predictions={'c':'d','e':'f'}) 
-x.add('x', 'y', 'z', 0)  
+x = SourceStreamTargetMap() 
+x
+x.add(1,2,3,4,)  
+x
+x.add(1,2,3,5,) 
+x.add(1,2,3,6,) 
+x
+x.add(1,2,4,6,) 
+x.add(1,2,5,6,) 
+x.add(1,2,6,7,)  
+x.add(2,2,6,7,)
+x.add(2,2,3,4,)
+x
+x.isFilled(2,2)
+x.isFilled(1,2)
+x.add(2,2,3)
+x
+x.isFilled(2,2)
+x.getAll(key=(2,2))
+x.erase(2,2)
+x
+x.erase(1,2)
 
 class HyperParameter:
     
@@ -137,3 +181,6 @@ class Observation:
             self.df = pd.DataFrame(
                 {(self.sourceId, self.streamId, self.streamId): [self.content] + [('StreamObservationId', self.observationId)]}, 
                 index=[self.observedTime])
+
+    def key(self):
+        return (self.sourceId, self.streamId)

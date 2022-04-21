@@ -38,14 +38,16 @@ import pandas as pd
 import datetime as dt
 from reactivex.subject import BehaviorSubject
 
-from satori.lib.engine.structs import Observation
+from satori.lib.engine.structs import Observation, SourceStreamTargetMap, SourceStreamMap
 from satori.lib.apis import disk
 
 class DataManager:
 
     def __init__(self):
-        self.sources = {} # dictionary of streams by source and their latest incremental
-        self.predictions = {} # dictionary of streams by source and their multiple predictions
+        # dictionary of source, streams, and their latest incremental
+        self.targets = SourceStreamMap() # must be initialized with keys otherwise we'll post partial predictions
+        # dictionary of source, stream, targets and their latest predictions
+        self.predictions = SourceStreamTargetMap() # must be initialized with keys otherwise we'll post partial predictions
         self.everything = {}  # a set of all the column names (stream ids) I've seen before.
         self.listeners = []
         self.newData = BehaviorSubject(None)
@@ -94,14 +96,12 @@ class DataManager:
                 cache latest observation for each stream as an Observation object with a DataFrame 
                 if it's new returns true so process can continue, if a repeat, return false
                 '''
-                if observation.sourceId not in self.sources.keys():
-                    self.sources[observation.sourceId] = {observation.streamId: None}
-                if observation.streamId not in self.sources[observation.sourceId].keys():
-                    self.sources[observation.sourceId][observation.streamId] = None
-                x = self.sources[observation.sourceId][observation.streamId]
+                if observation.key() not in self.targets.keys():
+                    self.targets[observation.key()] = None
+                x = self.targets[observation.key()]
                 if x is not None and x.observationId == observation.observationId:
                     return False
-                self.sources[observation.sourceId][observation.streamId] = observation
+                self.targets[observation.key()] = observation
                 return True
         
             def saveIncremental():
@@ -153,9 +153,23 @@ class DataManager:
     def runPublisher(self, models):
         def publish(model):
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
-            with open(f'{model.id.id()}.txt', 'w') as f:
-                f.write(f'{model.prediction}, {str(dt.datetime.now())} {model.prediction}')
-        
+            
+            def remember():
+                if model.key() not in self.predictions.keys():
+                    self.predictions[model.key()] = None
+                self.predictions[model.key()] = model.prediction
+                return True
+            
+            def post():
+                if self.predictions.isFilled(key=model.key()):
+                    for k, v in self.predictions.getAll(key=model.key()):
+                        with open(f'{model.streamKey()}.txt', 'a') as f:
+                            f.write(f'{str(dt.datetime.now())} | {k} | {v}\n')
+                    self.predictions.erase(key=model.key())
+                    
+            remember()
+            post()
+                
         ## non-implemented feature yet. as it turns out this requires the model to contain two datasets or
         ## one dataset that is cut on two different time frames (merge_asof for the above publish and 
         ## anti-merge_as of for the edge stream), so it introduces a lot of complexity we're not willing
