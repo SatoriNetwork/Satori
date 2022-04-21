@@ -100,7 +100,7 @@ class ModelManager:
     ### FLAGS ################################################################################
     
     def setupFlags(self):
-        self.modelUpdated = BehaviorSubject(False)
+        self.modelUpdated = BehaviorSubject(None)
         self.targetUpdated = BehaviorSubject(None)
         self.inputsUpdated = BehaviorSubject(None)
         self.predictionUpdate = BehaviorSubject(None)
@@ -191,11 +191,9 @@ class ModelManager:
     def produceTarget(self):
         series = self.data.loc[:, self.id.id()].shift(-1)
         self.target = pd.DataFrame(series)
-        self.target.columns = pd.MultiIndex.from_tuples([self.id.id()+('Raw',)])
 
-    @staticmethod 
-    def produceTargetName(target:str, prefix:str='Target_'):
-        return f'{prefix}{target}'
+    def produceTargetName(self):
+        return self.id.id()
 
     ### FEATURES ####################################################################
 
@@ -267,7 +265,7 @@ class ModelManager:
             v['x']: v['ppscore']
             for v in ppscore.predictors(
                 pd.concat([df, self.target], axis=1),
-                y=ModelManager.produceTargetName(self.targetId),
+                y=self.produceTargetName(),
                 output='df',
                 sorted=True,
                 sample=None)[['x', 'ppscore']].T.to_dict().values()}
@@ -306,37 +304,15 @@ class ModelManager:
     def producePredictable(self):
         if self.featureSet.shape[0] > 0:
             self.current = pd.DataFrame(self.featureSet.iloc[-1,:]).T#.dropna(axis=1)
-            print('\nself.data\n', self.data.tail(2))
-            print('\nself.featureSet\n', self.featureSet.tail(2))
-            print('\nself.current\n', self.current)
+            #print('\nself.data\n', self.data.tail(2))
+            #print('\nself.featureSet\n', self.featureSet.tail(2))
+            #print('\nself.current\n', self.current)
             #print('\nself.prediction\n', self.prediction)
 
     def producePrediction(self):
         return self.xgb.predict(self.current)[0]
 
     ### TRAIN ######################################################################
-
-    ## getting this error
-    #  warnings.warn("Estimator fit failed. The score on this train-test"
-    #C:\Users\jorda\AppData\Roaming\Python\Python39\site-packages\sklearn\model_selection\_validation.py:615: FitFailedWarning: Estimator fit failed. The score on this train-test partition for these parameters will be set to nan. Details:
-    #Traceback (most recent call last):
-    #  File "C:\Users\jorda\AppData\Roaming\Python\Python39\site-packages\sklearn\model_selection\_validation.py", line 598, in _fit_and_score
-    #    estimator.fit(X_train, y_train, **fit_params)
-    #  File "C:\Users\jorda\AppData\Roaming\Python\Python39\site-packages\sklearn\tree\_classes.py", line 1252, in fit
-    #    super().fit(
-    #  File "C:\Users\jorda\AppData\Roaming\Python\Python39\site-packages\sklearn\tree\_classes.py", line 157, in fit
-    #    X, y = self._validate_data(X, y,
-    #  File "C:\Users\jorda\AppData\Roaming\Python\Python39\site-packages\sklearn\base.py", line 430, in _validate_data
-    #    X = check_array(X, **check_X_params)
-    #  File "C:\Users\jorda\AppData\Roaming\Python\Python39\site-packages\sklearn\utils\validation.py", line 63, in inner_f
-    #    return f(*args, **kwargs)
-    #  File "C:\Users\jorda\AppData\Roaming\Python\Python39\site-packages\sklearn\utils\validation.py", line 720, in check_array
-    #    _assert_all_finite(array,
-    #  File "C:\Users\jorda\AppData\Roaming\Python\Python39\site-packages\sklearn\utils\validation.py", line 103, in _assert_all_finite
-    #    raise ValueError(
-    #ValueError: Input contains NaN, infinity or a value too large for dtype('float32').
-    #
-    #  warnings.warn("Estimator fit failed. The score on this train-test"
 
     def produceTrainingSet(self):
         df = self.featureSet.copy()
@@ -546,7 +522,7 @@ class ModelManager:
         def makePrediction(isTarget=False):
             if isTarget and self.buildStable():
                 self.prediction = self.producePrediction()
-                print(f'\nself.prediction - {self.streamId} {self.targetId}:', self.prediction)
+                print(f'self.prediction - {self.streamId} {self.targetId}:', self.prediction)
                 self.predictionUpdate.on_next(self)
             ## this is a feature to be added - a second publish stream which requires a
             ## different dataset - one where the latest update is taken into account.
@@ -558,11 +534,12 @@ class ModelManager:
             #    self.predictionEdgeUpdate.on_next(self)
         
         def makePredictionFromNewModel():
+            print(f'model updated - {self.streamId} {self.targetId}:', self.stable, self.test)
             makePrediction()
         
         def makePredictionFromNewInputs(incremental):
-            self.data = memory.appdendInsert(
-                merged=self.data, 
+            self.data = memory.appendInsert(
+                df=self.data, 
                 incremental=incremental)
             makePrediction()
             
@@ -571,8 +548,8 @@ class ModelManager:
                 if col not in self.data.columns:
                     incremental = incremental.drop(col, axis=1)
             #incremental.columns = ModelManager.addFeatureLevel(df=incremental)
-            self.data = memory.appdendInsert(
-                merged=self.data, 
+            self.data = memory.appendInsert(
+                df=self.data, 
                 incremental=incremental)
             makePrediction(isTarget=True)
                 
@@ -584,7 +561,7 @@ class ModelManager:
         try:
             self.buildTest()
             if self.evaluateCandidate():
-                self.modelUpdated.on_next(self)
+                self.modelUpdated.on_next(True)
         except NotFittedError as e:
             '''
             this happens on occasion...
@@ -600,10 +577,8 @@ class ModelManager:
             '''
             #print('Attribute', e)
             pass
-        except Exception as e:
-            print('UNEXPECTED', e)
-            
-            
+        #except Exception as e:
+        #    print('UNEXPECTED', e)
     
     def syncAvailableInputs(self):
         
@@ -616,3 +591,10 @@ class ModelManager:
             #self.features.append(x) 
             
         self.newAvailableInput.subscribe(lambda x: sync(x) if x is not None else None)
+
+
+def show(name, value):
+    if isinstance(value, pd.DataFrame):
+        print(f'\n{name}\n', value.tail(2))
+    else:
+        print(f'\n{name}\n', value)

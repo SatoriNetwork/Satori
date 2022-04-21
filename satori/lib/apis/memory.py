@@ -60,7 +60,7 @@ def merge(dfs:list[pd.DataFrame], targetColumn:'str|tuple[str]'):
             pd.merge_asof(left, right, left_index=True, right_index=True),
         dfs)
 
-def appdendInsert(merged:pd.DataFrame, incremental:pd.DataFrame):
+def appendInsert(df:pd.DataFrame, incremental:pd.DataFrame):
     ''' Layer 2
     after datasets merged one cannot merely append a dataframe. 
     we must insert the incremental at the correct location.
@@ -68,8 +68,10 @@ def appdendInsert(merged:pd.DataFrame, incremental:pd.DataFrame):
     to be used by models, it doesn't talk to disk directly.
     incremental is should be a multicolumn, one row DataFrame. 
     '''
-    if incremental.index.values[0] in merged.index.values:
-        merged.loc[incremental.index, [x for x in incremental.columns]] = incremental
+    df.index = pd.to_datetime(df.index)
+    incremental.index = pd.to_datetime(incremental.index)
+    if incremental.index.values[0] in df.index.values:
+        df.loc[incremental.index, [x for x in incremental.columns]] = incremental
     else:
-        merged = merged.append(incremental).sort_index()
-    return merged.fillna(method='ffill')
+        df = df.append(incremental).sort_index()
+    return df.fillna(method='ffill')

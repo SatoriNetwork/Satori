@@ -111,7 +111,7 @@ class Engine:
    
         publisher()
         subscriber()
-        #threads = {}
+        threads = {}
         #threads['scholar'] = threading.Thread(target=scholar, daemon=True)
         for model in self.models:
             model.buildStable() # we have to run this once for each model to complete its initialization
@@ -119,9 +119,9 @@ class Engine:
         #    sync(model)
         #    if self.view and self.view.isReactive:
         #        watcher(model)
-        #    threads[f'{model.id}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
-        #for thread in threads.values():
-        #    thread.start()
+            threads[f'{model.id}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
+        for thread in threads.values():
+            thread.start()
         #while threading.active_count() > 0:
         #    time.sleep(31)
         #    if not self.view.isReactive:
