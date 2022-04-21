@@ -264,10 +264,13 @@ class ModelManager:
     def scoreFeatures(self, df:pd.DataFrame = None) -> dict:
         ''' generates a predictive power score for each column in df '''
         df = df if df is not None else self.featureSet
+        if self.target.columns[0] in df.columns:
+            df = df.drop(self.target.columns[0], axis=1)
+        df = pd.concat([df, self.target], axis=1)
         return {
             v['x']: v['ppscore']
             for v in ppscore.predictors(
-                pd.concat([df, self.target], axis=1),
+                df,
                 y=self.key(),
                 output='df',
                 sorted=True,
@@ -561,27 +564,27 @@ class ModelManager:
         self.targetUpdated.subscribe(lambda x: makePredictionFromNewTarget(x) if x is not None else None)
         
     def runExplorer(self):
-        try:
-            self.buildTest()
-            if self.evaluateCandidate():
-                self.modelUpdated.on_next(True)
-        except NotFittedError as e:
-            '''
-            this happens on occasion...
-            maybe making  self.xgbStable a deepcopy would fix
-            '''
-            #print('not fitted', e)
-            pass
-        except AttributeError as e:
-            ''' 
-            this happens at the beginning of running when we have not set
-            self.xgbStable yet.
-            
-            '''
-            #print('Attribute', e)
-            pass
-        #except Exception as e:
-        #    print('UNEXPECTED', e)
+        #try:
+        self.buildTest()
+        if self.evaluateCandidate():
+            self.modelUpdated.on_next(True)
+        #except NotFittedError as e:
+        #    '''
+        #    this happens on occasion...
+        #    maybe making  self.xgbStable a deepcopy would fix
+        #    '''
+        #    #print('not fitted', e)
+        #    pass
+        #except AttributeError as e:
+        #    ''' 
+        #    this happens at the beginning of running when we have not set
+        #    self.xgbStable yet.
+        #    
+        #    '''
+        #    #print('Attribute', e)
+        #    pass
+        ##except Exception as e:
+        ##    print('UNEXPECTED', e)
     
     def syncAvailableInputs(self):
         
