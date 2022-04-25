@@ -34,9 +34,11 @@ Basic Reponsibilities of the DataManager:
     E. download the datastream and notify model manager
 4. garbage collect stale datastreams
 '''
+import os
 import pandas as pd
 import datetime as dt
 from reactivex.subject import BehaviorSubject
+from satori import config
 
 from satori.lib.engine.structs import Observation, SourceStreamTargetMap, SourceStreamMap
 from satori.lib.apis import disk
@@ -163,7 +165,9 @@ class DataManager:
             def post():
                 if self.predictions.isFilled(key=model.key()):
                     for k, v in self.predictions.getAll(key=model.key()):
-                        with open(f'{model.streamKey()}.txt', 'a') as f:
+                        path = config.root('..', 'predictions', k[0], k[1], k[2] + '.txt')
+                        disk.safetify(path)
+                        with open(path, 'a') as f:
                             f.write(f'{str(dt.datetime.now())} | {k} | {v}\n')
                     self.predictions.erase(key=model.key())
                     

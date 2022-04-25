@@ -87,7 +87,6 @@ def getEngine():
             'override': False}
         return {
             satori.ModelManager(
-                modelPath='modelHigh.joblib',
                 sourceId='streamrSpoof',
                 streamId='simpleEURCleanedHL',
                 targetId='High',
@@ -97,56 +96,51 @@ def getEngine():
                     targets=['High', 'Low'])],
                 pinnedFeatures=[('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow')],
                 chosenFeatures=[
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyHigh21'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh14std'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'), 
                     ('streamrSpoof', 'simpleEURCleanedHL', 'High'), 
                     ('streamrSpoof', 'simpleEURCleanedHL', 'Low'), 
                     ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
-                ],
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyHigh21'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh14std'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
                 **kwargs),
             satori.ModelManager(
-                modelPath='modelLow.joblib',
                 sourceId='streamrSpoof',
                 streamId='simpleEURCleanedHL',
                 targetId='Low',
                 targets=[SourceStreamTargets(
                     source='streamrSpoof', 
                     stream='simpleEURCleanedHL', 
-                    targets=['High', 'Low'])],
+                    targets=['Low', 'High'])],
                 pinnedFeatures=[('streamrSpoof', 'simpleEURCleanedHL', 'Low')],
                 chosenFeatures=[
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'), 
                     ('streamrSpoof', 'simpleEURCleanedHL', 'DailyLow21'), 
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
                     ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow14std'), 
                     ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
-                ],
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
                 **kwargs),
             satori.ModelManager(
-                modelPath='modelClose.joblib',
                 sourceId='streamrSpoof',
                 streamId='simpleEURCleanedC',
                 targetId='Close',
                 targets=[
                     SourceStreamTargets(
                         source='streamrSpoof', 
-                        stream='simpleEURCleanedHL', 
-                        targets=['High', 'Low']),
+                        stream='simpleEURCleanedC', 
+                        targets=['Close']),
                     SourceStreamTargets(
                         source='streamrSpoof', 
-                        stream='simpleEURCleanedC', 
-                        targets=['Close'])],
+                        stream='simpleEURCleanedHL', 
+                        targets=['High', 'Low'])],
                 chosenFeatures=[
                     ('streamrSpoof', 'simpleEURCleanedC', 'Close'),
                     ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
                     ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
                     ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyCLose7'),
-                ],
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyCLose7')],
                 **kwargs)
             }
     

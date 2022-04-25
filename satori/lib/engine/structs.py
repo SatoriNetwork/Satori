@@ -106,29 +106,6 @@ class SourceStreamTargetMap(dict):
             condition = lambda x: x[1] == stream and x[0] == source    
         return [(k, self[k]) for k in self if condition(k)]
 
-x = SourceStreamTargetMap() 
-x
-x.add(1,2,3,4,)  
-x
-x.add(1,2,3,5,) 
-x.add(1,2,3,6,) 
-x
-x.add(1,2,4,6,) 
-x.add(1,2,5,6,) 
-x.add(1,2,6,7,)  
-x.add(2,2,6,7,)
-x.add(2,2,3,4,)
-x
-x.isFilled(2,2)
-x.isFilled(1,2)
-x.add(2,2,3)
-x
-x.isFilled(2,2)
-x.getAll(key=(2,2))
-x.erase(2,2)
-x
-x.erase(1,2)
-
 class HyperParameter:
     
     def __init__(

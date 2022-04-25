@@ -12,6 +12,10 @@ import pyarrow as pa
 from satori.lib.apis import memory
 from satori.lib.engine.structs import SourceStreamTargets
 
+def safetify(path:str):
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))
+            
 class Api(object):
     def __init__(self, df:pd.DataFrame=None, source:str=None, stream:str=None, location:str=None, append:bool=None, ext:str='parquet'):
         self.df = df if df is not None else pd.DataFrame();
@@ -19,14 +23,14 @@ class Api(object):
         self.stream = stream
         self.location = location
         self.ext = ext
-        
+
     def path(self, source:str=None, stream:str=None, permanent:bool=False):
         ''' Layer 0 get the path of a file '''
         source = source or self.source or config.defaultSource
         stream = stream or self.stream
         return os.path.join(
                 self.location or config.dataPath(),
-                'permanent' if permanent else '',
+                'permanent' if permanent else 'incremental', # 'incremental', # we need a name for not permanent because what if a stream source is called permanent...
                 source,
                 f'{stream}.{self.ext}')
 

@@ -29,6 +29,7 @@ import ppscore
 from xgboost import XGBRegressor
 
 from satori.lib.apis import disk, memory
+from satori import config
 from .structs import HyperParameter, SourceStreamTargets
 
 
@@ -36,8 +37,7 @@ class ModelManager:
 
     def __init__(
         self,
-        modelPath:str='model.joblib',
-        dataPath:str='data.parquet',
+        modelPath:str=None,
         hyperParameters:'list(HyperParameter)'=None,
         metrics:dict=None,
         features:dict=None,
@@ -52,7 +52,6 @@ class ModelManager:
         override:bool=False,
     ):
         '''
-        dataPath: the path of the raw data
         modelPath: the path of the model
         hyperParameters: a list of HyperParameter objects
         metrics: a dictionary of functions that each produce
@@ -69,11 +68,10 @@ class ModelManager:
         split: train test split percentage or count
         override: override the existing model saved to disk if there is one
         '''
-        self.dataPath = dataPath
-        self.modelPath = modelPath
         self.sourceId = sourceId
         self.streamId = streamId
         self.targetId = targetId
+        self.modelPath = modelPath or config.root('..', 'models', self.sourceId, self.streamId, self.targetId + '.joblib')
         #self.sources = {'source': {'stream':['targets']}}
         self.targets:list[SourceStreamTargets] = targets
         self.id = SourceStreamTargets(source=sourceId, stream=streamId, targets=[targetId])
@@ -483,6 +481,7 @@ class ModelManager:
         ''' save the current model '''
         self.xgb.savedHyperParameters = self.hyperParameters
         self.xgb.savedChosenFeatures = self.chosenFeatures
+        disk.safetify(self.modelPath)
         joblib.dump(self.xgb, self.modelPath)
 
     def load(self) -> bool:
@@ -564,27 +563,30 @@ class ModelManager:
         self.targetUpdated.subscribe(lambda x: makePredictionFromNewTarget(x) if x is not None else None)
         
     def runExplorer(self):
-        #try:
-        self.buildTest()
-        if self.evaluateCandidate():
-            self.modelUpdated.on_next(True)
-        #except NotFittedError as e:
-        #    '''
-        #    this happens on occasion...
-        #    maybe making  self.xgbStable a deepcopy would fix
-        #    '''
-        #    #print('not fitted', e)
-        #    pass
-        #except AttributeError as e:
-        #    ''' 
-        #    this happens at the beginning of running when we have not set
-        #    self.xgbStable yet.
-        #    
-        #    '''
-        #    #print('Attribute', e)
-        #    pass
-        ##except Exception as e:
-        ##    print('UNEXPECTED', e)
+        if hasattr(self, 'target') and hasattr(self, 'xgbStable'):
+            try:
+                self.buildTest()
+                if self.evaluateCandidate():
+                    self.modelUpdated.on_next(True)
+            except NotFittedError as e:
+                '''
+                this happens on occasion...
+                maybe making  self.xgbStable a deepcopy would fix
+                '''
+                #print('not fitted', e)
+                pass
+            #except AttributeError as e:
+            #    ''' 
+            #    this happens at the beginning of running when we have not set
+            #    self.xgbStable yet.
+            #    
+            #    '''
+            #    #print('Attribute', e)
+            #    pass
+            ##except Exception as e:
+            ##    print('UNEXPECTED', e)
+        else:
+            time.sleep(1)
     
     def syncAvailableInputs(self):
         
