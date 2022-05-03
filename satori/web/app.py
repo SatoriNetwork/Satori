@@ -201,6 +201,8 @@ def update():
 @app.route('/history/request')
 def publsih():
     ''' to streamr - create a new datastream to publish to '''
+    # todo: spoof a dataset response - random generated data, so that the
+    #       scholar can be built to ask for history and download it.
     resp = {}
     return render_template('unknown.html', **resp)
 

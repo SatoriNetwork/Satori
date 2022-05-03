@@ -60,8 +60,6 @@ class Streamr():
             response.raise_for_status()
             time.sleep(2)
 
-# todo: we want this spoof to open the parquet file and see what the latest observation id is... do we save that in the parque file? probably not. actaully.
-#       then it should resume sending from that point. to spoof a real stream.   
 '''
 from satori.lib.engine.structs import Observation
 JSON = (

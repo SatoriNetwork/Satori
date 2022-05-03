@@ -50,7 +50,6 @@ class DataManager:
         self.targets = SourceStreamMap() # must be initialized with keys otherwise we'll post partial predictions
         # dictionary of source, stream, targets and their latest predictions
         self.predictions = SourceStreamTargetMap() # must be initialized with keys otherwise we'll post partial predictions
-        self.everything = {}  # a set of all the column names (stream ids) I've seen before.
         self.listeners = []
         self.newData = BehaviorSubject(None)
 
@@ -194,3 +193,35 @@ class DataManager:
         #self.availableInputs.append(newInput)
         #for model in models:
         #    model.newAvailableInput.on_next(newInput)
+        '''
+        ## basic algorithm:
+        while true
+            wait a bit (or get triggered when a model feels it's exhausted it's search space)
+            choose next model to target
+            PURGE old datasets downloaded for that mode that it's not using
+                purged datasets get added to a list by model so we don't download it again,
+                unsubscribe first
+            RECOMMENDER SYSTEM: choose what kind of dataset you should ask for 
+                (model inputs vs the inputs of other datasets)
+                (dataset features, etc.)
+                (the general case recommender system will generate a map of datasets 
+                 and their inputs, find the dataset(s) that looks the most like mine
+                 by inputs and choose a (popular) input they listen to that I don't)
+            ask for the dataset, download and save to disk
+            subscribe for updates
+            tell model its available
+            add it to the list with timestamp for later purge     
+        '''
+        '''
+        ## what the manifest should look like
+        config.yaml:
+        port: 24685
+        manifest:
+            models:
+                modelName: 
+                    pinned: [(sourceId, streamId, targetId), ...]
+                    accepted: [...]
+                    evaluating: [...]
+                    purged: [...]
+        
+        '''
