@@ -188,6 +188,19 @@ class DataManager:
     
     def runScholar(self, models):
         ''' download histories and tell model sync '''
+        
+        def syncManifest(purged: list = None, new: list = None):
+            purged = purged or []
+            new = new or []
+            manifest = config.get('manifest') or {}
+            toPurge = manifest.get('datasets to purge', [])
+            toPurge.extend(new)
+            for x in purged:
+                toPurge.remove(x)
+            manifest['datasets to purge'] = {
+                ds: dt.datetime.now() for ds in toPurge}
+            config.put('manifest', data=manifest)
+
         ## look for new useful datastreams - something like this
         #self.download(self.bestOf(self.compileMap(models)))
         #self.availableInputs.append(newInput)
@@ -198,9 +211,11 @@ class DataManager:
         while true
             wait a bit (or get triggered when a model feels it's exhausted it's search space)
             choose next model to target
-            PURGE old datasets downloaded for that mode that it's not using
-                purged datasets get added to a list by model so we don't download it again,
-                unsubscribe first
+            PURGE look at all datasets we have downloaded, look at manifest, anything that is
+                old enough that isn't being used in the model manifests (could litterally use
+                model.targets) gets tossed out as in deleted from disk and purged datasets
+                gets added to a list by model so we don't download it again, unsubscribe first
+                then syncManifest(purged=[...])
             RECOMMENDER SYSTEM: choose what kind of dataset you should ask for 
                 (model inputs vs the inputs of other datasets)
                 (dataset features, etc.)
@@ -210,7 +225,8 @@ class DataManager:
             ask for the dataset, download and save to disk
             subscribe for updates
             tell model its available
-            add it to the list with timestamp for later purge     
+            add it to the list with timestamp for later purge using
+                syncManifest(new=[...])     
         '''
         '''
         ## what the manifest should look like

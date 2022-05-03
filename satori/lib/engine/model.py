@@ -94,6 +94,14 @@ class ModelManager:
         self.produceFeatureStructure()
         if not self.data.empty:
             self.produceFeatureSet()
+        self.syncManifest()
+
+    def syncManifest(self):
+        manifest = config.get('manifest') or {}
+        manifest[self.key()] = {
+            'targets': [x.asTuples() for x in self.targets], 
+            'purged': manifest.get(self.key(), {}).get('purged', [])}
+        config.put('manifest', data=manifest)
 
     ### FLAGS ################################################################################
     
@@ -596,7 +604,11 @@ class ModelManager:
             of the list of things to explore and evaluate 
             '''
             ## something like this?
-            #self.features.append(x) 
+            #self.features.append(x)
+            # 
+            #self.targets.append(SourceStreamTargets(x))  or something
+            #self.syncManifest()  then sync manifest when you change targets.
+            #maybe remove targets that aren't being used as any features.. somewhere?
             
         self.newAvailableInput.subscribe(lambda x: sync(x) if x is not None else None)
 

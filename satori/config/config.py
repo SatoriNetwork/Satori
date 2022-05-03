@@ -37,10 +37,10 @@ def put(
     root: callable = None,
 ) -> dict:
     ''' makes a yaml fill somewhere in config folder '''
-    data = data or {}
-    path = path or args_to_config_path(*args, root=root)
-    with open(path, mode='w') as f:
-        yaml.dump(data, f, default_flow_style=False)
+    if data is not None: 
+        path = path or args_to_config_path(*args, root=root)
+        with open(path, mode='w') as f:
+            yaml.dump(data, f, default_flow_style=False)
     return path
 
 
