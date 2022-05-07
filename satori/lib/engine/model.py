@@ -15,6 +15,7 @@ import os
 import copy
 import time
 import random
+from tokenize import Double
 import joblib
 import numpy as np
 import pandas as pd
@@ -26,7 +27,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import ppscore
-from xgboost import XGBRegressor
+from xgboost import XGBRegressor, XGBClassifier
 
 from satori.lib.apis import disk, memory
 from satori import config
@@ -344,7 +345,10 @@ class ModelManager:
 
     def produceFit(self):
         self.xgbInUse = True
-        self.xgb = XGBRegressor(**{param.name: param.value for param in self.hyperParameters})
+        if all(isinstance(y, (int, Double)) for y in self.trainY): 
+            self.xgb = XGBRegressor(**{param.name: param.value for param in self.hyperParameters})
+        else:
+            self.xgb = XGBClassifier(**{param.name: param.value for param in self.hyperParameters})
         self.xgb.fit(
             self.trainX,
             self.trainY,
@@ -357,7 +361,10 @@ class ModelManager:
         self.xgbInUse = False
 
     def produceTestFit(self):
-        self.xgbTest = XGBRegressor(**{param.name: param.test for param in self.hyperParameters})
+        if all(isinstance(y, (int, Double)) for y in self.trainY): 
+            self.xgbTest = XGBRegressor(**{param.name: param.test for param in self.hyperParameters})
+        else:
+            self.xgbTest = XGBClassifier(**{param.name: param.value for param in self.hyperParameters})
         self.xgbTest.fit(
             self.trainXtest,
             self.trainYtest,
