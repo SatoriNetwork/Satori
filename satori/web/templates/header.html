@@ -1,0 +1,82 @@
+<!-- EXAMPLE REPLACE WITH BETTER TEMPLATE -->
+<body > 
+  <header id="header" class="page-topbar">
+    <div class="navbar-fixed">
+      <nav class="navbar-color gradient-45deg-crimson-monarch">
+        <div class="nav-wrapper">
+          <ul class="left">
+            <li>
+              <h1 class="logo-wrapper">
+                <a href="{{ url_for('home') }}" class="brand-logo darken-1">
+                  <span class="logo-text">Satori</span>
+                </a>
+              </h1>
+            </li>
+          </ul>
+          <ul class="right">
+            <li title='Full Screen' class='hide-on-med-and-down'>
+              <a href="javascript:void(0);" class="waves-effect waves-block waves-light toggle-fullscreen">
+                <i class="material-icons">settings_overscan</i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+<style>
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown a:hover {background-color: #ddd;}
+
+.show {display: block;}
+</style>
+<script>
+function searchToggle() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+function searchShow() {
+  document.getElementById("myDropdown").classList.add("show");
+}
+function searchHide() {
+  document.getElementById("myDropdown").classList.remove("show");
+}
+function searchNavAdd(search) {
+  if(search.value !== ""){
+    searchShow();
+    var allids = document.querySelectorAll('*[id]');
+    console.log(allids)
+    var drop_down = document.getElementById("myDropdown");
+    drop_down.innerHTML = "";
+    var children = drop_down.children;
+    cloned_ids = []
+    for(var i = 0; i < allids.length; i++){
+      if(allids[i].id.toLowerCase().includes("nav__")) {
+        if(!cloned_ids.includes(allids[i].id)) {
+          if(allids[i].id.toLowerCase().includes(search.value.toLowerCase())) {
+            cloned_ids.push(allids[i].id);
+            let clone = allids[i].cloneNode(true);
+            let div_item = clone.querySelector("#nav_item");
+            div_item.innerHTML = clone.innerHTML.split("</i>")[1]
+            let clone_p = document.createElement("span");
+            clone.id = "";
+            // this wont work now, the id doesn't know what folder this report is in:
+            clone_p.style = "font-size: .7rem!important; color:grey!important; margin:0px 0px 0px 15px;";
+            //clone_p.innerHTML = "(" + allids[i].id.split("__")[1]+")";
+            clone_p.innerHTML = clone.querySelector("#lineage").innerHTML;
+            div_item.appendChild(clone_p);
+            drop_down.appendChild(clone);
+          }
+        }
+      }
+    }
+  } else {
+    searchHide();
+  }
+}
+</script>

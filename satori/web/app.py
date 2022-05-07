@@ -38,12 +38,13 @@ from satori.lib.engine.structs import Observation
 ## Globals ####################################################################
 ###############################################################################
 
+full = False; # just web or everything
+
 app = Flask(__name__)
-#Mobility(app)
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
-#CWD = os.path.dirname(os.path.abspath(__file__))
-Engine = satori.getEngine()
-Engine.run()
+if full:
+    Engine = satori.getEngine()
+    Engine.run()
 
 def spoofStreamer():
     thread = threading.Thread(target=satori.spoof.Streamr(
@@ -218,7 +219,8 @@ def publsihMeta():
 ###############################################################################
 
 if __name__ == '__main__':
-    spoofStreamer()
+    if full:
+        spoofStreamer()
     serve(app, host='0.0.0.0', port=satori.config.get()['port'])
     
     #app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True)

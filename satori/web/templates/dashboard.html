@@ -1,0 +1,56 @@
+<!-- EXAMPLE REPLACE WITH BETTER TEMPLATE -->
+
+{% extends "basic.html" %}
+
+{% block content %}
+
+  <script type="text/javascript" src="{{ url_for('static', filename='js/fav-dash.js') }}"></script>
+
+  <!--work collections start-->
+<div id="work-collections">
+  <div class="row">
+    <div class="col s12 m6 l6">
+      <ul id="projects-collection" class="collection z-depth-1">
+        <li class="collection-item avatar">
+          <i class="material-icons monarch circle">star</i> <!--bookmark-->
+          <h6 class="collection-header m-0" style="margin-top: 12px !important">Favorites</h6>
+        </li>
+        {% for name, details in {'test':{'title_name':'title', 'parent_name':'parent'}}.items() %}
+        <li class="collection-item" id="dash_fav_{{name}}">
+          <div class="row">
+              <div class="col s9">
+                <p class="collections-title">{{ details['title_name'] }}</p>
+                <p class="collections-content">{{ details['parent_name'] }}</p>
+              </div>
+            <div class="col s3">
+                <i class="material-icons">star</i>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% if tip %}
+      <ul id="projects-collection" class="collection z-depth-1">
+        <li class="collection-item avatar">
+          <i class="material-icons steel circle">info</i> <!--highlight info-outline-->
+          <h6 class="collection-header m-0" style="margin-top: 12px !important">Tip of the day...</h6>
+        </li>
+        <li class="collection-item" >
+          <div class="row">
+            <span>
+              <div class="col s12">
+                <p class="collections-title">{{ tip['question'] }}</p>
+                <p class="collections-content">{{ tip['answer'] }}</p>
+              </div>
+            </span>
+          </div>
+        </li>
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<!--work collections end-->
+
+
+{% endblock %}
