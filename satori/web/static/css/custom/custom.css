@@ -9,15 +9,66 @@ NOTE:
 ------
 PLACE HERE YOUR OWN CSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
 WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
-.flatpickr-current-month {
-  display: flex !important;
+
+.gradient-45deg-xiketic-purple {
+  background: #10051D;
+  background: -webkit-linear-gradient(45deg, #10051D 15%, #533549 85%);
+  background: linear-gradient(45deg, #10051D 10%, #533549 90%);
+}
+.gradient-45deg-xiketic-purple.gradient-shadow {
+  box-shadow: 0 6px 20px 0 rgba(83, 53, 73, 0.5);
 }
 
-.flatpickr-monthDropdown-months {
-  display: flex !important;
+.gradient-45deg-xiketic-orange {
+  background: #10051D;
+  background: -webkit-linear-gradient(45deg, #10051D 15%, #F6B042 85%);
+  background: linear-gradient(45deg, #10051D 10%, #F6B042 90%);
+}
+.gradient-45deg-xiketic-orange.gradient-shadow {
+  box-shadow: 0 6px 20px 0 rgba(246, 176, 66, 0.5);
 }
 
-.numInput{
-  display: flex !important;
-  height: 2rem !important;
+.gradient-45deg-xiketic-lemon {
+  background: #10051D;
+  background: -webkit-linear-gradient(45deg, #10051D 15%, #F9ED4E 85%);
+  background: linear-gradient(45deg, #10051D 10%, #F9ED4E 90%);
+}
+.gradient-45deg-xiketic-lemon.gradient-shadow {
+  box-shadow: 0 6px 20px 0 rgba(249, 237, 78, 0.5);
+}
+
+.gradient-45deg-purple-orange {
+  background: #533549;
+  background: -webkit-linear-gradient(45deg, #533549 15%, #F6B042 85%);
+  background: linear-gradient(45deg, #533549 10%, #F6B042 90%);
+}
+.gradient-45deg-purple-orange.gradient-shadow {
+  box-shadow: 0 6px 20px 0 rgba(246, 176, 66, 0.5);
+}
+
+.gradient-45deg-purple-lemon {
+  background: #533549;
+  background: -webkit-linear-gradient(45deg, #533549 15%, #F9ED4E 85%);
+  background: linear-gradient(45deg, #533549 10%, #F9ED4E 90%);
+}
+.gradient-45deg-purple-lemon.gradient-shadow {
+  box-shadow: 0 6px 20px 0 rgba(249, 237, 78, 0.5);
+}
+
+.gradient-45deg-orange-lemon {
+  background: #F6B042;
+  background: -webkit-linear-gradient(45deg, #F6B042 15%, #F9ED4E 85%);
+  background: linear-gradient(45deg, #F6B042 10%, #F9ED4E 90%);
+}
+.gradient-45deg-orange-lemon.gradient-shadow {
+  box-shadow: 0 6px 20px 0 rgba(249, 237, 78, 0.5);
+}
+
+.gradient-45deg-purple-orange-lemon {
+  background: #533549;
+  background: -webkit-linear-gradient(45deg, #533549 15%, #F6B042 30%, #F9ED4E 55%);
+  background: linear-gradient(25deg, #533549 15%, #F6B042 45%, #F9ED4E 95%);
+}
+.gradient-45deg-purple-orange-lemon.gradient-shadow {
+  box-shadow: 0 6px 20px 0 rgba(249, 237, 78, 0.5);
 }

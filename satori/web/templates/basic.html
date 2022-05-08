@@ -30,17 +30,15 @@
     <!-- needed for modal -->
     <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
-
-    <script src="{{ url_for('static', filename='js/materialize1.0.0.min.js') }}"></script>
     
     <!-- CORE CSS-->
     <link href="{{ url_for('static', filename='css/materialize.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/materialize_style.css') }}" type="text/css" rel="stylesheet">
     <!-- Custome CSS-->
     <link href="{{ url_for('static', filename='css/custom/custom.css') }}" type="text/css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='vendors/flag-icon/css/flag-icon.min.css') }}" type="text/css" rel="stylesheet">
     <!-- HandsOnTable CSS and JS added to the dataset.py file instead -->
     <script src="{{ url_for('static', filename='js/handsontable.full.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/materialize1.0.0.min.js') }}"></script>
 
     {% block inner_head %}
     {% block preamble %}{% endblock %}
@@ -99,15 +97,15 @@
         </section>
       </div>
     </div>
-    <footer class="page-footer gradient-45deg-crimson-monarch">
+    <footer class="page-footer footer-fixed gradient-45deg-xiketic-purple">
         <div class="footer-copyright">
           <div class="container">
             <span>Satori
-              <a class="grey-text text-lighten-2" href="/" target="_blank"> </a>
+              <a class="grey-text text-lighten-2" href="http://satorinet.io" target="_blank"> </a>
               Network</span>
             <span class="right">
               Version
-              <a class="grey-text text-lighten-2" href="/">
+              <a class="grey-text text-lighten-2" href="http://satorinet.io">
                 <script type="text/javascript">
                   document.write(new Date().getFullYear());
                 </script>

@@ -5433,7 +5433,7 @@ li.home:before {
   top: 64px;
   width: 51%;
   height: 100%;
-  background: #eceff1;
+  background: #10051D;
   z-index: 1000;
   -webkit-transform: translateX(0);
   -ms-transform: translateX(0);
@@ -5458,7 +5458,7 @@ li.home:before {
   margin: -75px 0 0 -75px;
   border-radius: 50%;
   border: 3px solid transparent;
-  border-top-color: #B82025;
+  border-top-color: #533549;
   -webkit-animation: spin 2s linear infinite;
   animation: spin 2s linear infinite;
   z-index: 1001;
@@ -5473,7 +5473,7 @@ li.home:before {
   bottom: 5px;
   border-radius: 50%;
   border: 3px solid transparent;
-  border-top-color: #406281;
+  border-top-color: #F6B042;
   -webkit-animation: spin 3s linear infinite;
   animation: spin 3s linear infinite;
 }
@@ -5487,7 +5487,7 @@ li.home:before {
   bottom: 15px;
   border-radius: 50%;
   border: 3px solid transparent;
-  border-top-color: #868A8E;
+  border-top-color: #F9ED4E;
   -webkit-animation: spin 1.5s linear infinite;
   animation: spin 1.5s linear infinite;
 }
@@ -5580,9 +5580,9 @@ h1 span.logo-text {
   visibility: visible;
   opacity: 1;
   transition: opacity 0.2s linear;
+  letter-spacing: .2rem
 }
 h1 span.logo-text-small {
-  display: none;
 }
 
 .menu-sidebar-collapse {
@@ -5597,32 +5597,6 @@ header .brand-logo {
   margin: 1px 0px;
   padding: 22px 20px;
   line-height: .5;
-}
-@media only screen and (max-width: 992px){
-  header .brand-logo {
-    margin: 1px 0px;
-    padding: 0px 0px;
-    line-height: .5;
-    /*display: none;*/
-  }
-}
-
-@media only screen and (max-width: 992px){
-  h1 span.logo-text-small {
-    font-weight: bold; 
-    font-family: monospace; 
-    font-size: larger; 
-    padding-left: 60px;
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.2s linear;
-    display: block;
-  }
-}
-@media only screen and (max-width: 992px){
-  h1 span.logo-text {
-    display: none;
-  }
 }
 
 header .brand-logo img {
@@ -6834,8 +6808,8 @@ tr.group:hover {
   position: fixed;
   bottom: 0;
   width: 100%;
-  height: 21px;
-  font-size: xx-small;
+  
+  
 }
 
 .page-footer .container {
