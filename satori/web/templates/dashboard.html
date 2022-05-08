@@ -3,50 +3,120 @@
 {% extends "basic.html" %}
 
 {% block content %}
-
-  <script type="text/javascript" src="{{ url_for('static', filename='js/fav-dash.js') }}"></script>
-
-  <!--work collections start-->
 <div id="work-collections">
   <div class="row">
     <div class="col s12 m6 l6">
       <ul id="projects-collection" class="collection z-depth-1">
         <li class="collection-item avatar">
-          <i class="material-icons monarch circle">star</i> <!--bookmark-->
-          <h6 class="collection-header m-0" style="margin-top: 12px !important">Favorites</h6>
+          <div class="row">
+            <div class="col s9">
+              <i class="material-icons xiketic circle">account_balance_wallet</i>
+              <h6 class="collection-header m-0" style="margin-top: 12px !important">Wallet</h6>
+            </div>
+            <div class="col s3">
+              <div class="collections-content right"  style="margin-left: 12px !important; margin-top: .9rem !important;">sats</div>
+              <h6 class="collection-balance m-0 right">96</h6>
+            </div>
+          </div>
         </li>
-        {% for name, details in {'test':{'title_name':'title', 'parent_name':'parent'}}.items() %}
+        {% for name, details in {'test':{'in':'north_east','transaction_amount':'4', 'from_address':'S13f58e3s4e3sskxlxvef54se3531fexvbf4'},'test2':{'transaction_amount':'100', 'from_address':'S13f58e3s4e3sskxlxvef54se3531fexvbf4', 'in':'south_west'}}.items() %}
         <li class="collection-item" id="dash_fav_{{name}}">
           <div class="row">
-              <div class="col s9">
-                <p class="collections-title">{{ details['title_name'] }}</p>
-                <p class="collections-content">{{ details['parent_name'] }}</p>
-              </div>
+            <div class="col s9">
+              <p class="collections-title">{{ details['transaction_amount'] }}</p>
+              <p class="collections-content">{{ details['from_address'] }}</p>
+            </div>
             <div class="col s3">
-                <i class="material-icons">star</i>
+                <i class="material-icons right">{{ details['in'] }}</i>
             </div>
           </div>
         </li>
         {% endfor %}
       </ul>
-      {% if tip %}
+    </div>
+    <div class="col s12 m6 l6">
       <ul id="projects-collection" class="collection z-depth-1">
         <li class="collection-item avatar">
-          <i class="material-icons steel circle">info</i> <!--highlight info-outline-->
-          <h6 class="collection-header m-0" style="margin-top: 12px !important">Tip of the day...</h6>
+          <i class="material-icons xiketic circle">settings</i>
+          <h6 class="collection-header m-0" style="margin-top: 12px !important">Configuration</h6>
         </li>
-        <li class="collection-item" >
+        {% for name, details in {'override1':{'value':'24685', 'name':'local port'},'override2':{'value':'\satori\data', 'name':'data directory'}}.items() %}
+        <li class="collection-item" id="dash_fav_{{name}}">
           <div class="row">
-            <span>
-              <div class="col s12">
-                <p class="collections-title">{{ tip['question'] }}</p>
-                <p class="collections-content">{{ tip['answer'] }}</p>
-              </div>
-            </span>
+            <div class="col s9">
+              <p class="collections-title">{{ details['value'] }}</p>
+              <p class="collections-content">{{ details['name'] }}</p>
+            </div>
+            <div class="col s3">
+                <i class="material-icons">edit</i>
+            </div>
           </div>
         </li>
+        {% endfor %}
       </ul>
-      {% endif %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col s12 m12 l12">
+      <ul id="projects-collection" class="collection z-depth-1">
+        <li class="collection-item avatar">
+          <i class="material-icons xiketic circle">lightbulb</i> <!-- category network-intelligence lightbulb self-improvement -->
+          <h6 class="collection-header m-0" style="margin-top: 12px !important">Predictions</h6>
+        </li>
+        <!--li class="collection-item" id="dash_fav_{{name}}">
+          <div class="row">
+            <div class="col s">
+              <p class="collections-title">Sou</p>
+              <p class="collections-content">parent_name</p>
+            </div>
+            <div class="col s1">
+                <i class="material-icons right">edit</i>
+            </div>
+          </div>
+        </li-->
+        <table class="highlight responsive-table hide-on-med-and-down">
+          <thead>
+            <caption></caption>
+            <tr>
+              <th width="10%">Source</th>
+              <th width="15%">Stream</th>
+              <th width="10%">Target</th>
+              <th width="15%">Current Value</th>
+              <th width="15%">Current Prediction</th>
+              <th width="10%">Accuracy</th>
+              <th width="15%">Actions</th>
+              <th width="10%">Subscribers</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for details in [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00'}] %}
+            <tr>
+              <td>{{ details['source'] }}</td>
+              <td>{{ details['stream'] }}</td>
+              <td>{{ details['target'] }}</td>
+              <td>{{ details['value'] }}</td>
+              <td>{{ details['prediction'] }}</td>
+              <td>{{ details['accuracy'] }}</td>
+              <td>
+                <a class="waves-effect waves-light" href="/" title="Edit">
+                  <i class="material-icons">edit</i>
+                </a>
+                <a class="waves-effect waves-light" href="/" title="Delete">
+                  <i class="material-icons right">delete</i>
+                </a>
+              </td>
+              <td>{{ details['subscribers'] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      
+
+
+
+
+
+      </ul>
     </div>
   </div>
 </div>

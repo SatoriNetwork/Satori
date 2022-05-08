@@ -69,6 +69,6 @@ WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BET
   background: -webkit-linear-gradient(45deg, #533549 15%, #F6B042 30%, #F9ED4E 55%);
   background: linear-gradient(25deg, #533549 15%, #F6B042 45%, #F9ED4E 95%);
 }
-.gradient-45deg-purple-orange-lemon.gradient-shadow {
+/*.gradient-45deg-purple-orange-lemon.gradient-shadow {
   box-shadow: 0 6px 20px 0 rgba(249, 237, 78, 0.5);
-}
+}*/

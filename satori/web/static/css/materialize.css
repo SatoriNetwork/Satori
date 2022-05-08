@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=ZenMaruGothic:300,300i,400,400i,700);
+
 .materialize-red {
   background-color: #e51c23 !important;
 }
@@ -4618,44 +4618,12 @@ nav .input-field label.active i {
     height: 64px;
   }
 }
-/*
-@font-face {
-  font-family: "ZenMaruGothic";
-  src: local(ZenMaruGothic Thin), url("fonts/roboto/ZenMaruGothic-Thin.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Thin.woff") format("woff");
-  font-weight: 100;
-}
 
-@font-face {
-  font-family: "ZenMaruGothic";
-  src: local(ZenMaruGothic Light), url("fonts/roboto/ZenMaruGothic-Light.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Light.woff") format("woff");
-  font-weight: 300;
-}
-
-@font-face {
-  font-family: "ZenMaruGothic";
-  src: local(ZenMaruGothic Regular), url("fonts/roboto/ZenMaruGothic-Regular.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Regular.woff") format("woff");
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "ZenMaruGothic";
-  src: local(ZenMaruGothic Medium), url("fonts/roboto/ZenMaruGothic-Medium.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Medium.woff") format("woff");
-  font-weight: 500;
-}
-
-@font-face {
-  font-family: "ZenMaruGothic";
-  src: local(ZenMaruGothic Bold), url("fonts/roboto/ZenMaruGothic-Bold.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Bold.woff") format("woff");
-  font-weight: 700;
-}
-*/
 @font-face {
   font-family: "Zen Maru Gothic";
   src: local(ZenMaruGothic Thin),
   url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Light.tff") format("tff"),
-  local(ZenMaruGothic Thin),
-  url("fonts/roboto/ZenMaruGothic-Light.woff2") format("woff2"),
-  url("fonts/roboto/ZenMaruGothic-Light.woff") format("woff");
+  local(ZenMaruGothic Thin);
   font-weight: 100;
 }
 
@@ -4663,9 +4631,7 @@ nav .input-field label.active i {
   font-family: "Zen Maru Gothic";
   src: local(ZenMaruGothic Light),
   url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Light.tff") format("tff"),
-  local(ZenMaruGothic Light),
-  url("fonts/roboto/ZenMaruGothic-Light.woff2") format("woff2"),
-  url("fonts/roboto/ZenMaruGothic-Light.woff") format("woff");
+  local(ZenMaruGothic Light);
   font-weight: 300;
 }
 
@@ -4673,9 +4639,7 @@ nav .input-field label.active i {
   font-family: "Zen Maru Gothic";
   src: local(ZenMaruGothic Regular),
   url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Regular.tff") format("tff"),
-  local(ZenMaruGothic Regular),
-  url("fonts/roboto/ZenMaruGothic-Regular.woff2") format("woff2"),
-  url("fonts/roboto/ZenMaruGothic-Regular.woff") format("woff");
+  local(ZenMaruGothic Regular);
   font-weight: 400;
 }
 
@@ -4683,9 +4647,7 @@ nav .input-field label.active i {
   font-family: "Zen Maru Gothic";
   src: local(ZenMaruGothic Medium),
   url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Black.tff") format("tff"),
-  local(ZenMaruGothic Medium),
-  url("fonts/roboto/ZenMaruGothic-Medium.woff2") format("woff2"),
-  url("fonts/roboto/ZenMaruGothic-Medium.woff") format("woff");
+  local(ZenMaruGothic Medium);
   font-weight: 500;
 }
 
@@ -4693,9 +4655,7 @@ nav .input-field label.active i {
   font-family: "Zen Maru Gothic";
   src: local(ZenMaruGothic Bold),
   url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Bold.tff") format("tff"),
-  local(ZenMaruGothic Bold),
-  url("fonts/roboto/ZenMaruGothic-Bold.woff2") format("woff2"),
-  url("fonts/roboto/ZenMaruGothic-Bold.woff") format("woff");
+  local(ZenMaruGothic Bold);
   font-weight: 700;
 }
 
@@ -5694,7 +5654,7 @@ button.btn-floating {
   -webkit-tap-highlight-color: transparent;
   vertical-align: middle;
   z-index: 1;
-  transition: .3s ease-out;
+  transition: .7s ease-out;
 }
 
 .waves-effect .waves-ripple {
@@ -5713,7 +5673,7 @@ button.btn-floating {
 }
 
 .waves-effect.waves-light .waves-ripple {
-  background-color: rgba(255, 255, 255, 0.45);
+  background-color: rgba(255, 255, 255, 0.0);/* 0.45 seems permanent */
 }
 
 .waves-effect.waves-red .waves-ripple {

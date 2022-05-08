@@ -16,6 +16,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre:wght@300&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
     
+    <!-- https://material.io/resources/icons/?style=round -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round"rel="stylesheet">
+    <!-- https://material.io/resources/icons/?style=baseline -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons"rel="stylesheet">
+
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
     <script src="{{ url_for('static', filename='js/jquery3.3.1.min.js') }}s"></script>
 
@@ -29,7 +34,7 @@
     
     <!-- needed for modal -->
     <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"> -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}">
+    <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}"> -->
     
     <!-- CORE CSS-->
     <link href="{{ url_for('static', filename='css/materialize.css') }}" type="text/css" rel="stylesheet">
@@ -39,6 +44,9 @@
     <!-- HandsOnTable CSS and JS added to the dataset.py file instead -->
     <script src="{{ url_for('static', filename='js/handsontable.full.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/materialize1.0.0.min.js') }}"></script>
+    <!--plugins.js - Some Specific JS codes for Plugin Settings-->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/plugins.js') }}"></script>
+
 
     {% block inner_head %}
     {% block preamble %}{% endblock %}
