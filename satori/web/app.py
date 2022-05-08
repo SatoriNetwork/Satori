@@ -221,7 +221,8 @@ def publsihMeta():
 if __name__ == '__main__':
     if full:
         spoofStreamer()
-    serve(app, host='0.0.0.0', port=satori.config.get()['port'])
+    #serve(app, host='0.0.0.0', port=satori.config.get()['port'])
+    app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True, debug=True)
     
     #app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True)
     # https://stackoverflow.com/questions/11150343/slow-requests-on-local-flask-server

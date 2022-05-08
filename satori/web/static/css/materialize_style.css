@@ -2,7 +2,7 @@
   height: 100px;
 }
 
-@import url("https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700");
+@import url("https://fonts.googleapis.com/css?family=Zen Maru Gothic:300,300i,400,400i,700");
 .materialize-red {
   background-color: #e51c23 !important;
 }
@@ -2148,7 +2148,7 @@ a {
 
 html {
   line-height: 1.5;
-  font-family: "Roboto", sans-serif !important;
+  font-family: "Zen Maru Gothic", sans-serif !important;
   font-weight: normal;
   color: rgba(0, 0, 0, 0.87);
 }
@@ -2172,13 +2172,13 @@ html {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Roboto", sans-serif;
+  font-family: "Zen Maru Gothic", sans-serif;
   font-weight: 400;
   line-height: 1.1;
 }
 
 p {
-  font-family: "Roboto", sans-serif;
+  font-family: "Zen Maru Gothic", sans-serif;
 }
 
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
@@ -2626,9 +2626,11 @@ body.layout-semi-dark .footer-copyright {
   padding-left: 64px;
 }
 
+/*
 footer {
   padding-left: 240px;
 }
+*/
 
 footer.page-footer {
   padding-top: 1px;
@@ -5785,7 +5787,7 @@ header .brand-logo img {
 }
 
 .notification-badge {
-  font-family: "Roboto", sans-serif;
+  font-family: "Zen Maru Gothic", sans-serif;
   position: relative;
   right: 5px;
   top: -20px;
@@ -5992,7 +5994,7 @@ ul.side-nav.leftside-navigation li:not(.no-padding).active {
 }
 
 ul.side-nav.leftside-navigation li:not(.no-padding) a {
-  font-family: "Roboto", sans-serif;
+  font-family: "Zen Maru Gothic", sans-serif;
   font-size: 13px;
   /*
   font-weight: 300;

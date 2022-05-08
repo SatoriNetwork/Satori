@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700);
+@import url(https://fonts.googleapis.com/css?family=ZenMaruGothic:300,300i,400,400i,700);
 .materialize-red {
   background-color: #e51c23 !important;
 }
@@ -2144,7 +2144,7 @@ a {
 
 html {
   line-height: 1.5;
-  font-family: "Roboto", sans-serif !important;
+  font-family: "ZenMaruGothic", sans-serif !important;
   font-weight: normal;
   color: rgba(0, 0, 0, 0.87);
 }
@@ -2168,13 +2168,13 @@ html {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Roboto", sans-serif;
+  font-family: "ZenMaruGothic", sans-serif;
   font-weight: 400;
   line-height: 1.1;
 }
 
 p {
-  font-family: "Roboto", sans-serif;
+  font-family: "ZenMaruGothic", sans-serif;
 }
 
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
@@ -4620,62 +4620,82 @@ nav .input-field label.active i {
 }
 /*
 @font-face {
-  font-family: "Roboto";
-  src: local(Roboto Thin), url("fonts/roboto/Roboto-Thin.woff2") format("woff2"), url("fonts/roboto/Roboto-Thin.woff") format("woff");
+  font-family: "ZenMaruGothic";
+  src: local(ZenMaruGothic Thin), url("fonts/roboto/ZenMaruGothic-Thin.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Thin.woff") format("woff");
   font-weight: 100;
 }
 
 @font-face {
-  font-family: "Roboto";
-  src: local(Roboto Light), url("fonts/roboto/Roboto-Light.woff2") format("woff2"), url("fonts/roboto/Roboto-Light.woff") format("woff");
+  font-family: "ZenMaruGothic";
+  src: local(ZenMaruGothic Light), url("fonts/roboto/ZenMaruGothic-Light.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Light.woff") format("woff");
   font-weight: 300;
 }
 
 @font-face {
-  font-family: "Roboto";
-  src: local(Roboto Regular), url("fonts/roboto/Roboto-Regular.woff2") format("woff2"), url("fonts/roboto/Roboto-Regular.woff") format("woff");
+  font-family: "ZenMaruGothic";
+  src: local(ZenMaruGothic Regular), url("fonts/roboto/ZenMaruGothic-Regular.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Regular.woff") format("woff");
   font-weight: 400;
 }
 
 @font-face {
-  font-family: "Roboto";
-  src: local(Roboto Medium), url("fonts/roboto/Roboto-Medium.woff2") format("woff2"), url("fonts/roboto/Roboto-Medium.woff") format("woff");
+  font-family: "ZenMaruGothic";
+  src: local(ZenMaruGothic Medium), url("fonts/roboto/ZenMaruGothic-Medium.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Medium.woff") format("woff");
   font-weight: 500;
 }
 
 @font-face {
-  font-family: "Roboto";
-  src: local(Roboto Bold), url("fonts/roboto/Roboto-Bold.woff2") format("woff2"), url("fonts/roboto/Roboto-Bold.woff") format("woff");
+  font-family: "ZenMaruGothic";
+  src: local(ZenMaruGothic Bold), url("fonts/roboto/ZenMaruGothic-Bold.woff2") format("woff2"), url("fonts/roboto/ZenMaruGothic-Bold.woff") format("woff");
   font-weight: 700;
 }
 */
 @font-face {
-  font-family: "Roboto";
-  src: local(Rotobot Thin), url("fonts/proximanova/ProximaNovaT-Thin.tff") format("tff"), local(Roboto Thin), url("fonts/roboto/Roboto-Thin.woff2") format("woff2"), url("fonts/roboto/Roboto-Thin.woff") format("woff");
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Thin),
+  url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Light.tff") format("tff"),
+  local(ZenMaruGothic Thin),
+  url("fonts/roboto/ZenMaruGothic-Light.woff2") format("woff2"),
+  url("fonts/roboto/ZenMaruGothic-Light.woff") format("woff");
   font-weight: 100;
 }
 
 @font-face {
-  font-family: "Roboto";
-  src: local(Rotobot Light), url("fonts/proximanova/ProximaNova-Light.tff") format("tff"), local(Roboto Light), url("fonts/roboto/Roboto-Light.woff2") format("woff2"), url("fonts/roboto/Roboto-Light.woff") format("woff");
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Light),
+  url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Light.tff") format("tff"),
+  local(ZenMaruGothic Light),
+  url("fonts/roboto/ZenMaruGothic-Light.woff2") format("woff2"),
+  url("fonts/roboto/ZenMaruGothic-Light.woff") format("woff");
   font-weight: 300;
 }
 
 @font-face {
-  font-family: "Roboto";
-  src: local(Rotobot Regular), url("fonts/proximanova/ProximaNova-Regular.tff") format("tff"), local(Roboto Regular), url("fonts/roboto/Roboto-Regular.woff2") format("woff2"), url("fonts/roboto/Roboto-Regular.woff") format("woff");
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Regular),
+  url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Regular.tff") format("tff"),
+  local(ZenMaruGothic Regular),
+  url("fonts/roboto/ZenMaruGothic-Regular.woff2") format("woff2"),
+  url("fonts/roboto/ZenMaruGothic-Regular.woff") format("woff");
   font-weight: 400;
 }
 
 @font-face {
-  font-family: "Roboto";
-  src: local(Rotobot Medium), url("fonts/proximanova/ProximaNova-Black.tff") format("tff"), local(Roboto Medium), url("fonts/roboto/Roboto-Medium.woff2") format("woff2"), url("fonts/roboto/Roboto-Medium.woff") format("woff");
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Medium),
+  url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Black.tff") format("tff"),
+  local(ZenMaruGothic Medium),
+  url("fonts/roboto/ZenMaruGothic-Medium.woff2") format("woff2"),
+  url("fonts/roboto/ZenMaruGothic-Medium.woff") format("woff");
   font-weight: 500;
 }
 
 @font-face {
-  font-family: "Roboto";
-  src: local(Rotobot Bold), url("fonts/proximanova/ProximaNova-Bold.tff") format("tff"), local(Roboto Bold), url("fonts/roboto/Roboto-Bold.woff2") format("woff2"), url("fonts/roboto/Roboto-Bold.woff") format("woff");
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Bold),
+  url("fonts/Zen_Maru_Gothic/ZenMaruGothic-Bold.tff") format("tff"),
+  local(ZenMaruGothic Bold),
+  url("fonts/roboto/ZenMaruGothic-Bold.woff2") format("woff2"),
+  url("fonts/roboto/ZenMaruGothic-Bold.woff") format("woff");
   font-weight: 700;
 }
 
@@ -4685,7 +4705,7 @@ a {
 
 html {
   line-height: 1.5;
-  font-family: "Roboto", sans-serif;
+  font-family: "ZenMaruGothic", sans-serif;
   font-weight: normal;
   color: rgba(0, 0, 0, 0.87);
 }
