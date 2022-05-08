@@ -5566,7 +5566,9 @@ h1.logo-wrapper {
 
 h1 span.logo-text {
   font-size: 26px;
-  padding-left: 40px;
+  /* 
+  only needed if nav is included
+  padding-left: 40px; */
   visibility: visible;
   opacity: 1;
   transition: opacity 0.2s linear;
