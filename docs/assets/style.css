@@ -10,9 +10,11 @@ iframe {
     }
 .textFont {
     font-family: 'Zen Maru Gothic', sans-serif;
+    color: rgba(0, 0, 0, 0.8);
     }
 .textFontButton {
     font-family: 'Zen Maru Gothic', sans-serif;
+    color: rgba(0, 0, 0, 0.8);
     font-size: 25px;
     }
 button {
