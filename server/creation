@@ -1,3 +1,0 @@
-mix phx.new satori --live
-cd satori
-mix phx.gen.live Stream Observation observation wallet_id:integer stream_id:integer target_id:integer value  

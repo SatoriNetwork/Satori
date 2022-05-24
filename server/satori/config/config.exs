@@ -15,7 +15,7 @@ config :satori, SatoriWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [view: SatoriWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Satori.PubSub,
-  live_view: [signing_salt: "D8pQjTnq"]
+  live_view: [signing_salt: "CHGKg6lz"]
 
 # Configures the mailer
 #

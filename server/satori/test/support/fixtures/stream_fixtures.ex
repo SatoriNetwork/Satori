@@ -11,6 +11,7 @@ defmodule Satori.StreamFixtures do
     {:ok, observation} =
       attrs
       |> Enum.into(%{
+        source_id: 42,
         stream_id: 42,
         target_id: 42,
         value: "some value",

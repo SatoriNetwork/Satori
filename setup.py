@@ -18,7 +18,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=[f'{get_name()}.{p}' for p in find_packages(where=get_name())],
     install_requires=[],
-    python_requires='>=3.5.2',
+    python_requires='>=9.5',
     author='Jordan Miller',
     author_email="paradoxlabs@protonmail.com",
     url=f"https://github.com/lastmeta/{get_name()}",

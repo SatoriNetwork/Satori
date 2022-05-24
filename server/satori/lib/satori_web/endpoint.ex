@@ -7,7 +7,7 @@ defmodule SatoriWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_satori_key",
-    signing_salt: "NKvsHUfR"
+    signing_salt: "JbpZNUzN"
   ]
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
