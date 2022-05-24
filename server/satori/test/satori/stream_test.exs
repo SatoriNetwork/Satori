@@ -8,7 +8,7 @@ defmodule Satori.StreamTest do
 
     import Satori.StreamFixtures
 
-    @invalid_attrs %{stream_id: nil, target_id: nil, value: nil, wallet_id: nil}
+    @invalid_attrs %{source_id: nil, stream_id: nil, target_id: nil, value: nil, wallet_id: nil}
 
     test "list_observation/0 returns all observation" do
       observation = observation_fixture()
@@ -21,9 +21,10 @@ defmodule Satori.StreamTest do
     end
 
     test "create_observation/1 with valid data creates a observation" do
-      valid_attrs = %{stream_id: 42, target_id: 42, value: "some value", wallet_id: 42}
+      valid_attrs = %{source_id: 42, stream_id: 42, target_id: 42, value: "some value", wallet_id: 42}
 
       assert {:ok, %Observation{} = observation} = Stream.create_observation(valid_attrs)
+      assert observation.source_id == 42
       assert observation.stream_id == 42
       assert observation.target_id == 42
       assert observation.value == "some value"
@@ -36,9 +37,10 @@ defmodule Satori.StreamTest do
 
     test "update_observation/2 with valid data updates the observation" do
       observation = observation_fixture()
-      update_attrs = %{stream_id: 43, target_id: 43, value: "some updated value", wallet_id: 43}
+      update_attrs = %{source_id: 43, stream_id: 43, target_id: 43, value: "some updated value", wallet_id: 43}
 
       assert {:ok, %Observation{} = observation} = Stream.update_observation(observation, update_attrs)
+      assert observation.source_id == 43
       assert observation.stream_id == 43
       assert observation.target_id == 43
       assert observation.value == "some updated value"

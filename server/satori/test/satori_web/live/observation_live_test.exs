@@ -4,9 +4,9 @@ defmodule SatoriWeb.ObservationLiveTest do
   import Phoenix.LiveViewTest
   import Satori.StreamFixtures
 
-  @create_attrs %{stream_id: 42, target_id: 42, value: "some value", wallet_id: 42}
-  @update_attrs %{stream_id: 43, target_id: 43, value: "some updated value", wallet_id: 43}
-  @invalid_attrs %{stream_id: nil, target_id: nil, value: nil, wallet_id: nil}
+  @create_attrs %{source_id: 42, stream_id: 42, target_id: 42, value: "some value", wallet_id: 42}
+  @update_attrs %{source_id: 43, stream_id: 43, target_id: 43, value: "some updated value", wallet_id: 43}
+  @invalid_attrs %{source_id: nil, stream_id: nil, target_id: nil, value: nil, wallet_id: nil}
 
   defp create_observation(_) do
     observation = observation_fixture()

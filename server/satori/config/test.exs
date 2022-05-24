@@ -17,7 +17,7 @@ config :satori, Satori.Repo,
 # you can enable the server option below.
 config :satori, SatoriWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "QSpYdUz7Mkocwm2FJWjZdHtp2ACbkPNr6KkwIk733tlNUrovL7m/0xLyDJPwnkjI",
+  secret_key_base: "po+3bNcrXH7eBpLgNzI2Jr1HWheC0kITBseeQolehKSTr75lYhkQ7BrDOta8U4D+",
   server: false
 
 # In test we don't send emails.

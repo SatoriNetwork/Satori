@@ -23,7 +23,7 @@ config :satori, SatoriWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "8/4cX+B7vv2o3T+jzCetiSFWAKFocgll64kVoH5P9DZKhLRk52zYEjEjCBROsN0b",
+  secret_key_base: "yu4NlCNE9qBZTumRjQbZSdnj6kS+pVTtPySzaCfwkiBziFiKUmz5rmDfYZrO08+4",
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}

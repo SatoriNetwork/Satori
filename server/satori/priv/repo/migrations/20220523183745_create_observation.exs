@@ -3,9 +3,10 @@ defmodule Satori.Repo.Migrations.CreateObservation do
 
   def change do
     create table(:observation) do
-      add :wallet_id, :integer
+      add :source_id, :integer
       add :stream_id, :integer
       add :target_id, :integer
+      add :wallet_id, :integer
       add :value, :string
 
       timestamps()

@@ -9,9 +9,9 @@
     phx-change="validate"
     phx-submit="save">
   
-    <%= label f, :wallet_id %>
-    <%= number_input f, :wallet_id %>
-    <%= error_tag f, :wallet_id %>
+    <%= label f, :source_id %>
+    <%= number_input f, :source_id %>
+    <%= error_tag f, :source_id %>
   
     <%= label f, :stream_id %>
     <%= number_input f, :stream_id %>
@@ -20,6 +20,10 @@
     <%= label f, :target_id %>
     <%= number_input f, :target_id %>
     <%= error_tag f, :target_id %>
+  
+    <%= label f, :wallet_id %>
+    <%= number_input f, :wallet_id %>
+    <%= error_tag f, :wallet_id %>
   
     <%= label f, :value %>
     <%= text_input f, :value %>
