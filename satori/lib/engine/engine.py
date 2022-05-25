@@ -122,19 +122,6 @@ class Engine:
             threads[f'{model.id}.explorer'] = threading.Thread(target=explorer, args=[model], daemon=True)
         for thread in threads.values():
             thread.start()
-        #while threading.active_count() > 0:
-        #    time.sleep(31)
-        #    if not self.view.isReactive:
-        #        #self.updateView(
-        #        self.out(
-        #        predictions = {
-        #            model.id: model.prediction
-        #            for model in self.models},
-        #        scores = {
-        #            model.id: f'{round(model.stable, 3)} ({round(model.test, 3)})'
-        #            for model in self.models})
-                
-                
 
 howToRun = '''
 # see example notebook

@@ -137,3 +137,5 @@ dmypy.json
 *node_modules
 *.txt
 predictions/
+.vscode
+.elixir_ls
