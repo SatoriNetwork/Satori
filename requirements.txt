@@ -1,7 +1,4 @@
-functools
-setuptools
-itertools
-threading
+setuptools==56.0.0
 IPython==7.23.0
 matplotlib==3.4.1
 xgboost==1.5.1
