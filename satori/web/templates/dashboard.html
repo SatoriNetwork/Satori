@@ -5,8 +5,10 @@
 {% block content %}
 <div id="work-collections">
   <div class="row">
+    
     <div class="col s12 m6 l6">
       <ul id="projects-collection" class="collection z-depth-1">
+        <div class="overlay">Coming Eventually</div>
         <li class="collection-item avatar">
           <div class="row">
             <div class="col s9">
@@ -36,6 +38,7 @@
     </div>
     <div class="col s12 m6 l6">
       <ul id="projects-collection" class="collection z-depth-1">
+        <div class="overlay">Coming Soon</div>
         <li class="collection-item avatar">
           <i class="material-icons xiketic circle">settings</i>
           <h6 class="collection-header m-0" style="margin-top: 12px !important">Configuration</h6>
@@ -56,6 +59,7 @@
       </ul>
     </div>
   </div>
+
   <div class="row">
     <div class="col s12 m12 l12">
       <ul id="projects-collection" class="collection z-depth-1">
@@ -63,17 +67,6 @@
           <i class="material-icons xiketic circle">lightbulb</i> <!-- category network-intelligence lightbulb self-improvement -->
           <h6 class="collection-header m-0" style="margin-top: 12px !important">Predictions</h6>
         </li>
-        <!--li class="collection-item" id="dash_fav_{{name}}">
-          <div class="row">
-            <div class="col s">
-              <p class="collections-title">Sou</p>
-              <p class="collections-content">parent_name</p>
-            </div>
-            <div class="col s1">
-                <i class="material-icons right">edit</i>
-            </div>
-          </div>
-        </li-->
         <table class="highlight responsive-table hide-on-med-and-down">
           <thead>
             <caption></caption>
@@ -89,14 +82,14 @@
             </tr>
           </thead>
           <tbody>
-            {% for details in [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00'}] %}
+            {% for streamOverview in streamsOverview %}
             <tr>
-              <td>{{ details['source'] }}</td>
-              <td>{{ details['stream'] }}</td>
-              <td>{{ details['target'] }}</td>
-              <td>{{ details['value'] }}</td>
-              <td>{{ details['prediction'] }}</td>
-              <td>{{ details['accuracy'] }}</td>
+              <td>{{ streamOverview['source'] }}</td>
+              <td>{{ streamOverview['stream'] }}</td>
+              <td>{{ streamOverview['target'] }}</td>
+              <td>{{ streamOverview['value'] }}</td>
+              <td>{{ streamOverview['prediction'] }}</td>
+              <td>{{ streamOverview['accuracy'] }}</td>
               <td>
                 <a class="waves-effect waves-light" href="/" title="Edit">
                   <i class="material-icons">edit</i>
@@ -105,7 +98,7 @@
                   <i class="material-icons right">delete</i>
                 </a>
               </td>
-              <td>{{ details['subscribers'] }}</td>
+              <td>{{ streamOverview['subscribers'] }}</td>
             </tr>
             {% endfor %}
           </tbody>

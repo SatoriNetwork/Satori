@@ -139,15 +139,14 @@ class DataManager:
                     #        observation.df.loc[:, [
                     #            (observation.sourceId, observation.streamId, update) 
                     #            for update in sendUpdates]])
-            
-
 
             if remember():
                 saveIncremental()
                 compress()
                 tellModels()
             
-        self.listeners.append(self.newData.subscribe(lambda x: handleNewData(models, x) if x is not None else None))
+        self.listeners.append(self.newData.subscribe(
+            lambda x: handleNewData(models, x) if x is not None else None))
         #self.listeners.append(self.newData.subscribe(lambda x: print('triggered')))
                 
 
@@ -183,7 +182,8 @@ class DataManager:
         #        f.write(f'{model.predictionEdge}, {str(dt.datetime.now())} {model.predictionEdge}')
                 
         for model in models:
-            self.listeners.append(model.predictionUpdate.subscribe(lambda x: publish(x) if x else None))
+            self.listeners.append(model.predictionUpdate.subscribe(
+                lambda x: publish(x) if x else None))
         #    self.listeners.append(model.predictionEdgeUpdate.subscribe(lambda x: publishEdge(x) if x else None))
     
     def runScholar(self, models):

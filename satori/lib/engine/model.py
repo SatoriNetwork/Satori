@@ -1,6 +1,9 @@
-# how can you get to intelligence without taking the path of using as many
-# simplifying assumptions as possible?
-# you must reduce the complexity as soon as it arises, if you can.
+# WIP
+# This is the core of the engine - building models continuously to search for the best one
+# its reactive, but needs better architecture to support a more modular design.
+# the only option people have right now is to extend the object with overrides, using
+# their own algorithms, but that basically means rewriting the whole thing.
+# it needs better modularity, and perhaps should make use of sci-kit learn's pipelines.
 '''
 Basic Reponsibilities of the ModelManager:
 1. keep a record of the datasets, features, and parameters of the best model.
@@ -15,7 +18,6 @@ import os
 import copy
 import time
 import random
-from tokenize import Double
 import joblib
 import numpy as np
 import pandas as pd
@@ -96,6 +98,18 @@ class ModelManager:
         if not self.data.empty:
             self.produceFeatureSet()
         self.syncManifest()
+
+    def overview(self):
+        return {
+            'source': self.sourceId,
+            'stream': self.streamId, 
+            'target': self.targetId, 
+            'value': self.current.values[0][0] if hasattr(self, 'current') else '',
+            'prediction': self.prediction if hasattr(self, 'prediction') else '',
+            # this isn't the accuracy we really care about (historic accuracy), 
+            # it's accuracy of this current model on historic data.
+            'accuracy': f'{str(self.stable*100)[0:5]} %' if hasattr(self, 'stable') else '', 
+            'subscribers':'none'}
 
     def syncManifest(self):
         manifest = config.get('manifest') or {}
@@ -293,7 +307,7 @@ class ModelManager:
         '''
         for k in self.featureSet.columns:
             self.featureData[k] = (
-                self.featureImports[k],
+                self.featureImports[k], # KeyError: ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh43median')
                 self.featureData[k][1] if k in self.featureData.keys() else [] + (
                     self.features[k].keywords.get('columns', None)
                     or [self.features[k].keywords.get('column')]))
@@ -345,9 +359,10 @@ class ModelManager:
 
     def produceFit(self):
         self.xgbInUse = True
-        if all(isinstance(y, (int, Double)) for y in self.trainY): 
+        if all(isinstance(y[0], (int, float)) for y in self.trainY.values):
             self.xgb = XGBRegressor(**{param.name: param.value for param in self.hyperParameters})
         else:
+            # todo: Classifier untested
             self.xgb = XGBClassifier(**{param.name: param.value for param in self.hyperParameters})
         self.xgb.fit(
             self.trainX,
@@ -361,9 +376,10 @@ class ModelManager:
         self.xgbInUse = False
 
     def produceTestFit(self):
-        if all(isinstance(y, (int, Double)) for y in self.trainY): 
+        if all(isinstance(y[0], (int, float)) for y in self.trainY.values):
             self.xgbTest = XGBRegressor(**{param.name: param.test for param in self.hyperParameters})
         else:
+            # todo: Classifier untested
             self.xgbTest = XGBClassifier(**{param.name: param.value for param in self.hyperParameters})
         self.xgbTest.fit(
             self.trainXtest,

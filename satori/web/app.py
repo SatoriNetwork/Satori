@@ -30,6 +30,7 @@ from flask import Flask, url_for, render_template, redirect, jsonify
 from flask import send_from_directory, session, request, flash, Markup
 #from flask_mobility import Mobility
 from waitress import serve
+import webbrowser
 
 from satori.lib.engine.structs import Observation
 
@@ -38,7 +39,9 @@ from satori.lib.engine.structs import Observation
 ## Globals ####################################################################
 ###############################################################################
 
-full = False; # just web or everything
+full = True # just web or everything
+debug = False
+Engine = None
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
@@ -144,7 +147,13 @@ def dashboard():
         (model inputs and relative strengths)
         (access to all predictions and the truth)
     '''
-    resp = {}
+    if Engine is None:
+        streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00'}]
+    else:
+        streamsOverview = [model.overview() for model in Engine.models]
+    print('streamsOverview------------------------------------------------')
+    print(streamsOverview)
+    resp = {'streamsOverview': streamsOverview}
     return render_template('dashboard.html', **resp)
 
 ###############################################################################
@@ -221,9 +230,11 @@ def publsihMeta():
 if __name__ == '__main__':
     if full:
         spoofStreamer()
+
     #serve(app, host='0.0.0.0', port=satori.config.get()['port'])
-    app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True, debug=True)
-    
+    if not debug: 
+        webbrowser.open('http://127.0.0.1:24685', new=0, autoraise=True)
+    app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True, debug=debug)
     #app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True)
     # https://stackoverflow.com/questions/11150343/slow-requests-on-local-flask-server
     # did not help
