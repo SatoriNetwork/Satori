@@ -41,12 +41,14 @@ from satori.lib.engine.structs import Observation
 
 full = True # just web or everything
 debug = False
+Connection = None
 Engine = None
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 if full:
-    Engine = satori.getEngine()
+    Connection = satori.start.establishConnection()
+    Engine = satori.start.getEngine(Connection)
     Engine.run()
 
 def spoofStreamer():

@@ -1,3 +1,4 @@
+# todo create config if no config present, use config if config present
 from itertools import product
 from functools import partial
 import pandas as pd
@@ -6,8 +7,17 @@ import os
 
 from satori.lib.engine.structs import SourceStreamTargets
 
+
+def establishConnection():
+    ''' establishes a connection to the satori server, returns connection object '''
+    payload = {
+        'ram_total_gb': satori.apis.system.getRam(),
+        'ram_available_percent': satori.apis.system.getRamAvailablePercentage()}
+    # todo: implement connection 
+    
 # accept optional data necessary to generate models data and learner
-def getEngine():
+def getEngine(connection):
+    # todo: use connection if no config present to set yourself up correctly (connnection will provide streams to subscribe to)
     '''
     called by the flask app to start the Engine.
     returns None or Engine.
