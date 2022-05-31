@@ -4,6 +4,21 @@
   margin: 0 auto;
 }
 
+.phase {
+  max-width: 1172px;
+  width: 90%;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.phase-border {
+  margin-bottom: 0;
+  max-width: 172px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.3);
+  -o-border-image: linear-gradient(to right, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0)) 1%;
+  border-image: linear-gradient(to right, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0)) 1%;
+}
+
 .timeline-item {
   padding: 3em 2em 2em;
   position: relative;
@@ -36,6 +51,7 @@
   border: 2px solid rgba(0, 0, 0, 0.3);
   background: white;
 }
+
 .timeline-item:last-child {
   -o-border-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0)) 1 100%;
      border-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0)) 1 100%;
