@@ -15,7 +15,7 @@
 <body>
 
 <center>
-  <h1 style='font-size: 200px; margin-top: 0px; margin-bottom: 0px;' class="logoFont" onclick="showContent0()">Sat<img src="./assets/site/enso.png" width="100" height="100">ri</h1>
+  <h1 style='font-size: 200px; margin-top: 0px; margin-bottom: 0px;' class="logoFont resize-on-small-and-down" onclick="showContent0()">Sat<img src="./assets/site/enso.png" width="100" height="100">ri</h1>
   <button id='button1' class="textFontButton" onclick="showContent1()">Vision</button>
   <button id='button2' class="textFontButton" onclick="showContent2()">The Way</button>
   <button id='button3' class="textFontButton" onclick="showContent3()">Join</button>
@@ -147,7 +147,12 @@
     -->
     <br/>
     <center>
-    <button class="textFontButton">Timeline</button>
+    <button class="textFontButton">Roadmap</button>
+    <br/>
+    <br/>
+    <div class="phase">
+      <p class="textFont phase-border">Phase 1</p>
+    </div>
     <div class="container">
       <div class="timeline-item" date-is='November 2021'>
         <h2 class="textFontButton">Satori Network Conceptualized as the Simplest Approach to Distributed AI</h2>
@@ -191,9 +196,6 @@
           Satori Node needs a UI to show streams being predicted, wallet and earnings, and allow the user to configure how the node runs.
         </p>
       </div>
-    </div>
-    <h2 class="textFontButton">To Do</h2>
-    <div class="container">
       <div class="timeline-item" date-is='By end of Q3 2022'>
         <h2 class="textFontButton">Publish-subscribe Integration</h2>
         <p class="textFont">
@@ -210,8 +212,39 @@
             Satori needs the use of distributed consensus for incentive structures as well as for purposes of coordiation such as community voting, competition, and bounties. A platform needs to be chosen, smart contracts written and communication with the DLT must be represented in the node in the form of a wallet.
           </p>
       </div>
-      <div class="timeline-item" date-is='2023'>
+      <div class="timeline-item" date-is='early 2023'>
         <h2 class="textFontButton">Satori Launch</h2>
+        <p class="textFont">
+          Stress test during a beta launch make any necessary modifications and Launch the Satori Network.
+        </p>
+      </div>
+    </div>
+        <div class="phase">
+      <p class="textFont phase-border">Phase 2</p>
+    </div>
+    <div class="container">
+      <div class="timeline-item" date-is='2023-2024'>
+        <h2 class="textFontButton">Develop Market Platform</h2>
+        <p class="textFont">
+          The market platform will bring buyers and sellers of future forecasting together. This requires building out the rest of the Blockchain protocol to support market transaction for future forecasting.
+        </p>
+      </div>
+      <div class="timeline-item" date-is='2023-2024'>
+        <h2 class="textFontButton">Scale</h2>
+        <p class="textFont">
+          The network to as many nodes as possible to ensure the most reliable and robust predictions of the future.
+        </p>
+      </div>
+    </div>
+        <div class="phase">
+      <p class="textFont phase-border">Phase 3</p>
+    </div>
+    <div class="container">
+      <div class="timeline-item" date-is='2024-2026'>
+        <h2 class="textFontButton">Fully Functional DAO</h2>
+        <p class="textFont">
+          Remove all centralizing training wheels of Satori.
+        </p>
       </div>
     </div>
   </center>
@@ -234,7 +267,7 @@
   <!--<button class="textFontButton">Download</button>-->
     <button class="textFontButton"><a href="https://github.com/lastmeta/Satori">Get Involved</a></button>
   <br />
-  <img src="./assets/site/nodeui.png" style='margin-top:50px;' height=921 width=1642 title='Node software'>
+  <img src="./assets/site/nodeui.png" style='margin-top:50px;' height=921 width=1642 title='Node software' class="resize-on-med-and-down">
     <center><i><p class="textFont">Satori node software user interface</p></i></center>
   </div>
 </template>

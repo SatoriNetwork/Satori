@@ -1,3 +1,15 @@
+@media only screen and (max-width: 600px) {
+    .resize-on-small-and-down {
+        font-size: 100px !important;
+    }
+}
+@media only screen and (max-width: 840px) {
+    .resize-on-med-and-down {
+        width: -webkit-fill-available;
+        height: auto;
+    }
+}
+
 iframe {
     /*
     #width: 100vw;
