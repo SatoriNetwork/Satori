@@ -27,6 +27,7 @@ class ModelApi(object):
                 model.savedHyperParameters = hyperParameters
             if chosenFeatures is not None:
                 model.savedChosenFeatures = chosenFeatures
+            return model
         
         safetify(modelPath)
         model = appendAttributes(model, hyperParameters, chosenFeatures)
