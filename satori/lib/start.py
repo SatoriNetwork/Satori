@@ -28,8 +28,7 @@ def getEngine(connection):
     
     def getExistingDataManager():
         ''' generates DataManager from data on disk '''
-        data = satori.DataManager()
-        return data
+        return satori.DataManager()
     
     def getExistingModelManager():
         ''' generate a set of Model(s) for Engine '''

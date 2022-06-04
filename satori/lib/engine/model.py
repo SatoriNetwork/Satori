@@ -18,7 +18,6 @@ import os
 import copy
 import time
 import random
-import joblib
 import numpy as np
 import pandas as pd
 import datetime as dt
@@ -510,29 +509,25 @@ class ModelManager:
 
     def save(self):
         ''' save the current model '''
-        self.xgb.savedHyperParameters = self.hyperParameters
-        self.xgb.savedChosenFeatures = self.chosenFeatures
-        disk.safetify(self.modelPath)
-        joblib.dump(self.xgb, self.modelPath)
-
-    def load(self) -> bool:
+        disk.ModelApi.save(self.xgb, self.modelPath, self.hyperParameters, self.chosenFeatures)
+        
+    def load(self): # -> bool:
         ''' loads the model - happens on init so we automatically load our progress '''
-        if os.path.exists(self.modelPath):
-            xgb = joblib.load(self.modelPath)
-            if (
-                all([scf in self.features.keys() for scf in xgb.savedChosenFeatures]) and
-                True # all([shp in self.hyperParameters for shp in xgb.savedHyperParameters])
-            ):
-                self.xgb = xgb
-                self.hyperParameters = self.xgb.savedHyperParameters
-                self.chosenFeatures = self.xgb.savedChosenFeatures
-            return True
-        return False
+        xgb = disk.ModelApi.load(self.modelPath)
+        if xgb == False:
+            return False
+        if (
+            all([scf in self.features.keys() for scf in xgb.savedChosenFeatures]) and
+            True # all([shp in self.hyperParameters for shp in xgb.savedHyperParameters])
+        ):
+            self.xgb = xgb
+            self.hyperParameters = self.xgb.savedHyperParameters
+            self.chosenFeatures = self.xgb.savedChosenFeatures
+        return True
 
     ### MAIN PROCESSES #################################################################
 
     def buildStable(self):
-        #self.get()
         if self.data is not None and not self.data.empty and self.data.shape[0] > 20:
             self.produceTarget()
             self.produceFeatureStructure()
