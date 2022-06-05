@@ -1,87 +1,54 @@
 import os
-import json
 from functools import partial
-from .config import root, get, put, env, var
+from .config import root, read, write, get, put, env, var
 
 
 root = partial(root, os.path.abspath(__file__))
+read = partial(read, root=root)
+write = partial(write, root=root)
 get = partial(get, root=root)
 put = partial(put, root=root)
 env = partial(env, get=get, root=root)
 
-settingsPathName = 'SATORI_SETTINGS_PATH'
-defaultSource = 'streamr'
+def manifest(): 
+    return get('manifest') or {}
 
-def settingsPath():
-    '''
-    the settings path is where a file lives that tells satori
-    how it is setup to run. if the file doesn't exist or is empty
-    satori assumes this is the first time it has ever run and will
-    take the user through steps to create a settings file.
-    preliminary outline of a .satori.json file:
-    {
-        "publications": {
-            "stream id": "details"
-        },
-        "data path": "/repos/satori/data",
-        "model path": "/repos/satori/models",
-        "realtive data path": "./data",
-        "realtive model path": "./models"
-    }
-    '''
+def modify(data: dict): 
+    ''' modifies the config yaml without erasing comments (unlike put) '''
     
-    return var(settingsPathName) or root('../.satori.json')
+    def extractKey(line: str):
+        return line.replace('#', '').strip().split(':')[0]
+    
+    replacement = []
+    for line in read():
+        key = extractKey(line)
+        if key in data.keys():
+            replacement.append(f'{key}: {data[key]}')
+        else:
+            replacement.append(line)
+    write(lines=replacement)
 
-def settings():
-    ''' returns a dictionary of settings '''
-    if os.path.exists(settingsPath()):
-        try: 
-            with open(settingsPath(), 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            print(e)
-    return {}
+def flaskPort(): 
+    return get().get('user interface port', '24685')
 
-def getPath(of='data'):
+def nodejsPort(): 
+    return get().get('streamr light client port', '24686')
+
+def defaultSource(): 
+    return get().get('default source of data streams', 'streamr')
+
+def path(of='data'):
     ''' used to get the data or model path '''
-    satoriSattings = settings()
-    return satoriSattings.get(
-        f'{of} path', 
-        satoriSattings.get(
-            f'relative {of} Path', 
-            root(f'../{of}')))
+    return get().get(f'absolute {of} path', root(f'../{of}'))
 
 def dataPath(filename=None):
     ''' data path takes presidence over relative data path if both exist '''
     if filename:
-        return os.path.join(getPath(of='data'), filename)
-    return getPath(of='data')
+        return os.path.join(path(of='data'), filename)
+    return path(of='data')
 
 def modelPath(filename=None):
     ''' model path takes presidence over relative model path if both exist '''
     if filename:
-        return os.path.join(getPath(of='model'), filename)
-    return getPath(of='model')
-
-def dataSettings():
-    '''
-    data settings is the first thing we retrieve when starting up the app
-    it needs to hold information about where all the data is it is contained
-    within the data folder. Perhaps this could be contained in the .satori.json
-    but that was thought of as more of a user defined settings rather than 
-    something the engine would continually modify.
-    prelimiary outline of .data.json:
-    {
-        "subscription database": "EUR=X-simpleCleaned.csv"
-        "ancillary database": "ancilarydb.parquet"
-    }
-    '''
-    path = dataPath('.data.json')
-    if not os.path.exists(path):
-        return {}
-    try:
-        with open(path, 'r') as f:
-            return json.load(f)
-    except Exception as e:
-        print(e)
-    return {}
+        return os.path.join(path(of='model'), filename)
+    return path(of='model')

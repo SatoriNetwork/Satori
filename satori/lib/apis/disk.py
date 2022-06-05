@@ -8,6 +8,7 @@ import pyarrow.parquet as pq
 import pandas as pd
 from satori import config
 import os
+import joblib
 import pyarrow as pa
 from satori.lib.apis import memory
 from satori.lib.engine.structs import SourceStreamTargets
@@ -15,6 +16,29 @@ from satori.lib.engine.structs import SourceStreamTargets
 def safetify(path:str):
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
+
+class ModelApi(object):
+    
+    @staticmethod
+    def save(model, modelPath:str, hyperParameters:list=None, chosenFeatures:list=None):
+        ''' save to joblib file '''
+        def appendAttributes(model, hyperParameters:list=None, chosenFeatures:list=None):
+            if hyperParameters is not None:
+                model.savedHyperParameters = hyperParameters
+            if chosenFeatures is not None:
+                model.savedChosenFeatures = chosenFeatures
+            return model
+        
+        safetify(modelPath)
+        model = appendAttributes(model, hyperParameters, chosenFeatures)
+        joblib.dump(model, modelPath)
+    
+    @staticmethod
+    def load(modelPath:str):
+        if os.path.exists(modelPath):
+            return joblib.load(modelPath)
+        return False
+        
             
 class Api(object):
     def __init__(self, df:pd.DataFrame=None, source:str=None, stream:str=None, location:str=None, append:bool=None, ext:str='parquet'):
@@ -26,7 +50,7 @@ class Api(object):
 
     def path(self, source:str=None, stream:str=None, permanent:bool=False):
         ''' Layer 0 get the path of a file '''
-        source = source or self.source or config.defaultSource
+        source = source or self.source or config.defaultSource()
         stream = stream or self.stream
         return os.path.join(
                 self.location or config.dataPath(),

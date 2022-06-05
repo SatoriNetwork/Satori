@@ -1,3 +1,5 @@
+# TODO: refactor see issue #24
+
 '''
 the DataManager should save the streams to a database on disk as a parquet file
 so that the model managers can get their data easily.
@@ -192,7 +194,7 @@ class DataManager:
         def syncManifest(purged: list = None, new: list = None):
             purged = purged or []
             new = new or []
-            manifest = config.get('manifest') or {}
+            manifest = config.manifest()
             toPurge = manifest.get('datasets to purge', [])
             toPurge.extend(new)
             for x in purged:

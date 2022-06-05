@@ -1,9 +1,5 @@
-# WIP
-# This is the core of the engine - building models continuously to search for the best one
-# its reactive, but needs better architecture to support a more modular design.
-# the only option people have right now is to extend the object with overrides, using
-# their own algorithms, but that basically means rewriting the whole thing.
-# it needs better modularity, and perhaps should make use of sci-kit learn's pipelines.
+# TODO: refactor see issue #24
+
 '''
 Basic Reponsibilities of the ModelManager:
 1. keep a record of the datasets, features, and parameters of the best model.
@@ -18,7 +14,6 @@ import os
 import copy
 import time
 import random
-import joblib
 import numpy as np
 import pandas as pd
 import datetime as dt
@@ -112,7 +107,7 @@ class ModelManager:
             'subscribers':'none'}
 
     def syncManifest(self):
-        manifest = config.get('manifest') or {}
+        manifest = config.manifest()
         manifest[self.key()] = {
             'targets': [x.asTuples() for x in self.targets], 
             'purged': manifest.get(self.key(), {}).get('purged', [])}
@@ -510,29 +505,25 @@ class ModelManager:
 
     def save(self):
         ''' save the current model '''
-        self.xgb.savedHyperParameters = self.hyperParameters
-        self.xgb.savedChosenFeatures = self.chosenFeatures
-        disk.safetify(self.modelPath)
-        joblib.dump(self.xgb, self.modelPath)
-
-    def load(self) -> bool:
+        disk.ModelApi.save(self.xgb, self.modelPath, self.hyperParameters, self.chosenFeatures)
+        
+    def load(self): # -> bool:
         ''' loads the model - happens on init so we automatically load our progress '''
-        if os.path.exists(self.modelPath):
-            xgb = joblib.load(self.modelPath)
-            if (
-                all([scf in self.features.keys() for scf in xgb.savedChosenFeatures]) and
-                True # all([shp in self.hyperParameters for shp in xgb.savedHyperParameters])
-            ):
-                self.xgb = xgb
-                self.hyperParameters = self.xgb.savedHyperParameters
-                self.chosenFeatures = self.xgb.savedChosenFeatures
-            return True
-        return False
+        xgb = disk.ModelApi.load(self.modelPath)
+        if xgb == False:
+            return False
+        if (
+            all([scf in self.features.keys() for scf in xgb.savedChosenFeatures]) and
+            True # all([shp in self.hyperParameters for shp in xgb.savedHyperParameters])
+        ):
+            self.xgb = xgb
+            self.hyperParameters = self.xgb.savedHyperParameters
+            self.chosenFeatures = self.xgb.savedChosenFeatures
+        return True
 
     ### MAIN PROCESSES #################################################################
 
     def buildStable(self):
-        #self.get()
         if self.data is not None and not self.data.empty and self.data.shape[0] > 20:
             self.produceTarget()
             self.produceFeatureStructure()
