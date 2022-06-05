@@ -11,7 +11,7 @@ put = partial(put, root=root)
 env = partial(env, get=get, root=root)
 
 def manifest(): 
-    return config.get('manifest') or {}
+    return get('manifest') or {}
 
 def modify(data: dict): 
     ''' modifies the config yaml without erasing comments (unlike put) '''
@@ -29,10 +29,10 @@ def modify(data: dict):
     write(lines=replacement)
 
 def flaskPort(): 
-    return config.get().get('user interface port', '24685')
+    return get().get('user interface port', '24685')
 
 def nodejsPort(): 
-    return config.get().get('streamr light client port', '24686')
+    return get().get('streamr light client port', '24686')
 
 def defaultSource(): 
     return get().get('default source of data streams', 'streamr')

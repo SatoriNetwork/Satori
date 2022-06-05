@@ -42,9 +42,9 @@ def get(*args, path: str = None, root: callable = None):
     if os.path.exists(path):
         with open(path, mode='r') as f:
             try:
-                return yaml.load(f, Loader=yaml.FullLoader)
+                return yaml.load(f, Loader=yaml.FullLoader) or {}
             except AttributeError:
-                return yaml.load(f)
+                return yaml.load(f) or {}
     return {}
 
 
