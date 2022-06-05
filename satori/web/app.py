@@ -153,15 +153,15 @@ def edit_configuration():
     def accept_submittion(edit_configuration):
         data = {}
         if edit_configuration.flaskPort.data not in ['', None, satori.config.flaskPort()]:
-            data = {**data, **{'user interface port': edit_configuration.flaskPort.data}}
+            data = {**data, **{satori.config.verbose('flaskPort'): edit_configuration.flaskPort.data}}
         if edit_configuration.nodejsPort.data not in ['', None, satori.config.nodejsPort()]:
-            data = {**data, **{'streamr light client port': edit_configuration.nodejsPort.data}}
+            data = {**data, **{satori.config.verbose('nodejsPort'): edit_configuration.nodejsPort.data}}
         if edit_configuration.dataPath.data not in ['', None, satori.config.dataPath()]:
-            data = {**data, **{'absolute data path': edit_configuration.dataPath.data}}
+            data = {**data, **{satori.config.verbose('dataPath'): edit_configuration.dataPath.data}}
         if edit_configuration.modelPath.data not in ['', None, satori.config.modelPath()]:
-            data = {**data, **{'absolute model path': edit_configuration.modelPath.data}}
+            data = {**data, **{satori.config.verbose('modelPath'): edit_configuration.modelPath.data}}
         if edit_configuration.defaultSource.data not in ['', None, satori.config.defaultSource()]:
-            data = {**data, **{'default source of data streams': edit_configuration.defaultSource.data}}
+            data = {**data, **{satori.config.verbose('defaultSource'): edit_configuration.defaultSource.data}}
         satori.config.modify(data=data)
         return redirect('/dashboard')
 

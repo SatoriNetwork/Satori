@@ -10,6 +10,13 @@ get = partial(get, root=root)
 put = partial(put, root=root)
 env = partial(env, get=get, root=root)
 
+def verbose(name: str):
+    if name == 'flaskPort': return 'user interface port'
+    if name == 'nodejsPort': return 'streamr light client port'
+    if name == 'dataPath': return 'absolute data path'
+    if name == 'modelPath': return 'absolute model path'
+    if name == 'defaultSource': return 'default source of data streams'
+
 def manifest(): 
     return get('manifest') or {}
 
@@ -29,17 +36,13 @@ def modify(data: dict):
     write(lines=replacement)
 
 def flaskPort(): 
-    return get().get('user interface port', '24685')
+    return get().get(verbose('flaskPort'), '24685')
 
 def nodejsPort(): 
-    return get().get('streamr light client port', '24686')
+    return get().get(verbose('nodejsPort'), '24686')
 
 def defaultSource(): 
-    return get().get('default source of data streams', 'streamr')
-
-def path(of='data'):
-    ''' used to get the data or model path '''
-    return get().get(f'absolute {of} path', root(f'../{of}'))
+    return get().get(verbose('defaultSource'), 'streamr')
 
 def dataPath(filename=None):
     ''' data path takes presidence over relative data path if both exist '''
@@ -52,3 +55,7 @@ def modelPath(filename=None):
     if filename:
         return os.path.join(path(of='model'), filename)
     return path(of='model')
+
+def path(of='data'):
+    ''' used to get the data or model path '''
+    return get().get(verbose(f'{of}Path'), root(f'../{of}'))
