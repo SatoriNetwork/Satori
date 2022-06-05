@@ -31,7 +31,7 @@ from flask import send_from_directory, session, request, flash, Markup
 #from flask_mobility import Mobility
 from waitress import serve
 import webbrowser
-
+from satori.web import forms
 from satori.lib.engine.structs import Observation
 
 
@@ -132,6 +132,45 @@ def ping():
     return jsonify({'now': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
 
 ###############################################################################
+## Routes - forms #############################################################
+###############################################################################
+
+
+@app.route('/configuration', methods=['GET', 'POST'])
+def edit_configuration():
+    import importlib
+    global forms
+    forms = importlib.reload(forms)
+
+    def present_form(edit_configuration):
+        edit_configuration.flaskPort.data = satori.config.flaskPort()
+        edit_configuration.nodejsPort.data = satori.config.nodejsPort()
+        edit_configuration.dataPath.data = satori.config.dataPath()
+        edit_configuration.modelPath.data = satori.config.modelPath()
+        edit_configuration.defaultSource.data = satori.config.defaultSource()
+        return render_template('forms/config.html', **{'edit_configuration': edit_configuration})
+
+    def accept_submittion(edit_configuration):
+        data = {}
+        if edit_configuration.flaskPort.data not in ['', None, satori.config.flaskPort()]:
+            data = {**data, **{'user interface port': edit_configuration.flaskPort.data}}
+        if edit_configuration.nodejsPort.data not in ['', None, satori.config.nodejsPort()]:
+            data = {**data, **{'streamr light client port': edit_configuration.nodejsPort.data}}
+        if edit_configuration.dataPath.data not in ['', None, satori.config.dataPath()]:
+            data = {**data, **{'absolute data path': edit_configuration.dataPath.data}}
+        if edit_configuration.modelPath.data not in ['', None, satori.config.modelPath()]:
+            data = {**data, **{'absolute model path': edit_configuration.modelPath.data}}
+        if edit_configuration.defaultSource.data not in ['', None, satori.config.defaultSource()]:
+            data = {**data, **{'default source of data streams': edit_configuration.defaultSource.data}}
+        satori.config.modify(data=data)
+        return redirect('/dashboard')
+
+    edit_configuration = forms.EditConfigurationForm(formdata=request.form)
+    if request.method == 'POST':
+        return accept_submittion(edit_configuration)
+    return present_form(edit_configuration)
+    
+###############################################################################
 ## Routes - dashboard #########################################################
 ###############################################################################
 
@@ -156,9 +195,9 @@ def dashboard():
         streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00'}]
     else:
         streamsOverview = [model.overview() for model in Engine.models]
-    print('streamsOverview------------------------------------------------')
-    print(streamsOverview)
-    resp = {'streamsOverview': streamsOverview}
+    resp = {
+        'streamsOverview': streamsOverview,
+        'configOverrides': satori.config.get()}
     return render_template('dashboard.html', **resp)
 
 ###############################################################################

@@ -8,7 +8,7 @@
     
     <div class="col s12 m6 l6">
       <ul id="projects-collection" class="collection z-depth-1">
-        <div class="overlay">Coming Eventually</div>
+        <div class="overlay">Coming Soon</div>
         <li class="collection-item avatar">
           <div class="row">
             <div class="col s9">
@@ -38,20 +38,27 @@
     </div>
     <div class="col s12 m6 l6">
       <ul id="projects-collection" class="collection z-depth-1">
-        <div class="overlay">Coming Soon</div>
         <li class="collection-item avatar">
-          <i class="material-icons xiketic circle">settings</i>
-          <h6 class="collection-header m-0" style="margin-top: 12px !important">Configuration</h6>
-        </li>
-        {% for name, details in {'override1':{'value':'24685', 'name':'local port'},'override2':{'value':'\satori\data', 'name':'data directory'}}.items() %}
-        <li class="collection-item" id="dash_fav_{{name}}">
           <div class="row">
             <div class="col s9">
-              <p class="collections-title">{{ details['value'] }}</p>
-              <p class="collections-content">{{ details['name'] }}</p>
+              <i class="material-icons xiketic circle">settings</i>
+              <h6 class="collection-header m-0" style="margin-top: 12px !important">Configuration</h6>
             </div>
             <div class="col s3">
-                <i class="material-icons">edit</i>
+              <div class="collections-content right"  style="margin-left: 12px !important; margin-top: .9rem !important;">
+                <a href="{{ url_for('edit_configuration') }}"><i class="material-icons">edit</i></a>
+              </div>
+            </div>
+          </div>
+        </li>
+        {% for key, value in configOverrides.items() %}
+        <li class="collection-item" id="dash_fav_name">
+          <div class="row">
+            <div class="col s6">
+              <p class="collections-content">{{ key }}</p>
+            </div>
+            <div class="col s6">
+              <p class="collections-title" style="text-align: end">{{ value }}</p>
             </div>
           </div>
         </li>

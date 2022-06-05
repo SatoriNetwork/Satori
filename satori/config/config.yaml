@@ -5,12 +5,10 @@
 
 ## a local python flask server provides the user interface
 ## and the port it runs on can be configured here: (1024–49151)
-# user interface port: 24685
-
+user interface port: 24685
 ## a local nodejs server provides the engine with access
 ## to data streams and the port it runs on can be configured here: (1024–49151)
-# streamr light client port: 24686
-
+streamr light client port: 24687
 ## Satori saves models in the form of joblib files here:
 # absolute model path: /satori/model
 
