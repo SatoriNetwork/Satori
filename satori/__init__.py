@@ -3,6 +3,7 @@ from satori.lib import engine
 from satori.lib import apis
 from satori.lib import spoof
 from satori.lib import start
+from satori.lib import wallet
 from satori.lib.apis import disk
 from satori.lib.engine import view
 from satori.lib.engine import Engine

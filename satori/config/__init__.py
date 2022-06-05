@@ -15,6 +15,7 @@ def verbose(name: str):
     if name == 'nodejsPort': return 'streamr light client port'
     if name == 'dataPath': return 'absolute data path'
     if name == 'modelPath': return 'absolute model path'
+    if name == 'walletPath': return 'absolute wallet path'
     if name == 'defaultSource': return 'default source of data streams'
 
 def manifest(): 
@@ -41,9 +42,6 @@ def flaskPort():
 def nodejsPort(): 
     return get().get(verbose('nodejsPort'), '24686')
 
-def defaultSource(): 
-    return get().get(verbose('defaultSource'), 'streamr')
-
 def dataPath(filename=None):
     ''' data path takes presidence over relative data path if both exist '''
     if filename:
@@ -55,6 +53,15 @@ def modelPath(filename=None):
     if filename:
         return os.path.join(path(of='model'), filename)
     return path(of='model')
+
+def walletPath(filename=None):
+    ''' wallet path takes presidence over relative model path if both exist '''
+    if filename:
+        return os.path.join(path(of='wallet'), filename)
+    return path(of='wallet')
+
+def defaultSource(): 
+    return get().get(verbose('defaultSource'), 'streamr')
 
 def path(of='data'):
     ''' used to get the data or model path '''

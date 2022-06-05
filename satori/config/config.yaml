@@ -11,11 +11,14 @@
 ## to data streams and the port it runs on can be configured here: (1024–49151)
 # streamr light client port: 24686
 
+## Satori saves data streams in the form of parquet files here:
+# absolute data path: /satori/data
+
 ## Satori saves models in the form of joblib files here:
 # absolute model path: /satori/model
 
-## Satori saves data streams in the form of parquet files here:
-# absolute data path: /satori/data
+## Satori saves wallet information:
+# absolute wallet path: /satori/wallet
 
 ## the system Satori uses to get its streams:
 # default source of data streams: streamr

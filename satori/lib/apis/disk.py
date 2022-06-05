@@ -17,10 +17,25 @@ def safetify(path:str):
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
 
+class WalletApi(object):
+    
+    @staticmethod
+    def save(wallet, walletPath:str=None):
+        walletPath = walletPath or config.walletPath()
+        safetify(walletPath)
+        config.put(data=wallet, path=walletPath)
+    
+    @staticmethod
+    def load(walletPath:str=None):
+        walletPath = walletPath or config.walletPath()
+        if os.path.exists(walletPath):
+            return config.get(walletPath)
+        return False
+
 class ModelApi(object):
     
     @staticmethod
-    def save(model, modelPath:str, hyperParameters:list=None, chosenFeatures:list=None):
+    def save(model, modelPath:str=None, hyperParameters:list=None, chosenFeatures:list=None):
         ''' save to joblib file '''
         def appendAttributes(model, hyperParameters:list=None, chosenFeatures:list=None):
             if hyperParameters is not None:
@@ -29,12 +44,14 @@ class ModelApi(object):
                 model.savedChosenFeatures = chosenFeatures
             return model
         
+        modelPath = modelPath or config.modelPath()
         safetify(modelPath)
         model = appendAttributes(model, hyperParameters, chosenFeatures)
         joblib.dump(model, modelPath)
     
     @staticmethod
-    def load(modelPath:str):
+    def load(modelPath:str=None):
+        modelPath = modelPath or config.modelPath()
         if os.path.exists(modelPath):
             return joblib.load(modelPath)
         return False
