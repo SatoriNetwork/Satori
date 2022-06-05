@@ -17,7 +17,7 @@ class Streamr():
         past = existing.shape[0] if existing is not None else 0
         self.past = df.iloc[:past]
         self.future = df.iloc[past:]
-        self.port = config.get()['port']
+        self.port = config.flaskPort()
         self.incremental = self.getNewData()
 
     def getNewData(self): # -> pd.DataFrame:

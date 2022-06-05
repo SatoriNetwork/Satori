@@ -13,7 +13,7 @@ class SourceStreamTargets:
     ):
         self.stream = stream
         self.targets = targets or [stream] 
-        self.source = source or config.defaultSource
+        self.source = source or config.defaultSource()
 
     def id(self):
         ''' id has one target '''

@@ -13,7 +13,10 @@ def establishConnection():
     payload = {
         'ram_total_gb': satori.apis.system.getRam(),
         'ram_available_percent': satori.apis.system.getRamAvailablePercentage()}
-    # todo: implement connection 
+    # todo: implement connection
+    # we'll tell the server we're up and running, and have these resources
+    # it will give us a list of streams to predict
+    
     
 # accept optional data necessary to generate models data and learner
 def getEngine(connection):
@@ -153,10 +156,11 @@ def getEngine(connection):
                 **kwargs)
             }
     
-    # todo: use settings...
-    dataSettings = satori.config.dataSettings()
-    if dataSettings != {}:
-        return None
+    # todo: use existence of something else like wallet file to tell if system setup, or just ask server directly...
+    #dataSettings = satori.config.dataSettings()
+    #if dataSettings != {}:
+    #    return None # this should trigger front end to take them through a process?
+    
     return satori.Engine(
         view=satori.View(),
         data=getExistingDataManager(),

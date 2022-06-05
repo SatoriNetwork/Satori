@@ -39,12 +39,15 @@ from satori.lib.engine.structs import Observation
 ## Globals ####################################################################
 ###############################################################################
 
+# development flags
 full = True # just web or everything
 debug = False
+
+# singletons
 Connection = None
 Engine = None
-
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 if full:
     Connection = satori.start.establishConnection()
@@ -236,7 +239,7 @@ if __name__ == '__main__':
     #serve(app, host='0.0.0.0', port=satori.config.get()['port'])
     if not debug: 
         webbrowser.open('http://127.0.0.1:24685', new=0, autoraise=True)
-    app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True, debug=debug)
+    app.run(host='0.0.0.0', port=satori.config.flaskPort(), threaded=True, debug=debug)
     #app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True)
     # https://stackoverflow.com/questions/11150343/slow-requests-on-local-flask-server
     # did not help

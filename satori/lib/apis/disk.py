@@ -50,7 +50,7 @@ class Api(object):
 
     def path(self, source:str=None, stream:str=None, permanent:bool=False):
         ''' Layer 0 get the path of a file '''
-        source = source or self.source or config.defaultSource
+        source = source or self.source or config.defaultSource()
         stream = stream or self.stream
         return os.path.join(
                 self.location or config.dataPath(),

@@ -17,6 +17,24 @@ def args_to_config_path(*args, root: callable) -> str:
     args.insert(0, 'config')
     return root(*args)
 
+def read(*args, path: str = None, root: callable = None):
+    ''' gets configuration out of the yaml file '''
+    path = path or args_to_config_path(*args, root=root)
+    if os.path.exists(path):
+        with open(path, mode='r') as f:
+            return f.readlines()
+    return []
+
+def write(
+    *args,
+    lines: list,
+    path: str = None,
+    root: callable = None,
+):
+    ''' writes lines to the file at path '''
+    path = path or args_to_config_path(*args, root=root)
+    with open(path, mode='w') as f:
+        f.writelines(lines)
 
 def get(*args, path: str = None, root: callable = None):
     ''' gets configuration out of the yaml file '''

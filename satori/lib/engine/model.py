@@ -1,9 +1,5 @@
-# WIP
-# This is the core of the engine - building models continuously to search for the best one
-# its reactive, but needs better architecture to support a more modular design.
-# the only option people have right now is to extend the object with overrides, using
-# their own algorithms, but that basically means rewriting the whole thing.
-# it needs better modularity, and perhaps should make use of sci-kit learn's pipelines.
+# TODO: refactor see issue #24
+
 '''
 Basic Reponsibilities of the ModelManager:
 1. keep a record of the datasets, features, and parameters of the best model.
@@ -111,7 +107,7 @@ class ModelManager:
             'subscribers':'none'}
 
     def syncManifest(self):
-        manifest = config.get('manifest') or {}
+        manifest = config.manifest()
         manifest[self.key()] = {
             'targets': [x.asTuples() for x in self.targets], 
             'purged': manifest.get(self.key(), {}).get('purged', [])}
