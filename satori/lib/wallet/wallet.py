@@ -32,9 +32,20 @@ class Wallet():
         self._entropy = self._generateEntropy()
         self._privateKeyObj = self._generatePrivateKey()
         self._addressObj = self._generateAddress()
-        self.scripthash = '76a914' + [s for s in self._addressObj.to_scriptPubKey().raw_iter()][2][1].hex() + '88ac'
         self.address = str(self._addressObj)
+        self.scripthash = '76a914' + [s for s in self._addressObj.to_scriptPubKey().raw_iter()][2][1].hex() + '88ac'
         self.privateKey = str(self._privateKeyObj)
+
+    def _makeScripthash(self):
+        OP_DUP = b'76'
+        OP_HASH160 = b'a9'
+        BYTES_TO_PUSH = b'14'
+        OP_EQUALVERIFY = b'88'
+        OP_CHECKSIG = b'ac'
+        self.address
+        DATA_TO_PUSH = lambda address: hexlify(b58decode_check(address)[1:])
+        sig_script_raw = lambda address: b''.join((OP_DUP, OP_HASH160, BYTES_TO_PUSH, DATA_TO_PUSH(address), OP_EQUALVERIFY, OP_CHECKSIG))
+        script_hash = lambda address: sha256(codecs.decode(sig_script_raw(address), 'hex_codec')).digest()[::-1].hex()
 
     def _generateEntropy(self):
         return os.urandom(32)
