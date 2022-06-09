@@ -1,7 +1,7 @@
 import threading
 import time
-from .data import DataManager
-from .model import ModelManager
+from .managers.data import DataManager
+from .managers.model import ModelManager
 from .view import View
 
 class Engine:
