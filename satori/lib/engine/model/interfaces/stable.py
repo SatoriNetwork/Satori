@@ -59,20 +59,11 @@ class StableModelInterface:
 
     def _produceFeatureSet(self):
         ''' produces a feature set for the stable model '''
-            
-    def _produceFeatureImportance(self):
-        ''' calculates feature importance '''
 
     def leastValuableFeature(self):
         ''' returns the least valuable feaure '''
 
     ### FEATURE DATA ####################################################################
-
-    def _produceFeatureData(self):
-        '''
-        produces our feature data map:
-        {feature: (feature importance, [raw inputs])}
-        '''
     
     def showFeatureData(self):
         '''
@@ -85,27 +76,8 @@ class StableModelInterface:
 
     ### CURRENT ####################################################################
 
-    def _producePredictable(self):
-        ''' generates self.current '''
-
     def producePrediction(self):
         '''generates a prediction'''
-
-    ### TRAIN ######################################################################
-
-    def _produceTrainingSet(self):
-        ''' produces a training dataset '''
-
-    def _produceFit(self):
-        ''' produces a fit for the stable model '''
-
-    ### SAVE ###########################################################################
-
-    def _save(self):
-        ''' save the current model '''
-        
-    def _load(self): # -> bool:
-        ''' loads the model - happens on init so we automatically load our progress '''
         
     ### MAIN PROCESSES #################################################################
 

@@ -84,29 +84,6 @@ class PilotModelInterface():
     def _produceFeatureSet(self, featureNames:'list[str]'=None):
         ''' produces a feature set for the pilot model '''
 
-    def _produceEvalFeatureSet(self, featureNames:'list[str]'):
-        ''' produces a feature set for the evaluation model '''
-
-    def _scoreFeatures(self, df:pd.DataFrame = None): # -> dict:
-        ''' generates a predictive power score for each column in df '''
-
-    ### TRAIN ######################################################################
-
-    def _produceTrainingSet(self):
-        ''' produces a pilot training dataset'''
-
-    def _produceFit(self):
-        ''' produces a fit for the pilot model '''
-
-    ### META TRAIN ######################################################################
-
-    def _produceHyperParameters(self):
-        ''' produces a set of pilot hyper parameters '''
-
-
-    def _produceFeatures(self):
-        ''' sets testFeatures to a list of feature names '''
-
     ### MAIN PROCESSES #################################################################
 
     def build(self):
