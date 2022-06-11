@@ -6,6 +6,7 @@ import satori
 import os
 
 from satori.lib.engine.structs import SourceStreamTargets
+import satori.lib.engine.model.metrics as metrics
 
 
 def establishConnection():
@@ -78,14 +79,14 @@ def getEngine(connection):
                     maximum=2),],
             'metrics':  {
                 ## raw data features
-                'Raw': satori.ModelManager.rawDataMetric,
+                'Raw': metrics.rawDataMetric,
                 ## daily percentage change, 1 day ago, 2 days ago, 3 days ago... 
-                **{f'Daily{i}': partial(satori.ModelManager.dailyPercentChangeMetric, yesterday=i) for i in list(range(1, 31))},
+                **{f'Daily{i}': partial(metrics.dailyPercentChangeMetric, yesterday=i) for i in list(range(1, 31))},
                 ## rolling period transformation percentage change, max of the last 7 days, etc... 
-                **{f'Rolling{tx[0:3]}{i}': partial(satori.ModelManager.rollingPercentChangeMetric, window=i, transformation=tx)
+                **{f'Rolling{tx[0:3]}{i}': partial(metrics.rollingPercentChangeMetric, window=i, transformation=tx)
                     for tx, i in product('sum() max() min() mean() median() std()'.split(), list(range(2, 21)))},
                 ## rolling period transformation percentage change, max of the last 50 or 70 days, etc... 
-                **{f'Rolling{tx[0:3]}{i}': partial(satori.ModelManager.rollingPercentChangeMetric, window=i, transformation=tx)
+                **{f'Rolling{tx[0:3]}{i}': partial(metrics.rollingPercentChangeMetric, window=i, transformation=tx)
                     for tx, i in product('sum() max() min() mean() median() std()'.split(), list(range(22, 90, 7)))}
             },
             'features': {

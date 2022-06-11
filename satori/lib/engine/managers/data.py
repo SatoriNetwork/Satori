@@ -36,8 +36,6 @@ Basic Reponsibilities of the DataManager:
     E. download the datastream and notify model manager
 4. garbage collect stale datastreams
 '''
-import os
-import pandas as pd
 import datetime as dt
 from reactivex.subject import BehaviorSubject
 from satori import config

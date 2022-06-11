@@ -1,11 +1,12 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField, SelectField
+from satori.config import verbose
 
 class EditConfigurationForm(FlaskForm):
-    flaskPort = IntegerField('user interface port', validators=[])
-    nodejsPort = IntegerField('streamr light client port', validators=[])
-    defaultSource = SelectField('default source of data streams', validators=[], choices=['streamr', 'satori'])
-    dataPath = StringField('absolute data path', validators=[])
-    modelPath = StringField('absolute model path', validators=[])
+    flaskPort = IntegerField(verbose('flaskPort'), validators=[])
+    nodejsPort = IntegerField(verbose('nodejsPort'), validators=[])
+    dataPath = StringField(verbose('dataPath'), validators=[])
+    modelPath = StringField(verbose('modelPath'), validators=[])
+    defaultSource = SelectField(verbose('defaultSource'), validators=[], choices=['streamr', 'satori'])
     submit = SubmitField('Save')
 
