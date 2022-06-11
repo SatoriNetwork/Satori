@@ -1,12 +1,11 @@
 ''' interface for a StableModel '''
 
-from satori.lib.engine.managers.model import ModelManager
 from satori.lib.engine.structs import HyperParameter
 
 class StableModelInterface:
 
     def __init__(self,
-        manager:ModelManager,
+        manager:'ModelManager',
         hyperParameters:'list(HyperParameter)'=None, # used in pilot and manager
         metrics:dict=None,
         features:dict=None, # used in pilot and manager

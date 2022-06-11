@@ -1,14 +1,13 @@
 ''' interface for a PilotModel '''
 
 import pandas as pd
-from satori.lib.engine.managers.model import ModelManager
 from satori.lib.engine.model.interfaces.stable import StableModelInterface
 
 class PilotModelInterface():
 
     def __init__(
         self,
-        manager:ModelManager,
+        manager:'ModelManager',
         stable:StableModelInterface,
         exploreFeatures:bool=True,
     ):

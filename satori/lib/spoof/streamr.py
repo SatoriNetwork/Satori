@@ -53,12 +53,12 @@ class Streamr():
 
     def run(self):
         while True:
+            time.sleep(3)
             x = self.provideIncrementalWithId()
             response = requests.post(
                 url=f'http://127.0.0.1:{self.port}/subscription/update', 
                 json=x)
             response.raise_for_status()
-            time.sleep(2)
 
 '''
 from satori.lib.engine.structs import Observation

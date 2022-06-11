@@ -26,7 +26,6 @@ class ModelManager:
 
     def __init__(
         self,
-        
         modelPath:str=None,
         hyperParameters:'list(HyperParameter)'=None,
         metrics:dict=None,
@@ -67,6 +66,7 @@ class ModelManager:
         self.id = SourceStreamTargets(source=sourceId, stream=streamId, targets=[targetId])
         self.setupFlags()
         self.get()
+        # how could we use dependency injection here? 
         self.stable = StableModel(
             manager=self,
             hyperParameters=hyperParameters or [],
@@ -77,6 +77,7 @@ class ModelManager:
             split=split) 
         if not override:
             self.load()
+        # how could we use dependency injection here? 
         self.pilot = PilotModel(
             manager=self,
             stable=self.stable,
@@ -200,8 +201,8 @@ class ModelManager:
             True # all([shp in self.stable.hyperParameters for shp in xgb.savedHyperParameters])
         ):
             self.stable.xgb = xgb
-            self.stable.hyperParameters = self.xgb.savedHyperParameters
-            self.stable.chosenFeatures = self.xgb.savedChosenFeatures
+            self.stable.hyperParameters = xgb.savedHyperParameters
+            self.stable.chosenFeatures = xgb.savedChosenFeatures
         return True
 
     ### LIFECYCLE ######################################################################
