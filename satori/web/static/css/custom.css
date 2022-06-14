@@ -1,14 +1,108 @@
-/*================================================================================
-	Item Name: Materialize - Material Design Admin Template
-	Version: 4.0
-	Author: PIXINVENT
-	Author URL: https://themeforest.net/user/pixinvent/portfolio
-================================================================================
-
-NOTE:
-------
+/* NOTE:
 PLACE HERE YOUR OWN CSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
 WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+
+@font-face {
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Thin),
+  url("../fonts/Zen_Maru_Gothic/ZenMaruGothic-Light.tff") format("tff"),
+  local(ZenMaruGothic Thin);
+  font-weight: 100;
+}
+
+@font-face {
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Light),
+  url("../fonts/Zen_Maru_Gothic/ZenMaruGothic-Light.tff") format("tff"),
+  local(ZenMaruGothic Light);
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Regular),
+  url("../fonts/Zen_Maru_Gothic/ZenMaruGothic-Regular.tff") format("tff"),
+  local(ZenMaruGothic Regular);
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Medium),
+  url("../fonts/Zen_Maru_Gothic/ZenMaruGothic-Black.tff") format("tff"),
+  local(ZenMaruGothic Medium);
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Zen Maru Gothic";
+  src: local(ZenMaruGothic Bold),
+  url("../fonts/Zen_Maru_Gothic/ZenMaruGothic-Bold.tff") format("tff"),
+  local(ZenMaruGothic Bold);
+  font-weight: 700;
+}
+
+
+html {
+  line-height: 1.5;
+  font-family: "Zen Maru Gothic", sans-serif !important;
+  font-weight: normal;
+  color: rgba(0, 0, 0, 0.87);
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-weight: 400;
+  line-height: 1.1;
+}
+p {
+  font-family: "Zen Maru Gothic", sans-serif;
+}
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+  font-weight: inherit;
+}
+
+.navbar .navbar-brand {
+  font-family: "Zen Maru Gothic";
+  font-size: 3rem !important;
+  letter-spacing: .2rem !important;
+  font-weight: 400 !important;
+}
+
+.sidenav-header {
+  height: inherit; 
+}
+
+.bg-gradient-dark {
+  background-image: linear-gradient(195deg, #10051D 0%, #533549 100%);
+}
+.bg-gradient-light-footer {
+  background-image: linear-gradient(25deg, #533549 15%, #F6B042 45%, #F9ED4E 95%);
+}
+.bg-gradient-primary {
+  background-image: linear-gradient(195deg, #F6B042 0%, #F9ED4E 100%);
+  color:#533549 !important;
+}
+.bg-gradient-drastic {
+  background-image: linear-gradient(195deg, #533549 0%, #F6B042 100%);
+}
+.shadow-primary {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(233, 30, 99, 0.4) !important;
+}
+.shadow-drastic {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(210, 210, 210, 0.4) !important;
+}
+
+
+
+.sidenav .collapse .nav-item .nav-link.active {
+  color: #533549 !important;
+}
+.sidenav .collapse .nav-item .nav-link.active i {
+  color: #533549 !important;
+}
+
+
+/* older version: */
 
 .gradient-45deg-xiketic-purple {
   background: #10051D;
