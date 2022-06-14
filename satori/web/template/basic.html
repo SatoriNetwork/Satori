@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% block head %}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ url_for('template/assets', filename='img/apple-icon.png'}}">
+    <link rel="icon" type="image/png" href="{{ url_for('template/assets', filename='img/favicon.png'}}">
+    <title>{% block title %}{{ title }}{% endblock %}</title>
+    <!--     Fonts and icons     
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre:wght@300&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Sans+Libre:wght@300&family=Zen+Maru+Gothic&display=swap" rel="stylesheet">
+    <!-- Nucleo Icons -->
+    <link href="{{ url_for('template/assets', filename='css/nucleo-icons.css') }}" rel="stylesheet" />
+    <link href="{{ url_for('template/assets', filename='css/nucleo-svg.css') }}" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- CSS Files -->
+    <link id="pagestyle" href="{{ url_for('template/assets', filename='css/material-dashboard.css?v=3.0.3') }}" rel="stylesheet" />
+    <!-- CORE CSS
+    <link href="{{ url_for('template/assets', filename='css/materialize.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ url_for('template/assets', filename='css/materialize_style.css') }}" type="text/css" rel="stylesheet">-->
+    <!-- Custome CSS
+    <link href="{{ url_for('template/assets', filename='css/custom.css') }}" type="text/css" rel="stylesheet">-->
+    <!-- Favicons-->
+    <link rel="icon" href="{{ url_for('template/assets', filename='img/favicon/favicon.ico') }}" sizes="32x32">
+    {% block inner_head %}
+    {% block preamble %}{% endblock %}
+    {% block resources %}
+        {% block css_resources %}
+        {{ bokeh_css | indent(8) if bokeh_css }}
+        {% endblock %}
+        {% block js_resources %}
+        {{ bokeh_js | indent(8) if bokeh_js }}
+        {% endblock %}
+    {% endblock %}
+    {% block postamble %}{% endblock %}
+    {% endblock %}
+  </head>
+  {% endblock %}
+  <body>
+    <div id="loader-wrapper">
+      <div id="loader"></div>
+      <div class="loader-section section-left"></div>
+      <div class="loader-section section-right"></div>
+    </div>
+    {% include 'header.html' %}
+    <div id="main">
+      <div class="wrapper">
+        <!--
+          Side nav not needed right now
+          { % include 'nav-side.html' % }-->
+        <div>
+          <script>
+            function delete_this(flash){
+              $(flash).parent().remove()
+            }
+          </script>
+          <article class="flashes">
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <ul>
+                  {% for message in messages %}
+                    <li class="card" onclick=delete_this(this)>
+                      <a title="remove"><p style="margin: 15px; color: #868A8E; cursor: pointer;">
+                        {{message}}
+                        <i class="small material-icons right">close</i>
+                      </p></a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+          </article>
+        </div>
+        <section id="content">
+          <div class="container" style="position: relative;display: block;top: -15px">
+
+            {% block content %}
+            {% endblock %}
+
+          </div>
+        </section>
+      </div>
+    </div>
+    <footer class="page-footer footer-fixed gradient-45deg-xiketic-purple">
+        <div class="footer-copyright">
+          <div class="container">
+            <span>Satori
+              <a class="grey-text text-lighten-2" href="http://satorinet.io" target="_blank"> </a>
+              Network</span>
+            <span class="right">
+              Version
+              <a class="grey-text text-lighten-2" href="http://satorinet.io">
+                <script type="text/javascript">
+                  document.write(new Date().getFullYear());
+                </script>
+                .1
+              </a>
+            </span>
+          </div>
+        </div>
+    </footer>
+    <!-- ================================================
+    Scripts
+    ================================================ -->
+    <!-- jQuery Library -->
+    <script type="text/javascript" src="{{ url_for('template/assets', filename='vendors/jquery-3.2.1.min.js') }}"></script>
+    <!--materialize js-->
+    <script type="text/javascript" src="{{ url_for('template/assets', filename='js/materialize.min.js') }}"></script>
+    <!--scrollbar-->
+    <script type="text/javascript" src="{{ url_for('template/assets', filename='vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <!--plugins.js - Some Specific JS codes for Plugin Settings-->
+    <script type="text/javascript" src="{{ url_for('template/assets', filename='js/plugins.js') }}"></script>
+    <!--custom-script.js - Add your own theme custom JS-->
+    <script type="text/javascript" src="{{ url_for('template/assets', filename='js/custom-script.js') }}"></script>
+
+  </body>
+</html>
