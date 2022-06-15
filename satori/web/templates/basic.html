@@ -23,9 +23,9 @@
   <body class="g-sidenav-show bg-gray-200">
     <!--{ % include 'loader.html' %}-->
     <!--{ % include 'header.html' % }-->
-    {% include 'nav-header.html' %}
+    {% include 'nav-side.html' %}
     <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
-      {% include 'nav-side.html' %}
+      {% include 'header.html' %}
       <div class="container-fluid py-4">
         {% include 'flash.html' %}
         {% block content %}
@@ -33,7 +33,7 @@
         {% include 'footer.html' %}
       </div>
     </main>
-    {% include 'settings.html' %}
+    <!--{ % include 'settings.html' % }-->
     {% include 'scripts.html' %}
   </body>
 </html>

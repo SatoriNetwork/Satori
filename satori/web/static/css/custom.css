@@ -75,24 +75,51 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 .bg-gradient-dark {
   background-image: linear-gradient(195deg, #10051D 0%, #533549 100%);
 }
-.bg-gradient-light-footer {
-  background-image: linear-gradient(25deg, #533549 15%, #F6B042 45%, #F9ED4E 95%);
+.bg-gradient-xpurple {
+  background-image: linear-gradient(195deg, #10051D 0%, #45167F 100%);
 }
+.bg-gradient-purple {
+  background-image: linear-gradient(195deg, #533549 0%, #603E55 100%);
+}
+/*.bg-gradient-light-footer { unused
+  background-image: linear-gradient(25deg, #533549 15%, #F6B042 45%, #F9ED4E 95%);
+}*/
 .bg-gradient-primary {
   background-image: linear-gradient(195deg, #F6B042 0%, #F9ED4E 100%);
+  color:#533549 !important;
+}
+.bg-gradient-yellow {
+  background-image: linear-gradient(195deg, #F9ED4E 0%, #F4EB86 100%);
+  color:#533549 !important;
+}
+.bg-gradient-orange {
+  background-image: linear-gradient(195deg, #F6B042 0%, #F8C947 100%);
   color:#533549 !important;
 }
 .bg-gradient-drastic {
   background-image: linear-gradient(195deg, #533549 0%, #F6B042 100%);
 }
+.shadow-dark {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(16, 5, 29, 0.4) !important;
+}
 .shadow-primary {
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(233, 30, 99, 0.4) !important;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(249, 237, 78, .6) !important;
 }
 .shadow-drastic {
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(210, 210, 210, 0.4) !important;
 }
-
-
+.shadow-xpurple {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(16, 5, 29, 0.4) !important;
+}
+.shadow-purple {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(210, 210, 210, 0.4) !important;
+}
+.shadow-orange {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(246, 176, 66, 0.5) !important;
+}
+.shadow-yellow {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(249, 237, 78, .6) !important;
+}
 
 .sidenav .collapse .nav-item .nav-link.active {
   color: #533549 !important;
