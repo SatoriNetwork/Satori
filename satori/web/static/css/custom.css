@@ -75,6 +75,12 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 .bg-gradient-dark {
   background-image: linear-gradient(195deg, #10051D 0%, #533549 100%);
 }
+.bg-gradient-dark-reverse {
+  background-image: linear-gradient(195deg, #533549 0%, #10051D 100%);
+}
+.bg-gradient-grey {
+  background-image: linear-gradient(195deg, #CFDCE3 0%, #929CA1 100%);
+}
 .bg-gradient-xpurple {
   background-image: linear-gradient(195deg, #10051D 0%, #45167F 100%);
 }
@@ -88,6 +94,9 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
   background-image: linear-gradient(195deg, #F6B042 0%, #F9ED4E 100%);
   color:#533549 !important;
 }
+.bg-gradient-primary-reverse {
+  background-image: linear-gradient(195deg, #F9ED4E 0%, #F6B042 100%);
+}
 .bg-gradient-yellow {
   background-image: linear-gradient(195deg, #F9ED4E 0%, #F4EB86 100%);
   color:#533549 !important;
@@ -99,11 +108,20 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 .bg-gradient-drastic {
   background-image: linear-gradient(195deg, #533549 0%, #F6B042 100%);
 }
+.bg-gradient-less-drastic {
+  background-image: linear-gradient(195deg, #744E48 0%, #533549 100%);
+}
+.bg-gradient-drastic-reverse {
+  background-image: linear-gradient(195deg, #F6B042 0%, #533549 100%);
+}
 .shadow-dark {
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(16, 5, 29, 0.4) !important;
 }
 .shadow-primary {
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(249, 237, 78, .6) !important;
+}
+.shadow-primary-reverse {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(246, 176, 66, 0.5) !important;
 }
 .shadow-drastic {
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(210, 210, 210, 0.4) !important;
