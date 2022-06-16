@@ -97,12 +97,74 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 .bg-gradient-primary-reverse {
   background-image: linear-gradient(195deg, #F9ED4E 0%, #F6B042 100%);
 }
+.bg-gradient-primary-reverse i {
+  color: #533549 !important;
+  position: relative;
+}
+.bg-gradient-primary-reverse p {
+  color: #533549 !important;
+  position: relative;
+}
 .bg-gradient-yellow {
   background-image: linear-gradient(195deg, #F9ED4E 0%, #F4EB86 100%);
   color:#533549 !important;
 }
 .bg-gradient-orange {
-  background-image: linear-gradient(195deg, #F6B042 0%, #F8C947 100%);
+  background-image: linear-gradient(195deg, #F8C947 0%, #F6B042 100%);
+  color:#533549 !important;
+}
+.bg-gradient-green3 {
+  background-image: linear-gradient(195deg, #e3ffa1 0%, #bdd486 100%);
+  color:#533549 !important;
+}
+.bg-gradient-green2 {
+  background-image: linear-gradient(270deg, #C0D889 0%, #94a669 100%);
+  color:#533549 !important;
+}
+.bg-gradient-green1 {
+  background-image: linear-gradient(270deg, #94a669 0%, #788755 100%);
+  color:#533549 !important;
+}
+.bg-gradient-green {
+  background-image: linear-gradient(270deg, #788755 0%, #495335 100%);
+  color:#533549 !important;
+}
+.text-success {
+  color: #82c7ab !important;
+}
+.text-danger {
+  color: #d68461 !important;
+}
+.bg-gradient-blue {
+  background-image: linear-gradient(195deg, #82c7ab 0%, #4f95a6 100%);
+  color:#533549 !important;
+}
+.bg-gradient-blue0 {
+  background-image: linear-gradient(195deg, #447f8c 0%, #35646e 100%);
+  color:#533549 !important;
+}
+.bg-gradient-blue1 {
+  background-image: linear-gradient(195deg, #4c8f9e 0%, #447f8c 100%);
+  color:#533549 !important;
+}
+.bg-gradient-blue2 {
+  background-image: linear-gradient(195deg, #559fb0 0%, #4c8f9e 100%);
+  color:#533549 !important;
+}
+.bg-gradient-blue3 {
+  background-image: linear-gradient(195deg, #61b6c9 0%, #559fb0 100%);
+  color:#533549 !important;
+}
+.bg-gradient-idk2 {
+  background-image: linear-gradient(195deg, #cfe691 0%, #82c7ab 100%);
+  color:#533549 !important;
+}
+.bg-gradient-idk1 {
+  background-image: linear-gradient(195deg, #eba091 0%, #c78477 100%);
+  color:#533549 !important;
+}
+.bg-gradient-idk {
+  background-image: linear-gradient(195deg, #e1fa9e 0%, #649c88 100%);
   color:#533549 !important;
 }
 .bg-gradient-drastic {
