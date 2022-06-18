@@ -7,7 +7,8 @@ import os
 
 from satori.lib.engine.structs import SourceStreamTargets
 import satori.lib.engine.model.metrics as metrics
-
+from satori.lib.apis import disk
+from satori.lib.apis import memory
 
 def establishConnection():
     ''' establishes a connection to the satori server, returns connection object '''
@@ -32,7 +33,7 @@ def getEngine(connection):
     
     def getExistingDataManager():
         ''' generates DataManager from data on disk '''
-        return satori.DataManager()
+        return satori.DataManager(disk=disk.Disk())
     
     def getExistingModelManager():
         ''' generate a set of Model(s) for Engine '''
@@ -100,6 +101,8 @@ def getEngine(connection):
             'override': False}
         return {
             satori.ModelManager(
+                disk=disk.Disk(),
+                memory=memory.Memory,
                 sourceId='streamrSpoof',
                 streamId='simpleEURCleanedHL',
                 targetId='High',
@@ -118,6 +121,8 @@ def getEngine(connection):
                     ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
                 **kwargs),
             satori.ModelManager(
+                disk=disk.Disk(),
+                memory=memory.Memory,
                 sourceId='streamrSpoof',
                 streamId='simpleEURCleanedHL',
                 targetId='Low',
@@ -136,6 +141,8 @@ def getEngine(connection):
                     ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
                 **kwargs),
             satori.ModelManager(
+                disk=disk.Disk(),
+                memory=memory.Memory,
                 sourceId='streamrSpoof',
                 streamId='simpleEURCleanedC',
                 targetId='Close',

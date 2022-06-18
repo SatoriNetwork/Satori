@@ -16,16 +16,18 @@ from reactivex.subject import BehaviorSubject
 from sklearn.exceptions import NotFittedError
 
 from satori import config
-from satori.lib.apis import disk, memory
 from satori.lib.engine.structs import HyperParameter, SourceStreamTargets
 from satori.lib.engine.model.pilot import PilotModel
 from satori.lib.engine.model.stable import StableModel
-
+from satori.lib.engine.interfaces.disk import ModelDataDiskApi
+from satori.lib.engine.interfaces.memory import ModelMemoryApi
 
 class ModelManager:
 
     def __init__(
         self,
+        disk:ModelDataDiskApi=None,
+        memory:ModelMemoryApi=None,
         modelPath:str=None,
         hyperParameters:'list(HyperParameter)'=None,
         metrics:dict=None,
@@ -57,6 +59,8 @@ class ModelManager:
         split: train test split percentage or count
         override: override the existing model saved to disk if there is one
         '''
+        self.disk = disk
+        self.memory = memory
         self.sourceId = sourceId
         self.streamId = streamId
         self.targetId = targetId
@@ -142,7 +146,7 @@ class ModelManager:
             self.data = self.data if self.data is not None else pd.DataFrame(
                 {x: [] for x in SourceStreamTargets.combine(self.targets)})
     
-        self.data = disk.Api().gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
+        self.data = self.disk.gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
         handleEmpty()
 
     ### TARGET ####################################################################
@@ -185,7 +189,7 @@ class ModelManager:
 
     def save(self):
         ''' save the current model '''
-        disk.ModelApi.save(
+        self.disk.saveModel(
             self.stable.xgb,
             self.modelPath,
             self.stable.hyperParameters,
@@ -193,7 +197,7 @@ class ModelManager:
         
     def load(self): # -> bool:
         ''' loads the model - happens on init so we automatically load our progress '''
-        xgb = disk.ModelApi.load(self.modelPath)
+        xgb = self.disk.loadModel(self.modelPath)
         if xgb == False:
             return False
         if (

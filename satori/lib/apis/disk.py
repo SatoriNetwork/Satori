@@ -11,13 +11,14 @@ import os
 import joblib
 import pyarrow as pa
 from satori.lib.apis import memory
+from satori.lib.engine.interfaces.disk import DataDiskApi, ModelDataDiskApi, ModelDiskApi, WalletDiskApi
 from satori.lib.engine.structs import SourceStreamTargets
 
 def safetify(path:str):
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
 
-class WalletApi(object):
+class WalletApi(WalletDiskApi):
     
     @staticmethod
     def save(wallet, walletPath:str=None):
@@ -32,7 +33,7 @@ class WalletApi(object):
             return config.get(walletPath)
         return False
 
-class ModelApi(object):
+class ModelApi(ModelDiskApi):
     
     @staticmethod
     def save(model, modelPath:str=None, hyperParameters:list=None, chosenFeatures:list=None):
@@ -57,13 +58,57 @@ class ModelApi(object):
         return False
         
             
-class Api(object):
-    def __init__(self, df:pd.DataFrame=None, source:str=None, stream:str=None, location:str=None, append:bool=None, ext:str='parquet'):
+class Disk(DataDiskApi, ModelDataDiskApi):
+    ''' single point of contact for interacting with disk '''
+    
+    def __init__(self,
+        df:pd.DataFrame=None,
+        source:str=None,
+        stream:str=None,
+        location:str=None,
+        ext:str='parquet',
+    ):
+        self.memory = memory.Memory
+        self.setAttributes(df=df, source=source, stream=stream, location=location, ext=ext)
+
+    def setAttributes(
+        self,
+        df:pd.DataFrame=None,
+        source:str=None,
+        stream:str=None,
+        location:str=None,
+        ext:str='parquet',
+    ):
         self.df = df if df is not None else pd.DataFrame();
         self.source = source
         self.stream = stream
         self.location = location
         self.ext = ext
+        return self
+    
+    @staticmethod
+    def safetify(path:str):
+        safetify(path)
+
+    @staticmethod
+    def saveModel(model, modelPath:str=None, hyperParameters:list=None, chosenFeatures:list=None):
+        ModelApi.save(
+            model,
+            modelPath=modelPath,
+            hyperParameters=hyperParameters,
+            chosenFeatures=chosenFeatures)
+
+    @staticmethod
+    def loadModel(modelPath:str=None):
+        ModelApi.load(modelPath=modelPath)
+
+    @staticmethod
+    def saveWallet(wallet, walletPath:str=None):
+        WalletApi.save(wallet, walletPath=walletPath)
+
+    @staticmethod
+    def loadWallet(walletPath:str=None):
+        WalletApi.load(walletPath=walletPath)
 
     def path(self, source:str=None, stream:str=None, permanent:bool=False):
         ''' Layer 0 get the path of a file '''
@@ -205,6 +250,12 @@ class Api(object):
         rdf.columns = pd.MultiIndex.from_product([[source], [stream], rdf.columns])
         return rdf.sort_index()
     
+    def savePrediction(self, path:str=None, prediction:str=None):
+        ''' Layer 1 - saves prediction to disk '''
+        safetify(path)
+        with open(path, 'a') as f:
+            f.write(prediction)
+    
     def gather(
         self, 
         targetColumn:'str|tuple[str]',
@@ -232,17 +283,17 @@ class Api(object):
         source = source or self.source
         stream = stream or self.stream
         if sourceStreamTargetss is not None:
-            return memory.merge(filterNone([
+            return self.memory.merge(filterNone([
                     dropIf(self.read(source, stream, columns=targets), (source, stream, 'StreamObservationId'))
                     for source, stream, targets in SourceStreamTargets.condense(sourceStreamTargetss)]),
                 targetColumn=targetColumn)
         if sourceStreamTargets is not None:
-            return memory.merge(filterNone([
+            return self.memory.merge(filterNone([
                     dropIf(self.read(source, stream, columns=targets), (source, stream, 'StreamObservationId'))
                     for source, stream, targets in sourceStreamTargets]),
                 targetColumn=targetColumn)
         if targets is not None:
-            return memory.merge(
+            return self.memory.merge(
                 dropIf(
                     self.read(
                         source or self.source,
@@ -251,18 +302,19 @@ class Api(object):
                     (source, stream, 'StreamObservationId')),
                 targetColumn=targetColumn)
         if targetsByStream is not None:
-            return memory.merge(filterNone([
+            return self.memory.merge(filterNone([
                     dropIf(self.read(source or self.source, stream, columns=targets), (source, stream, 'StreamObservationId'))
                     for stream, targets in targetsByStream.items()]),
                 targetColumn=targetColumn)
         if targetsByStreamBySource is not None:
-            return memory.merge(filterNone([
+            return self.memory.merge(filterNone([
                     dropIf(self.read(source, stream, columns=targets), (source, stream, 'StreamObservationId'))
                     for source, values in targetsByStreamBySource.items()
                     for stream, targets in values]),
                 targetColumn=targetColumn)
         return dropIf(self.read(source, stream), (source, stream, 'StreamObservationId'))
         
+  
 '''
 from satori.lib.apis import disk
 x = disk.Api(source='streamrSpoof', stream='simpleEURCleaned') 
