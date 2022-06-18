@@ -1,5 +1,6 @@
 import os
-import satori
+from satori import config
+from satori.lib.apis.disk import WalletApi
 import ravencoin.base58
 from ravencoin.wallet import P2PKHRavencoinAddress, CRavencoinSecret
 
@@ -14,19 +15,19 @@ class Wallet():
         self.privateKey = None
 
     def load(self):
-        wallet = satori.disk.WalletApi.load(
-            walletPath=satori.config.walletPath('wallet.yaml'))
+        wallet = WalletApi.load(
+            walletPath=config.walletPath('wallet.yaml'))
         self.scripthash = wallet['scripthash']
         self.address = wallet['address']
         self.privateKey = wallet['privateKey']
 
     def save(self):
-        satori.disk.WalletApi.save(
+        WalletApi.save(
             wallet={
                 'scripthash': self.scripthash,
                 'address': self.address,
                 'privateKey': self.privateKey},
-            walletPath=satori.config.walletPath('wallet.yaml'))
+            walletPath=config.walletPath('wallet.yaml'))
 
     def generate(self):
         self._entropy = self._generateEntropy()

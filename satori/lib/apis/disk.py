@@ -11,7 +11,7 @@ import os
 import joblib
 import pyarrow as pa
 from satori.lib.apis import memory
-from satori.lib.engine.interfaces.disk import DataDiskApi, ModelDataDiskApi, ModelDiskApi, WalletDiskApi
+from satori.lib.engine.interfaces.data import DataDiskApi, ModelDataDiskApi, ModelDiskApi, WalletDiskApi
 from satori.lib.engine.structs import SourceStreamTargets
 
 def safetify(path:str):
