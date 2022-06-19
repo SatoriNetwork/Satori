@@ -40,7 +40,7 @@ from satori.lib.engine.structs import Observation
 ###############################################################################
 
 # development flags
-full = False # just web or everything
+full = True # just web or everything
 debug = True
 
 # singletons

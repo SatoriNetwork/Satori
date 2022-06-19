@@ -11,7 +11,9 @@ import os
 import joblib
 import pyarrow as pa
 from satori.lib.apis import memory
-from satori.lib.engine.interfaces.data import DataDiskApi, ModelDataDiskApi, ModelDiskApi, WalletDiskApi
+from satori.lib.engine.interfaces.data import DataDiskApi
+from satori.lib.engine.interfaces.model import ModelDataDiskApi, ModelDiskApi
+from satori.lib.engine.interfaces.wallet import WalletDiskApi
 from satori.lib.engine.structs import SourceStreamTargets
 
 def safetify(path:str):
@@ -100,7 +102,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
 
     @staticmethod
     def loadModel(modelPath:str=None):
-        ModelApi.load(modelPath=modelPath)
+        return ModelApi.load(modelPath=modelPath)
 
     @staticmethod
     def saveWallet(wallet, walletPath:str=None):
@@ -108,7 +110,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
 
     @staticmethod
     def loadWallet(walletPath:str=None):
-        WalletApi.load(walletPath=walletPath)
+        return WalletApi.load(walletPath=walletPath)
 
     def path(self, source:str=None, stream:str=None, permanent:bool=False):
         ''' Layer 0 get the path of a file '''

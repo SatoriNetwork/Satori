@@ -19,7 +19,7 @@ from satori import config
 from satori.lib.engine.structs import HyperParameter, SourceStreamTargets
 from satori.lib.engine.model.pilot import PilotModel
 from satori.lib.engine.model.stable import StableModel
-from satori.lib.engine.interfaces.data import ModelDataDiskApi
+from satori.lib.engine.interfaces.model import ModelDataDiskApi
 from satori.lib.engine.interfaces.model import ModelMemoryApi
 
 class ModelManager:
@@ -231,7 +231,7 @@ class ModelManager:
             makePrediction()
         
         def makePredictionFromNewInputs(incremental):
-            self.data = memory.appendInsert(
+            self.data = self.memory.appendInsert(
                 df=self.data, 
                 incremental=incremental)
             makePrediction()
@@ -241,7 +241,7 @@ class ModelManager:
                 if col not in self.data.columns:
                     incremental = incremental.drop(col, axis=1)
             #incremental.columns = ModelManager.addFeatureLevel(df=incremental)
-            self.data = memory.appendInsert(
+            self.data = self.memory.appendInsert(
                 df=self.data, 
                 incremental=incremental)
             makePrediction(isTarget=True)

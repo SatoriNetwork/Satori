@@ -97,6 +97,18 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 .bg-gradient-primary-reverse {
   background-image: linear-gradient(195deg, #F9ED4E 0%, #F6B042 100%);
 }
+.bg-gradient-primary-reverse3 {
+  background-image: linear-gradient(195deg, #F9ED4E 0%, #F8DE4B 100%);
+}
+.bg-gradient-primary-reverse2 {
+  background-image: linear-gradient(195deg, #F8DE4B 0%, #F8CF48 100%);
+}
+.bg-gradient-primary-reverse1 {
+  background-image: linear-gradient(195deg, #F8CF48 0%, #F7BF45 100%);
+}
+.bg-gradient-primary-reverse0 {
+  background-image: linear-gradient(195deg, #F7BF45 0%, #F6B042 100%);
+}
 .bg-gradient-primary-reverse i {
   color: #533549 !important;
   position: relative;

@@ -22,7 +22,7 @@ class ModelDataDiskApi():
         ''' saves model using ModelDiskApi'''
     
     @staticmethod
-    def loadModel(model, modelPath:str=None, hyperParameters:list=None, chosenFeatures:list=None):
+    def loadModel(model):
         ''' loads model using ModelDiskApi'''
         
     def gather(
