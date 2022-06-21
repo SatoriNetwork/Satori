@@ -62,6 +62,16 @@ from binascii import hexlify
 from hashlib import sha256
 import codecs
 
+OP_DUP = b'76'
+OP_HASH160 = b'a9'
+BYTES_TO_PUSH = b'14'
+OP_EQUALVERIFY = b'88'
+OP_CHECKSIG = b'ac'
+DATA_TO_PUSH = lambda address: hexlify(b58decode_check(address)[1:])
+sig_script_raw = lambda address: b''.join((OP_DUP, OP_HASH160, BYTES_TO_PUSH, DATA_TO_PUSH(address), OP_EQUALVERIFY, OP_CHECKSIG))
+script_hash = lambda address: sha256(codecs.decode(sig_script_raw(address), 'hex_codec')).digest()[::-1].hex()
+
+
 
 a = grappler.ElectrumXConnector(
     # host="fortress.qtornado.com", # bitcoin mainnet
@@ -71,16 +81,6 @@ a = grappler.ElectrumXConnector(
     ssl=True,
     timeout=5
 )
-
-
-OP_DUP = b'76'
-OP_HASH160 = b'a9'
-BYTES_TO_PUSH = b'14'
-OP_EQUALVERIFY = b'88'
-OP_CHECKSIG = b'ac'
-DATA_TO_PUSH = lambda address: hexlify(b58decode_check(address)[1:])
-sig_script_raw = lambda address: b''.join((OP_DUP, OP_HASH160, BYTES_TO_PUSH, DATA_TO_PUSH(address), OP_EQUALVERIFY, OP_CHECKSIG))
-script_hash = lambda address: sha256(codecs.decode(sig_script_raw(address), 'hex_codec')).digest()[::-1].hex()
 
 
 a.send("server.version")
@@ -101,9 +101,13 @@ b = grappler.ElectrumXConnector(
     ssl=True,
     timeout=5
 )
+b.send("server.version", 'Meta', '1.10')
+b.send("blockchain.scripthash.get_asset_balance", script_hash('REsQeZT8KD8mFfcD4ZQQWis4Ju9eYjgxtT'))
+b.send("blockchain.asset.get_meta", 'SATORI')
 
-b.send("server.version")
+# unneeded
 b.send("server.banner")
 b.send("blockchain.relayfee")
-b.send("blockchain.scripthash.listassets", script_hash('RVuaiv475RtZ9zKYobTQS8DHfKW5NNB3vf'))
-b.send("blockchain.asset.get_meta", ['SATORI'])
+b.send('blockchain.scripthash.get_balance', script_hash('n1issueAssetXXXXXXXXXXXXXXXXWdnemQ'))
+b.send("blockchain.scripthash.list_assets", script_hash('RVuaiv475RtZ9zKYobTQS8DHfKW5NNB3vf'))
+b.send("blockchain.scripthash.list_assets", script_hash('REsQeZT8KD8mFfcD4ZQQWis4Ju9eYjgxtT'))
