@@ -191,11 +191,20 @@ def dashboard():
         (model inputs and relative strengths)
         (access to all predictions and the truth)
     '''
+    def getWallet():
+        from satori.lib.wallet import Wallet
+        wallet = Wallet()
+        wallet.init()
+        return wallet
+    
+    wallet = getWallet()
+    print(f'WALLET {wallet}')
     if Engine is None:
         streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00'}]
     else:
         streamsOverview = [model.overview() for model in Engine.models]
     resp = {
+        'wallet': wallet,
         'streamsOverview': streamsOverview,
         'configOverrides': satori.config.get()}
     return render_template('dashboard.html', **resp)

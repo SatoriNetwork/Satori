@@ -17,6 +17,7 @@ def verbose(name: str):
     if name == 'modelPath': return 'absolute model path'
     if name == 'walletPath': return 'absolute wallet path'
     if name == 'defaultSource': return 'default source of data streams'
+    if name == 'electrumxServers': return 'electrumx servers'
 
 def manifest(): 
     return get('manifest') or {}
@@ -62,6 +63,9 @@ def walletPath(filename=None):
 
 def defaultSource(): 
     return get().get(verbose('defaultSource'), 'streamr')
+
+def electrumxServers(): 
+    return get().get(verbose('electrumxServers'), ['rvn4lyfe.com:50002', 'moontree.com:50002'])
 
 def path(of='data'):
     ''' used to get the data or model path '''

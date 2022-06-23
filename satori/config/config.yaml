@@ -22,3 +22,10 @@
 
 ## the system Satori uses to get its streams:
 # default source of data streams: streamr
+
+## Satori connects to an electrumX server to get wallet balances
+## to reduce the load on any one server multiple servers can be
+## specified and a random one will be chosen on startup:
+#electrumx servers: 
+#  - rvn4lyfe.com:50002
+#  - moontree.com:50002
