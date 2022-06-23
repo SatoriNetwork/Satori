@@ -198,7 +198,6 @@ def dashboard():
         return wallet
     
     wallet = getWallet()
-    print(f'WALLET {wallet}')
     if Engine is None:
         streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00'}]
     else:

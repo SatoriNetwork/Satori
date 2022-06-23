@@ -150,6 +150,35 @@
               </tr>
             </thead>
             <tbody>
+              {% for streamOverview in streamsOverview %}
+              <tr>
+                <td>
+                  <div class="d-flex px-3 py-1">
+                    <h6 class="mb-0 text-sm">{{ streamOverview['source'] }}</h6>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex px-3 py-1">
+                    <h6 class="mb-0 text-sm">{{ streamOverview['stream'] }}</h6>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex px-3 py-1">
+                    <h6 class="mb-0 text-sm">{{ streamOverview['target'] }}</h6>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex px-3 py-1">
+                    <h6 class="mb-0 text-sm">{{ streamOverview['value'] }}</h6>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex px-3 py-1">
+                    <h6 class="mb-0 text-sm">{{ streamOverview['prediction'] }}</h6>
+                  </div>
+                </td>                                                                
+                <!-- example
+                <td>{{ streamOverview['accuracy'] }}</td>
               <tr>
                 <td>
                   <div class="d-flex px-3 py-1">
@@ -230,7 +259,9 @@
                     <h6 class="mb-0 text-sm">71</h6>
                   </div>
                 </td>
+                -->
               </tr> 
+              {% endfor %}
             </tbody>
           </table>
         </div>
