@@ -121,6 +121,12 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 .bg-gradient-primary-reverse0 i {
   color: #533549 !important;
 }
+.bg-gradient-primary-reverse4 {
+  background-image: linear-gradient(195deg, #F8DE4B 0%, #F8CF48 100%);
+}
+.bg-gradient-primary-reverse4 i {
+  color: #9e7187 !important;
+}
 
 .bg-gradient-primary-reverse i {
   color: #533549 !important;
@@ -265,6 +271,13 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
 .bg-gradient-drastic-reverse {
   background-image: linear-gradient(195deg, #F6B042 0%, #533549 100%);
 }
+.bg-gradient-drastic-reverse i {
+  color: #F9ED4E !important;
+}
+.bg-gradient-less-drastic-reverse {
+  background-image: linear-gradient(195deg, #af9da1 0%, #3d2735 100%);
+}
+
 .shadow-dark {
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(16, 5, 29, 0.4) !important;
 }
@@ -379,4 +392,17 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
   text-align: center;
   height: 100%;
   z-index: 1000;
+}
+
+.yellow-hover:hover {
+  background: linear-gradient(90deg, rgb(246, 176, 66, .5) 0%, rgb(249, 237, 78, .5) 100%);
+}
+td:first-child {
+  border-radius: 0.5rem  0 0 0.5rem ;
+}
+td:last-child {
+  border-radius: 0 0.5rem 0.5rem  0;
+}
+.mt-3 {
+  margin-top: 2rem !important;
 }

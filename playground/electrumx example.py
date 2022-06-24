@@ -56,7 +56,7 @@ electrumx(host, port, content)
 
 
 
-import grappler
+from satori.lib.apis.blockchain import ElectrumX
 from base58 import b58decode_check
 from binascii import hexlify
 from hashlib import sha256
@@ -73,7 +73,31 @@ script_hash = lambda address: sha256(codecs.decode(sig_script_raw(address), 'hex
 
 
 
-a = grappler.ElectrumXConnector(
+b = ElectrumX(
+    # host="fortress.qtornado.com", # bitcoin mainnet
+    host='rvn4lyfe.com',
+    port=50002,
+    # port=443,
+    ssl=True,
+    timeout=5
+)
+
+b.send("server.version", 'Meta', '1.10')
+b.send("blockchain.scripthash.get_asset_balance", script_hash('REsQeZT8KD8mFfcD4ZQQWis4Ju9eYjgxtT'))
+b.send("blockchain.scripthash.get_balance", script_hash('REsQeZT8KD8mFfcD4ZQQWis4Ju9eYjgxtT'))
+b.send("blockchain.transaction.get", 'a015f44b866565c832022cab0dec94ce0b8e568dbe7c88dce179f9616f7db7e3', True)
+b.send("blockchain.asset.get_meta", 'SATORI')
+
+# unneeded
+b.send("server.banner")
+b.send("blockchain.relayfee")
+b.send('blockchain.scripthash.get_balance', script_hash('n1issueAssetXXXXXXXXXXXXXXXXWdnemQ'))
+b.send("blockchain.scripthash.list_assets", script_hash('RVuaiv475RtZ9zKYobTQS8DHfKW5NNB3vf'))
+b.send("blockchain.scripthash.list_assets", script_hash('REsQeZT8KD8mFfcD4ZQQWis4Ju9eYjgxtT'))
+
+
+
+a = ElectrumX(
     # host="fortress.qtornado.com", # bitcoin mainnet
     host='tn.not.fyi',
     port=55002,
@@ -93,21 +117,3 @@ print()
 print('RVuaiv475RtZ9zKYobTQS8DHfKW5NNB3vf')
 print(script_hash('RVuaiv475RtZ9zKYobTQS8DHfKW5NNB3vf'))
 print()
-b = grappler.ElectrumXConnector(
-    # host="fortress.qtornado.com", # bitcoin mainnet
-    host='rvn4lyfe.com',
-    port=50002,
-    # port=443,
-    ssl=True,
-    timeout=5
-)
-b.send("server.version", 'Meta', '1.10')
-b.send("blockchain.scripthash.get_asset_balance", script_hash('REsQeZT8KD8mFfcD4ZQQWis4Ju9eYjgxtT'))
-b.send("blockchain.asset.get_meta", 'SATORI')
-
-# unneeded
-b.send("server.banner")
-b.send("blockchain.relayfee")
-b.send('blockchain.scripthash.get_balance', script_hash('n1issueAssetXXXXXXXXXXXXXXXXWdnemQ'))
-b.send("blockchain.scripthash.list_assets", script_hash('RVuaiv475RtZ9zKYobTQS8DHfKW5NNB3vf'))
-b.send("blockchain.scripthash.list_assets", script_hash('REsQeZT8KD8mFfcD4ZQQWis4Ju9eYjgxtT'))

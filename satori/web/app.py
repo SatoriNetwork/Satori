@@ -26,13 +26,36 @@ import satori
 import requests
 import pandas as pd
 import datetime as dt
-from flask import Flask, url_for, render_template, redirect, jsonify
+from flask import Flask, url_for, render_template, redirect, jsonify, send_file
 from flask import send_from_directory, session, request, flash, Markup
 #from flask_mobility import Mobility
 from waitress import serve
 import webbrowser
 from satori.web import forms
 from satori.lib.engine.structs import Observation
+
+
+###############################################################################
+## Helpers ####################################################################
+###############################################################################
+
+def spoofStreamer():
+    thread = threading.Thread(target=satori.spoof.Streamr(
+        sourceId='streamrSpoof',
+        streamId='simpleEURCleanedHL',
+    ).run, daemon=True)
+    thread.start()
+    thread = threading.Thread(target=satori.spoof.Streamr(
+        sourceId='streamrSpoof',
+        streamId='simpleEURCleanedC',
+    ).run, daemon=True)
+    thread.start()
+
+def getWallet():
+    from satori.lib.wallet import Wallet
+    wallet = Wallet()
+    wallet.init()
+    return wallet
 
 
 ###############################################################################
@@ -46,25 +69,15 @@ debug = True
 # singletons
 Connection = None
 Engine = None
+Wallet = getWallet()
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 if full:
+    Wallet = getWallet()
     Connection = satori.start.establishConnection()
     Engine = satori.start.getEngine(Connection)
     Engine.run()
-
-def spoofStreamer():
-    thread = threading.Thread(target=satori.spoof.Streamr(
-        sourceId='streamrSpoof',
-        streamId='simpleEURCleanedHL',
-    ).run, daemon=True)
-    thread.start()
-    thread = threading.Thread(target=satori.spoof.Streamr(
-        sourceId='streamrSpoof',
-        streamId='simpleEURCleanedC',
-    ).run, daemon=True)
-    thread.start()
 
 ###############################################################################
 ## Functions ##################################################################
@@ -191,22 +204,35 @@ def dashboard():
         (model inputs and relative strengths)
         (access to all predictions and the truth)
     '''
-    def getWallet():
-        from satori.lib.wallet import Wallet
-        wallet = Wallet()
-        wallet.init()
-        return wallet
-    
-    wallet = getWallet()
     if Engine is None:
         streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00'}]
     else:
         streamsOverview = [model.overview() for model in Engine.models]
     resp = {
-        'wallet': wallet,
+        'title': 'Dashboard',
+        'wallet': Wallet,
         'streamsOverview': streamsOverview,
         'configOverrides': satori.config.get()}
     return render_template('dashboard.html', **resp)
+
+@app.route('/wallet')
+def wallet():
+    Wallet.get(allWalletInfo=True)
+    import io
+    import qrcode
+    from base64 import b64encode
+    img = qrcode.make(Wallet.address)
+    buf = io.BytesIO()
+    img.save(buf)
+    buf.seek(0)
+    #return send_file(buf, mimetype='image/jpeg')
+    img = b64encode(buf.getvalue()).decode('ascii')
+    img_tag = f'<img src="data:image/jpg;base64,{img}" class="img-fluid"/>'
+    resp = {
+        'title':'Wallet',
+        'image': img_tag,
+        'wallet': Wallet}
+    return render_template('wallet.html', **resp) 
 
 ###############################################################################
 ## Routes - subscription ######################################################

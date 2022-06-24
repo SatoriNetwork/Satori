@@ -9,9 +9,13 @@ class ElectrumX(Connector):
         super(type(self), self).__init__(*args, **kwargs)
 
     def _receive(self):
-        raw = self.connection.recv(1024)
-        r = json.loads(raw)
-        self.log.log(5, "_receive {}".format(r))
+        raw = self.connection.recv(1024*16)
+        try:
+            r = json.loads(raw)
+            self.log.log(5, "_receive {}".format(r))
+        except json.decoder.JSONDecodeError:
+            print('RAW')
+            print(raw)
         return raw
 
     def send(self, method, *args):
