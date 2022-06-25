@@ -19,6 +19,7 @@ from satori.lib.engine.structs import SourceStreamTargets
 def safetify(path:str):
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
+    return path
 
 class WalletApi(WalletDiskApi):
     
@@ -90,7 +91,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
     
     @staticmethod
     def safetify(path:str):
-        safetify(path)
+        return safetify(path)
 
     @staticmethod
     def saveModel(model, modelPath:str=None, hyperParameters:list=None, chosenFeatures:list=None):
@@ -116,11 +117,12 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         ''' Layer 0 get the path of a file '''
         source = source or self.source or config.defaultSource()
         stream = stream or self.stream
-        return os.path.join(
+        return safetify(os.path.join(
                 self.location or config.dataPath(),
                 'permanent' if permanent else 'incremental', # 'incremental', # we need a name for not permanent because what if a stream source is called permanent...
                 source,
-                f'{stream}.{self.ext}')
+                f'{stream}.{self.ext}'))
+        
 
     def exists(self, source:str=None, stream:str=None, permanent:bool=False,):
         ''' Layer 0 return True if file exists at path, else False '''
@@ -157,7 +159,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         must remove multiindex column first.
         streamId is the name of file.
         '''
-        pq.write_table(self.toTable(df), self.path(permanent=True))        
+        pq.write_table(self.toTable(df), self.path(permanent=True))
         
     def compress(self, source:str=None, stream:str=None):
         ''' Layer 1

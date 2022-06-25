@@ -114,7 +114,10 @@ class DataManager:
                 ''' compress if the number of incrementals is high '''
                 self.disk.setAttributes(source=observation.sourceId, stream=observation.streamId)
                 if len(self.disk.incrementals()) > 100:
-                    self.disk.compress()
+                    try:
+                        self.disk.compress()
+                    except Exception:
+                        pass
                 
             def tellModels():
                 ''' tell the modesl that listen to this stream and these targets '''

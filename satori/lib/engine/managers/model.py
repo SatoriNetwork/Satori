@@ -97,12 +97,16 @@ class ModelManager:
         self.stable.build()
 
     def overview(self):
+        print('DATA')
+        print(self.data.dropna().loc[:, (self.sourceId, self.streamId, self.targetId)].values.tolist()[-100:])
         return {
             'source': self.sourceId,
             'stream': self.streamId, 
             'target': self.targetId, 
             'value': self.stable.current.values[0][0] if hasattr(self.stable, 'current') else '',
             'prediction': self.stable.prediction if hasattr(self.stable, 'prediction') else '',
+            'values': self.data.dropna().loc[:, (self.sourceId, self.streamId, self.targetId)].values.tolist()[-100:],
+            'predictions': [.9,.8,1,.6,.9,.5,.6,.8,1.1],
             # this isn't the accuracy we really care about (historic accuracy), 
             # it's accuracy of this current model on historic data.
             'accuracy': f'{str(self.stableScore*100)[0:5]} %' if hasattr(self, 'stableScore') else '', 
@@ -178,7 +182,7 @@ class ModelManager:
         # not sure what this score is... r2 f1? not mae I think
         if self.stableScore < self.pilotScore:
             for param in self.stable.hyperParameters:
-                param.value = param.test
+                param.value = param.test # is this right? it looks right but I don't think the stable model ever updates from the pilot
             self.stable.chosenFeatures = self.pilot.testFeatures
             self.stable.featureSet = self.pilot.testFeatureSet
             self.save()

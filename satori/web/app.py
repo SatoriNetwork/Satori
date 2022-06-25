@@ -27,7 +27,7 @@ import requests
 import pandas as pd
 import datetime as dt
 from flask import Flask, url_for, render_template, redirect, jsonify, send_file
-from flask import send_from_directory, session, request, flash, Markup
+from flask import send_from_directory, session, request, flash, Markup, Response
 #from flask_mobility import Mobility
 from waitress import serve
 import webbrowser
@@ -63,7 +63,7 @@ def getWallet():
 ###############################################################################
 
 # development flags
-full = False # just web or everything
+full = True # just web or everything
 debug = True
 
 # singletons
@@ -205,7 +205,7 @@ def dashboard():
         (access to all predictions and the truth)
     '''
     if Engine is None:
-        streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00'}]
+        streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00', 'predictions': [2,3,1]}]
     else:
         streamsOverview = [model.overview() for model in Engine.models]
     resp = {
@@ -214,6 +214,75 @@ def dashboard():
         'streamsOverview': streamsOverview,
         'configOverrides': satori.config.get()}
     return render_template('dashboard.html', **resp)
+
+
+@app.route('/learn')
+def learn():
+    def update():
+        yield 'data: Prepare for learning\n\n'
+        # Preapre model
+        time.sleep(1.0)
+    
+
+        for i in range(1, 101):
+            # Perform update
+            time.sleep(0.1)
+            yield f'data: {i}%\n\n'
+
+        yield 'data: close\n\n'
+
+    import time
+    return Response(update(), mimetype='text/event-stream')
+
+@app.route('/learn2')
+def learn2():
+    def update():
+        yield 'data: Prepare for learning\n\n'
+        # Preapre model
+        time.sleep(10.0)
+        for i in range(1, 101):
+            # Perform update
+            time.sleep(0.01)
+            yield f'data: {i}%\n\n'
+
+        yield 'data: close\n\n'
+
+    import time
+    return Response(update(), mimetype='text/event-stream')
+
+class StreamsOverview():
+    
+    def __init__(self, engine):
+        self.engine = engine
+        self.overview = [{'source': '-', 'stream': '-', 'target':'-', 'subscribers':'-', 'accuracy': '-', 'prediction': '-', 'value': '-', 'values': [3,2,1], 'predictions': [3,2,1]}]
+        self.viewed = False
+    
+    def setIt(self):
+        self.overview = [model.overview() for model in self.engine.models]
+        self.viewed = False
+
+    def setViewed(self):
+        self.viewed = True
+    
+@app.route('/model-updates')
+def modelUpdates():
+    def update():
+        streamsOverview = StreamsOverview(Engine)
+        listeners = [] 
+        #listeners.append(Engine.data.newData.subscribe(
+        #    lambda x: streamsOverview.setIt() if x is not None else None))    
+        for model in Engine.models:
+            listeners.append(model.predictionUpdate.subscribe(lambda x: streamsOverview.setIt() if x is not None else None))
+        while True:
+            if streamsOverview.viewed:
+                time.sleep(1)
+            else: 
+                # parse it out here?
+                yield "data: " + str(streamsOverview.overview).replace("'", '"') + "\n\n"
+                streamsOverview.setViewed()
+                    
+    import time
+    return Response(update(), mimetype='text/event-stream')
 
 @app.route('/wallet')
 def wallet():
@@ -275,7 +344,8 @@ def update():
     so we can call .on_next() here to pass along the update got here from the 
     Streamr LightClient, and trigger a new prediction.
     '''
-    print('POSTJSON:', request.json)
+    #print('POSTJSON:', request.json)
+    print('POSTJSON...')
     x = Observation(request.json)
     Engine.data.newData.on_next(x)
     

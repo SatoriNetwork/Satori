@@ -88,7 +88,7 @@
         </div>
       </div>
       <div class="card-body">
-        <h6 class="mb-0" style='float:left;'>Earnings</h6>
+        <h6 class="mb-0" style='float:left;'>Win Rate</h6>
         <p class="mb-0 text-sm" style='float:right;'><i class="material-icons text-sm my-auto me-1">schedule</i>prior 7 days</p>
       </div>
     </div>
@@ -149,9 +149,9 @@
                 <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prediction</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="updating_table">
               {% for streamOverview in streamsOverview %}
-              <tr class='yellow-hover'>
+              <tr class='yellow-hover' onmouseover="setData(chartOne,{{ streamOverview['predictions'] }});setData(chartTwo,[4,3,2,1]);setData(chartThree,[4,3,2,1]);">
                 <td>
                   <div class="d-flex px-3 py-1">
                     <h6 class="mb-0 text-sm">{{ streamOverview['source'] }}</h6>
@@ -269,6 +269,361 @@
     </div>
   </div>
 </div>
+
+<p id="learn_output"></p>
+<p id="learn_output2"></p>
+<p id="learn_output3"></p>
+<script src="{{ url_for('static', filename='js/plugins/chartjs.min.js') }}"></script>
+<script>
+  function addData(chart, label, data) {
+    chart.data.labels.push(label);
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(data);
+    });
+    chart.update();
+  }
+  function addDataChartOne() {
+    addData(chartOne, '', [1]);
+  }
+
+  function removeData(chart) {
+    chart.data.labels.pop();
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data.pop();
+    });
+    chart.update();
+  }
+  function removeAllData(chart) {
+    chart.data.labels = [];
+    chart.data.datasets.forEach((dataset) => {
+        dataset.data = [];
+    });
+    chart.update();
+  }
+  function removeDataChartOne() {
+    removeAllData(chartOne);
+  }
+  function setData(chart, data) {
+    removeAllData(chart);
+    let labels = [];
+    for (let x in data) {
+      labels.push('');
+      if (labels.length == data.length){
+        addData(chart, 'now', data[x]);
+      } else {
+        addData(chart, '', data[x]);
+      }
+    }
+  }
+
+  var ctx = document.getElementById("chart-bars").getContext("2d");
+  var chartOne = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["", "", "", "", "", "", "Today"],
+      datasets: [{
+        label: "",
+        tension: 0.4,
+        borderWidth: 0,
+        borderRadius: 4,
+        borderSkipped: false,
+        backgroundColor: "rgba(60, 60, 60, .8)",
+        data: [50, 20, 10, 22, 50, 10, 40],
+        maxBarThickness: 4
+      }, ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [1, 0],
+            color: 'rgba(180, 180, 180, .2)'
+          },
+          ticks: {
+            suggestedMin: 0,
+            suggestedMax: 500,
+            beginAtZero: true,
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              style: 'normal',
+              lineHeight: 2
+            },
+            color: "#98999a"
+          },
+        },
+        x: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [5, 5],
+            color: 'rgba(45, 45, 45, .0)'
+          },
+          ticks: {
+            display: true,
+            color: '#98999a',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              style: 'normal',
+              lineHeight: 2
+            },
+          }
+        },
+      },
+    },
+  });
+
+
+  var ctx2 = document.getElementById("chart-line").getContext("2d");
+
+  var chartTwo = new Chart(ctx2, {
+    type: "line",
+    data: {
+      labels: ["", "", "", "", "", "", "", "", "Now"],
+      datasets: [{
+        label: "",
+        tension: .2,
+        borderWidth: 0,
+        pointRadius: 0,
+        pointBackgroundColor: "rgba(60, 60, 60, .8)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(60, 60, 60, .8)",
+        borderWidth: 3,
+        backgroundColor: "transparent",
+        fill: true,
+        data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [1, 0],
+            color: 'rgba(180, 180, 180, .2)'
+          },
+          ticks: {
+            display: true,
+            color: '#98999a',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              style: 'normal',
+              lineHeight: 2
+            },
+          }
+        },
+        x: {
+          grid: {
+            drawBorder: false,
+            display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
+          },
+          ticks: {
+            display: true,
+            color: '#98999a',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              style: 'normal',
+              lineHeight: 2
+            },
+          }
+        },
+      },
+    },
+  });
+
+  var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
+
+  var chartThree = new Chart(ctx3, {
+    type: "line",
+    data: {
+      labels: ["", "", "", "", "", "", "", "", "Now"],
+      datasets: [{
+        label: "",
+        tension: .2,
+        borderWidth: 0,
+        pointRadius: 0,
+        pointBackgroundColor: "rgba(60, 60, 60, .8)",
+        pointBorderColor: "transparent",
+        borderColor: "rgba(60, 60, 60, .8)",
+        borderWidth: 3,
+        backgroundColor: "transparent",
+        fill: true,
+        data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
+      scales: {
+        y: {
+          grid: {
+            drawBorder: false,
+            display: true,
+            drawOnChartArea: true,
+            drawTicks: false,
+            borderDash: [1, 0],
+            color: 'rgba(180, 180, 180, .2)'
+          },
+          ticks: {
+            display: true,
+            padding: 10,
+            color: '#98999a',
+            font: {
+              size: 14,
+              weight: 300,
+              style: 'normal',
+              lineHeight: 2
+            },
+          }
+        },
+        x: {
+          grid: {
+            drawBorder: false,
+            display: false,
+            drawOnChartArea: false,
+            drawTicks: false,
+            borderDash: [5, 5]
+          },
+          ticks: {
+            display: true,
+            color: '#98999a',
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 300,
+              style: 'normal',
+              lineHeight: 2
+            },
+          }
+        },
+      },
+    },
+  });
+  //var target_output = document.getElementById("learn_output");
+  //var target_output2 = document.getElementById("learn_output2");
+  //var target_output3 = document.getElementById("learn_output3");
+  var table_output = document.getElementById("updating_table");
+  //var learn_update = new EventSource("/learn");
+  //var learn_update2 = new EventSource("/learn2");
+  //var learn_update3 = new EventSource("/model-updates");
+  var table_update = new EventSource("/model-updates");
+ 
+  //learn_update.onmessage = function (e) {
+  //    if (e.data == "close") {
+  //        learn_update.close();
+  //    } else {
+  //        target_output.innerHTML = "Status: " + e.data;
+  //    }
+  //};
+  //learn_update2.onmessage = function (e) {
+  //    if (e.data == "close") {
+  //        target_output2.innerHTML = "All DONE!";
+  //        learn_update2.close();
+  //    } else {
+  //        target_output2.innerHTML = "Status: " + e.data;
+  //    }
+  //};
+  //learn_update3.onmessage = function (e) {
+  //  if (e.data == "close") {
+  //    target_output3.innerHTML = "All DONE!";
+  //    learn_update3.close();
+  //  } else {
+  //    console.log('TEST');
+  //    console.log(e.data);
+  //    target_output3.innerHTML = "Status: " + e.data;
+  //  }
+  //};
+  table_update.onmessage = function (e) {
+    if (e.data == "close") {
+      table_update.close();
+    } else {
+      const streamOverview = JSON.parse(e.data);
+      var rows = [];
+      for (var i=0; i<streamOverview.length; i++) {
+        rows.push(`
+        <tr class='yellow-hover' onmouseenter="setData(chartOne,[` + streamOverview[i]["predictions"] + `]);setData(chartTwo,[4,3,2,1]);setData(chartThree,[` + streamOverview[i]["values"] + `]);">
+          <td>
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">` + streamOverview[i]["source"] + `</h6>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">` + streamOverview[i]["stream"] + `</h6>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">` + streamOverview[i]["target"] + `</h6>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">` + streamOverview[i]["value"] + `</h6>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">` + streamOverview[i]["prediction"] + `</h6>
+            </div>
+          </td>                                                                
+        </tr>`);
+      }
+      table_output.innerHTML = rows.join("");
+    }
+  };
+</script>
+
 {% endblock %}
 
 
