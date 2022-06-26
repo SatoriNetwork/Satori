@@ -63,7 +63,7 @@ def getWallet():
 ###############################################################################
 
 # development flags
-full = True # just web or everything
+full = False # just web or everything
 debug = True
 
 # singletons
@@ -161,7 +161,11 @@ def edit_configuration():
         edit_configuration.dataPath.data = satori.config.dataPath()
         edit_configuration.modelPath.data = satori.config.modelPath()
         edit_configuration.defaultSource.data = satori.config.defaultSource()
-        return render_template('forms/config.html', **{'edit_configuration': edit_configuration})
+        edit_configuration.electrumxServers.data = satori.config.electrumxServers()
+        resp = {
+            'title': 'Configuration',
+            'edit_configuration': edit_configuration}
+        return render_template('forms/config.html', **resp)
 
     def accept_submittion(edit_configuration):
         data = {}
@@ -175,6 +179,8 @@ def edit_configuration():
             data = {**data, **{satori.config.verbose('modelPath'): edit_configuration.modelPath.data}}
         if edit_configuration.defaultSource.data not in ['', None, satori.config.defaultSource()]:
             data = {**data, **{satori.config.verbose('defaultSource'): edit_configuration.defaultSource.data}}
+        if edit_configuration.electrumxServers.data not in ['', None, satori.config.electrumxServers()]:
+            data = {**data, **{satori.config.verbose('electrumxServers'): edit_configuration.electrumxServers.data}}
         satori.config.modify(data=data)
         return redirect('/dashboard')
 

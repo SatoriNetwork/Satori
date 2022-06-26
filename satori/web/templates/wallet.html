@@ -28,40 +28,39 @@
           <p class="text-sm mb-3">wallet address</p>
         </center>
       </a>
-        <hr class="dark horizontal my-3">
-        <center>
-          <p id="show" class="danger text-sm mb-2" onclick="document.getElementById('sensitive').style.display='block';document.getElementById('show').style.display='none';">
-            show Private Key
-          </p>
-          <div id="sensitive" style="display: none;">
-            <p class="text-sm mb-2" onclick="document.getElementById('show').style.display='block';document.getElementById('sensitive').style.display='none';">hide Private Key</p>
-            {{ wallet.privateKey }}
-          </div>
-        </center>
+      <hr class="dark horizontal my-3">
+      <center>
+        <p id="show" class="danger text-sm mb-2" onclick="document.getElementById('sensitive').style.display='block';document.getElementById('show').style.display='none';">
+          show Private Key
+        </p>
+        <div id="sensitive" style="display: none;">
+          <p class="text-sm mb-2" onclick="document.getElementById('show').style.display='block';document.getElementById('sensitive').style.display='none';">hide Private Key</p>
+          {{ wallet.privateKey }}
+        </div>
+      </center>
     </div>
   </div>
   <div class="col-xl-6 col-sm-6">
     <div class="card">
-      <div class="card-header p-3 pt-2">
+      <div class="card-header p-3 pt-2" style='height: 597px;'>
         <div class="icon icon-lg icon-shape bg-gradient-less-drastic-reverse shadow-drastic text-center border-radius-xl mt-n4 position-absolute">
           <i class="material-icons opacity-10">send</i>
         </div>
         <div class="text-end pt-1">
           <h4 class="mb-0">Send</h4>
         </div>
-        <div class="text-center pt-1">
-          <h4 class="mb-0">coming soon!</h4>
+        <div class="text-center pt-1" style="padding-top: 15rem !important;">
+          <h4 class="mb-0">coming soon</h4>
           <p class="text-sm mb-0 "></p>
         </div>
       </div>
       <hr class="dark horizontal my-0">
       <div class="card-footer p-1">
-        <p class="mb-0"><span class="text-success text-sm font-weight-bolder">...</span>Submit</p>
+        <center><p class="mb-1"><span class="text-success text-sm font-weight-bolder"></span>to send Satori tokens, please download and import your private key into a <a href='https://ravencoin.org/wallet/' target='_blank'>Ravencoin wallet</a> such as <a href='https://moontree.com/'>Moontree</a></p></center>
       </div>
     </div>
   </div>
 </div>
-</>
 <div class="row mb-4">
   <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
     <div class="card">

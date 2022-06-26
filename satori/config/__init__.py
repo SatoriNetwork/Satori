@@ -16,7 +16,7 @@ def verbose(name: str):
     if name == 'dataPath': return 'absolute data path'
     if name == 'modelPath': return 'absolute model path'
     if name == 'walletPath': return 'absolute wallet path'
-    if name == 'defaultSource': return 'default source of data streams'
+    if name == 'defaultSource': return 'default data streams source'
     if name == 'electrumxServers': return 'electrumx servers'
 
 def manifest(): 
