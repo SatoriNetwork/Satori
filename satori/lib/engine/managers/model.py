@@ -97,15 +97,13 @@ class ModelManager:
         self.stable.build()
 
     def overview(self):
-        print('DATA')
-        print(self.data.dropna().loc[:, (self.sourceId, self.streamId, self.targetId)].values.tolist()[-100:])
         return {
             'source': self.sourceId,
             'stream': self.streamId, 
             'target': self.targetId, 
             'value': self.stable.current.values[0][0] if hasattr(self.stable, 'current') else '',
             'prediction': self.stable.prediction if hasattr(self.stable, 'prediction') else '',
-            'values': self.data.dropna().loc[:, (self.sourceId, self.streamId, self.targetId)].values.tolist()[-100:],
+            'values': self.data.dropna().loc[:, (self.sourceId, self.streamId, self.targetId)].values.tolist()[-20:],
             'predictions': [.9,.8,1,.6,.9,.5,.6,.8,1.1],
             # this isn't the accuracy we really care about (historic accuracy), 
             # it's accuracy of this current model on historic data.

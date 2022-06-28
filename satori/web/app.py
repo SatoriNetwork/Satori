@@ -222,45 +222,12 @@ def dashboard():
     return render_template('dashboard.html', **resp)
 
 
-@app.route('/learn')
-def learn():
-    def update():
-        yield 'data: Prepare for learning\n\n'
-        # Preapre model
-        time.sleep(1.0)
-    
-
-        for i in range(1, 101):
-            # Perform update
-            time.sleep(0.1)
-            yield f'data: {i}%\n\n'
-
-        yield 'data: close\n\n'
-
-    import time
-    return Response(update(), mimetype='text/event-stream')
-
-@app.route('/learn2')
-def learn2():
-    def update():
-        yield 'data: Prepare for learning\n\n'
-        # Preapre model
-        time.sleep(10.0)
-        for i in range(1, 101):
-            # Perform update
-            time.sleep(0.01)
-            yield f'data: {i}%\n\n'
-
-        yield 'data: close\n\n'
-
-    import time
-    return Response(update(), mimetype='text/event-stream')
-
 class StreamsOverview():
     
     def __init__(self, engine):
         self.engine = engine
         self.overview = [{'source': '-', 'stream': '-', 'target':'-', 'subscribers':'-', 'accuracy': '-', 'prediction': '-', 'value': '-', 'values': [3,2,1], 'predictions': [3,2,1]}]
+        self.demo = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'99', 'accuracy': [.5,.7,.8,.85,.87,.9,.91,.92,.93], 'prediction': 15.25, 'value': 15, 'values': [12,13,12.5,13.25,14,13.5,13.4,13.7,14.2,13.5,14.5,14.75,14.6,15.1], 'predictions': [3,2,1]}]
         self.viewed = False
     
     def setIt(self):
@@ -277,15 +244,19 @@ def modelUpdates():
         listeners = [] 
         #listeners.append(Engine.data.newData.subscribe(
         #    lambda x: streamsOverview.setIt() if x is not None else None))    
-        for model in Engine.models:
-            listeners.append(model.predictionUpdate.subscribe(lambda x: streamsOverview.setIt() if x is not None else None))
-        while True:
-            if streamsOverview.viewed:
-                time.sleep(1)
-            else: 
-                # parse it out here?
-                yield "data: " + str(streamsOverview.overview).replace("'", '"') + "\n\n"
-                streamsOverview.setViewed()
+        if Engine is not None: 
+            for model in Engine.models:
+                listeners.append(model.predictionUpdate.subscribe(lambda x: streamsOverview.setIt() if x is not None else None))
+            while True:
+                if streamsOverview.viewed:
+                    time.sleep(1)
+                else: 
+                    # parse it out here?
+                    yield "data: " + str(streamsOverview.overview).replace("'", '"') + "\n\n"
+                    streamsOverview.setViewed()
+        else:
+            yield "data: " + str(streamsOverview.demo).replace("'", '"') + "\n\n"
+            
                     
     import time
     return Response(update(), mimetype='text/event-stream')

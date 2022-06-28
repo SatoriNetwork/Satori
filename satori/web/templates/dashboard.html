@@ -118,8 +118,8 @@
         </div>
       </div>
       <div class="card-body">
-        <h6 class="mb-0" style='float:left;'>Rank</h6>
-        <p class="mb-0 text-sm" style='float:right;'><i class="material-icons text-sm my-auto me-1">schedule</i>entire history</p>
+        <h6 class="mb-0" style='float:left;'>Observations</h6>
+        <p class="mb-0 text-sm" style='float:right;'><i class="material-icons text-sm my-auto me-1">schedule</i>up to 100 most recent observations</p>
       </div>
     </div>
   </div>
@@ -132,7 +132,7 @@
           <div class="col-lg-6 col-7">
             <h6>Predictions</h6>
             <p class="text-sm mb-0">
-              This Satori Node's prediction streams
+              Streams published by this Satori Node 
             </p>
           </div>
         </div>
@@ -151,7 +151,7 @@
             </thead>
             <tbody id="updating_table">
               {% for streamOverview in streamsOverview %}
-              <tr class='yellow-hover' onmouseover="setData(chartOne,{{ streamOverview['predictions'] }});setData(chartTwo,[4,3,2,1]);setData(chartThree,[4,3,2,1]);">
+              <tr class='yellow-hover' onmouseover="setData(chartOne,{{ streamOverview['predictions'] }});setData(chartTwo,[.5,.7,.8,.85,.87,.9,.91,.92,.93]);setData(chartThree,[4,3,2,1]);">
                 <td>
                   <div class="d-flex px-3 py-1">
                     <h6 class="mb-0 text-sm">{{ streamOverview['source'] }}</h6>
@@ -282,6 +282,12 @@
     });
     chart.update();
   }
+  function addDataChartThree(label, data, prediction) {
+    chartThree.data.labels.push(label);
+    chartThree.data.datasets[0].data.push(data);
+    chartThree.data.datasets[1].data.push(prediction);
+    chartThree.update();
+  }
   function addDataChartOne() {
     addData(chartOne, '', [1]);
   }
@@ -315,7 +321,21 @@
       }
     }
   }
-
+  function setDataChartThree(data, prediction) {
+    removeAllData(chartThree);
+    let labels = [];
+    for (let x in data) {
+      labels.push('');
+      if (labels.length == data.length){
+        addDataChartThree('now', data[x], null);
+      } else {
+        addDataChartThree('', data[x], null);
+      }
+    }
+    console.log(prediction)
+    addDataChartThree('next', null, prediction);
+  }
+  
   var ctx = document.getElementById("chart-bars").getContext("2d");
   var chartOne = new Chart(ctx, {
     type: "bar",
@@ -477,7 +497,7 @@
   var chartThree = new Chart(ctx3, {
     type: "line",
     data: {
-      labels: ["", "", "", "", "", "", "", "", "Now"],
+      labels: ["", "", "", "", "", "", "", "", "", "Next"],
       datasets: [{
         label: "",
         tension: .2,
@@ -489,7 +509,19 @@
         borderWidth: 3,
         backgroundColor: "transparent",
         fill: true,
-        data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+        data: [50, 40, 300, 220, 500, 250, 400, 230, 500, null],
+      }, {
+        label: "",
+        tension: .2,
+        borderWidth: 0,
+        pointRadius: 3,
+        pointBackgroundColor: "rgba(246, 176, 66, .8)",
+        pointBorderColor: "rgba(246, 176, 66, .8)",
+        borderColor: "rgba(246, 176, 66, .8)",
+        borderWidth: 0,
+        backgroundColor: "rgba(246, 176, 66, .8)",
+        fill: true,
+        data: [null, null, null, null, null, null, null, null, null, 450],
       }],
     },
     options: {
@@ -549,40 +581,8 @@
       },
     },
   });
-  //var target_output = document.getElementById("learn_output");
-  //var target_output2 = document.getElementById("learn_output2");
-  //var target_output3 = document.getElementById("learn_output3");
   var table_output = document.getElementById("updating_table");
-  //var learn_update = new EventSource("/learn");
-  //var learn_update2 = new EventSource("/learn2");
-  //var learn_update3 = new EventSource("/model-updates");
   var table_update = new EventSource("/model-updates");
- 
-  //learn_update.onmessage = function (e) {
-  //    if (e.data == "close") {
-  //        learn_update.close();
-  //    } else {
-  //        target_output.innerHTML = "Status: " + e.data;
-  //    }
-  //};
-  //learn_update2.onmessage = function (e) {
-  //    if (e.data == "close") {
-  //        target_output2.innerHTML = "All DONE!";
-  //        learn_update2.close();
-  //    } else {
-  //        target_output2.innerHTML = "Status: " + e.data;
-  //    }
-  //};
-  //learn_update3.onmessage = function (e) {
-  //  if (e.data == "close") {
-  //    target_output3.innerHTML = "All DONE!";
-  //    learn_update3.close();
-  //  } else {
-  //    console.log('TEST');
-  //    console.log(e.data);
-  //    target_output3.innerHTML = "Status: " + e.data;
-  //  }
-  //};
   table_update.onmessage = function (e) {
     if (e.data == "close") {
       table_update.close();
@@ -591,7 +591,7 @@
       var rows = [];
       for (var i=0; i<streamOverview.length; i++) {
         rows.push(`
-        <tr class='yellow-hover' onmouseenter="setData(chartOne,[` + streamOverview[i]["predictions"] + `]);setData(chartTwo,[4,3,2,1]);setData(chartThree,[` + streamOverview[i]["values"] + `]);">
+        <tr class='yellow-hover' onmouseenter="setData(chartOne,[` + streamOverview[i]["predictions"] + `]);setData(chartTwo,[.5,.7,.8,.85,.87,.9,.91,.92,.93]);setDataChartThree([` + streamOverview[i]["values"] + `], ` + streamOverview[i]["prediction"] + `);">
           <td>
             <div class="d-flex px-3 py-1">
               <h6 class="mb-0 text-sm">` + streamOverview[i]["source"] + `</h6>
