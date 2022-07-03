@@ -44,17 +44,26 @@
                 </div>
               </p><br />
               <p>
+                <div class="input-group input-group-outline" onmouseover="walletPathMessage();">
+                  <label class="form-label">{{ edit_configuration.walletPath.label }}</label>
+                  {{ edit_configuration.walletPath(size=32, class_="form-control") }}
+                </div>
+              </p><br />
+              <!-- not necessary to show yet, involves some other setup to make it work right.
+                <p>
                 <div class="input-group input-group-outline" onmouseover="defaultSourceMessage();">
                   <label class="form-label">{{ edit_configuration.defaultSource.label }}</label>
                   {{ edit_configuration.defaultSource(size=3, class_="form-control") }}
                 </div>
-              </p><br />
+              </p><br />-->    
+              <!--  haven't made ability to save chocies to yaml, 
+                    and this isn't right as is, it needs to allow users to add or remove servers.
               <p>
                 <div class="input-group input-group-outline" onmouseover="electrumxServersMessage();">
                   <label class="form-label">{{ edit_configuration.electrumxServers.label }}</label>
                   {{ edit_configuration.electrumxServers(size=3, class_="form-control") }}
                 </div>
-              </p>    
+              </p>-->    
             </div>
           </div>
           <div class="card-footer p-1">
@@ -117,6 +126,12 @@
       var warningArea = document.getElementById("warningArea");
       helpArea.innerHTML = "The absolute model path is the full path of the folder where models are saved.";
       warningArea.innerHTML = "WARNING: Do not modify this value unless you know what you're doing.";
+    }
+    function walletPathMessage() {
+      var helpArea = document.getElementById("helpArea");
+      var warningArea = document.getElementById("warningArea");
+      helpArea.innerHTML = "The absolute wallet path is the full path of the folder where your wallet details are saved. Do not allow anyone else to have access to this directory.";
+      warningArea.innerHTML = "WARNING: Keep it secret, keep it safe. Do not modify this value unless you know what you're doing.";
     }
     function defaultSourceMessage() {
       var helpArea = document.getElementById("helpArea");

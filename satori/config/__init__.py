@@ -32,7 +32,7 @@ def modify(data: dict):
     for line in read():
         key = extractKey(line)
         if key in data.keys():
-            replacement.append(f'{key}: {data[key]}')
+            replacement.append(f'{key}: {data[key]}\n')
         else:
             replacement.append(line)
     write(lines=replacement)

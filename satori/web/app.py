@@ -160,6 +160,7 @@ def edit_configuration():
         edit_configuration.nodejsPort.data = satori.config.nodejsPort()
         edit_configuration.dataPath.data = satori.config.dataPath()
         edit_configuration.modelPath.data = satori.config.modelPath()
+        edit_configuration.walletPath.data = satori.config.walletPath()
         edit_configuration.defaultSource.data = satori.config.defaultSource()
         edit_configuration.electrumxServers.data = satori.config.electrumxServers()
         resp = {
@@ -177,10 +178,12 @@ def edit_configuration():
             data = {**data, **{satori.config.verbose('dataPath'): edit_configuration.dataPath.data}}
         if edit_configuration.modelPath.data not in ['', None, satori.config.modelPath()]:
             data = {**data, **{satori.config.verbose('modelPath'): edit_configuration.modelPath.data}}
+        if edit_configuration.walletPath.data not in ['', None, satori.config.walletPath()]:
+            data = {**data, **{satori.config.verbose('walletPath'): edit_configuration.walletPath.data}}
         if edit_configuration.defaultSource.data not in ['', None, satori.config.defaultSource()]:
             data = {**data, **{satori.config.verbose('defaultSource'): edit_configuration.defaultSource.data}}
         if edit_configuration.electrumxServers.data not in ['', None, satori.config.electrumxServers()]:
-            data = {**data, **{satori.config.verbose('electrumxServers'): edit_configuration.electrumxServers.data}}
+            data = {**data, **{satori.config.verbose('electrumxServers'): [edit_configuration.electrumxServers.data]}}
         satori.config.modify(data=data)
         return redirect('/dashboard')
 
