@@ -26,8 +26,8 @@ import satori
 import requests
 import pandas as pd
 import datetime as dt
-from flask import Flask, url_for, render_template, redirect, jsonify
-from flask import send_from_directory, session, request, flash, Markup
+from flask import Flask, url_for, render_template, redirect, jsonify, send_file
+from flask import send_from_directory, session, request, flash, Markup, Response
 #from flask_mobility import Mobility
 from waitress import serve
 import webbrowser
@@ -36,23 +36,8 @@ from satori.lib.engine.structs import Observation
 
 
 ###############################################################################
-## Globals ####################################################################
+## Helpers ####################################################################
 ###############################################################################
-
-# development flags
-full = True # just web or everything
-debug = False
-
-# singletons
-Connection = None
-Engine = None
-app = Flask(__name__)
-
-app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
-if full:
-    Connection = satori.start.establishConnection()
-    Engine = satori.start.getEngine(Connection)
-    Engine.run()
 
 def spoofStreamer():
     thread = threading.Thread(target=satori.spoof.Streamr(
@@ -65,6 +50,34 @@ def spoofStreamer():
         streamId='simpleEURCleanedC',
     ).run, daemon=True)
     thread.start()
+
+def getWallet():
+    from satori.lib.wallet import Wallet
+    wallet = Wallet()
+    wallet.init()
+    return wallet
+
+
+###############################################################################
+## Globals ####################################################################
+###############################################################################
+
+# development flags
+full = False # just web or everything
+debug = True
+
+# singletons
+Connection = None
+Engine = None
+Wallet = getWallet()
+app = Flask(__name__)
+
+app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
+if full:
+    Wallet = getWallet()
+    Connection = satori.start.establishConnection()
+    Engine = satori.start.getEngine(Connection)
+    Engine.run()
 
 ###############################################################################
 ## Functions ##################################################################
@@ -147,8 +160,13 @@ def edit_configuration():
         edit_configuration.nodejsPort.data = satori.config.nodejsPort()
         edit_configuration.dataPath.data = satori.config.dataPath()
         edit_configuration.modelPath.data = satori.config.modelPath()
+        edit_configuration.walletPath.data = satori.config.walletPath()
         edit_configuration.defaultSource.data = satori.config.defaultSource()
-        return render_template('forms/config.html', **{'edit_configuration': edit_configuration})
+        edit_configuration.electrumxServers.data = satori.config.electrumxServers()
+        resp = {
+            'title': 'Configuration',
+            'edit_configuration': edit_configuration}
+        return render_template('forms/config.html', **resp)
 
     def accept_submittion(edit_configuration):
         data = {}
@@ -160,8 +178,12 @@ def edit_configuration():
             data = {**data, **{satori.config.verbose('dataPath'): edit_configuration.dataPath.data}}
         if edit_configuration.modelPath.data not in ['', None, satori.config.modelPath()]:
             data = {**data, **{satori.config.verbose('modelPath'): edit_configuration.modelPath.data}}
+        if edit_configuration.walletPath.data not in ['', None, satori.config.walletPath()]:
+            data = {**data, **{satori.config.verbose('walletPath'): edit_configuration.walletPath.data}}
         if edit_configuration.defaultSource.data not in ['', None, satori.config.defaultSource()]:
             data = {**data, **{satori.config.verbose('defaultSource'): edit_configuration.defaultSource.data}}
+        if edit_configuration.electrumxServers.data not in ['', None, satori.config.electrumxServers()]:
+            data = {**data, **{satori.config.verbose('electrumxServers'): [edit_configuration.electrumxServers.data]}}
         satori.config.modify(data=data)
         return redirect('/dashboard')
 
@@ -192,13 +214,74 @@ def dashboard():
         (access to all predictions and the truth)
     '''
     if Engine is None:
-        streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00'}]
+        streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00', 'predictions': [2,3,1]}]
     else:
         streamsOverview = [model.overview() for model in Engine.models]
     resp = {
+        'title': 'Dashboard',
+        'wallet': Wallet,
         'streamsOverview': streamsOverview,
         'configOverrides': satori.config.get()}
     return render_template('dashboard.html', **resp)
+
+
+class StreamsOverview():
+    
+    def __init__(self, engine):
+        self.engine = engine
+        self.overview = [{'source': '-', 'stream': '-', 'target':'-', 'subscribers':'-', 'accuracy': '-', 'prediction': '-', 'value': '-', 'values': [3,2,1], 'predictions': [3,2,1]}]
+        self.demo = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'99', 'accuracy': [.5,.7,.8,.85,.87,.9,.91,.92,.93], 'prediction': 15.25, 'value': 15, 'values': [12,13,12.5,13.25,14,13.5,13.4,13.7,14.2,13.5,14.5,14.75,14.6,15.1], 'predictions': [3,2,1]}]
+        self.viewed = False
+    
+    def setIt(self):
+        self.overview = [model.overview() for model in self.engine.models]
+        self.viewed = False
+
+    def setViewed(self):
+        self.viewed = True
+    
+@app.route('/model-updates')
+def modelUpdates():
+    def update():
+        streamsOverview = StreamsOverview(Engine)
+        listeners = [] 
+        #listeners.append(Engine.data.newData.subscribe(
+        #    lambda x: streamsOverview.setIt() if x is not None else None))    
+        if Engine is not None: 
+            for model in Engine.models:
+                listeners.append(model.predictionUpdate.subscribe(lambda x: streamsOverview.setIt() if x is not None else None))
+            while True:
+                if streamsOverview.viewed:
+                    time.sleep(1)
+                else: 
+                    # parse it out here?
+                    yield "data: " + str(streamsOverview.overview).replace("'", '"') + "\n\n"
+                    streamsOverview.setViewed()
+        else:
+            yield "data: " + str(streamsOverview.demo).replace("'", '"') + "\n\n"
+            
+                    
+    import time
+    return Response(update(), mimetype='text/event-stream')
+
+@app.route('/wallet')
+def wallet():
+    Wallet.get(allWalletInfo=True)
+    import io
+    import qrcode
+    from base64 import b64encode
+    img = qrcode.make(Wallet.address)
+    buf = io.BytesIO()
+    img.save(buf)
+    buf.seek(0)
+    #return send_file(buf, mimetype='image/jpeg')
+    img = b64encode(buf.getvalue()).decode('ascii')
+    img_tag = f'<img src="data:image/jpg;base64,{img}" class="img-fluid"/>'
+    resp = {
+        'title':'Wallet',
+        'image': img_tag,
+        'wallet': Wallet}
+    return render_template('wallet.html', **resp) 
 
 ###############################################################################
 ## Routes - subscription ######################################################
@@ -241,7 +324,8 @@ def update():
     so we can call .on_next() here to pass along the update got here from the 
     Streamr LightClient, and trigger a new prediction.
     '''
-    print('POSTJSON:', request.json)
+    #print('POSTJSON:', request.json)
+    print('POSTJSON...')
     x = Observation(request.json)
     Engine.data.newData.on_next(x)
     

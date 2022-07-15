@@ -16,16 +16,18 @@ from reactivex.subject import BehaviorSubject
 from sklearn.exceptions import NotFittedError
 
 from satori import config
-from satori.lib.apis import disk, memory
 from satori.lib.engine.structs import HyperParameter, SourceStreamTargets
 from satori.lib.engine.model.pilot import PilotModel
 from satori.lib.engine.model.stable import StableModel
-
+from satori.lib.engine.interfaces.model import ModelDataDiskApi
+from satori.lib.engine.interfaces.model import ModelMemoryApi
 
 class ModelManager:
 
     def __init__(
         self,
+        disk:ModelDataDiskApi=None,
+        memory:ModelMemoryApi=None,
         modelPath:str=None,
         hyperParameters:'list(HyperParameter)'=None,
         metrics:dict=None,
@@ -57,6 +59,8 @@ class ModelManager:
         split: train test split percentage or count
         override: override the existing model saved to disk if there is one
         '''
+        self.disk = disk
+        self.memory = memory
         self.sourceId = sourceId
         self.streamId = streamId
         self.targetId = targetId
@@ -99,6 +103,8 @@ class ModelManager:
             'target': self.targetId, 
             'value': self.stable.current.values[0][0] if hasattr(self.stable, 'current') else '',
             'prediction': self.stable.prediction if hasattr(self.stable, 'prediction') else '',
+            'values': self.data.dropna().loc[:, (self.sourceId, self.streamId, self.targetId)].values.tolist()[-20:],
+            'predictions': [.9,.8,1,.6,.9,.5,.6,.8,1.1],
             # this isn't the accuracy we really care about (historic accuracy), 
             # it's accuracy of this current model on historic data.
             'accuracy': f'{str(self.stableScore*100)[0:5]} %' if hasattr(self, 'stableScore') else '', 
@@ -142,7 +148,7 @@ class ModelManager:
             self.data = self.data if self.data is not None else pd.DataFrame(
                 {x: [] for x in SourceStreamTargets.combine(self.targets)})
     
-        self.data = disk.Api().gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
+        self.data = self.disk.gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
         handleEmpty()
 
     ### TARGET ####################################################################
@@ -174,7 +180,7 @@ class ModelManager:
         # not sure what this score is... r2 f1? not mae I think
         if self.stableScore < self.pilotScore:
             for param in self.stable.hyperParameters:
-                param.value = param.test
+                param.value = param.test # is this right? it looks right but I don't think the stable model ever updates from the pilot
             self.stable.chosenFeatures = self.pilot.testFeatures
             self.stable.featureSet = self.pilot.testFeatureSet
             self.save()
@@ -185,7 +191,7 @@ class ModelManager:
 
     def save(self):
         ''' save the current model '''
-        disk.ModelApi.save(
+        self.disk.saveModel(
             self.stable.xgb,
             self.modelPath,
             self.stable.hyperParameters,
@@ -193,7 +199,7 @@ class ModelManager:
         
     def load(self): # -> bool:
         ''' loads the model - happens on init so we automatically load our progress '''
-        xgb = disk.ModelApi.load(self.modelPath)
+        xgb = self.disk.loadModel(self.modelPath)
         if xgb == False:
             return False
         if (
@@ -227,7 +233,7 @@ class ModelManager:
             makePrediction()
         
         def makePredictionFromNewInputs(incremental):
-            self.data = memory.appendInsert(
+            self.data = self.memory.appendInsert(
                 df=self.data, 
                 incremental=incremental)
             makePrediction()
@@ -237,7 +243,7 @@ class ModelManager:
                 if col not in self.data.columns:
                     incremental = incremental.drop(col, axis=1)
             #incremental.columns = ModelManager.addFeatureLevel(df=incremental)
-            self.data = memory.appendInsert(
+            self.data = self.memory.appendInsert(
                 df=self.data, 
                 incremental=incremental)
             makePrediction(isTarget=True)

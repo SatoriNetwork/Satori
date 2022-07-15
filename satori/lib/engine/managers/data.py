@@ -39,19 +39,20 @@ Basic Reponsibilities of the DataManager:
 import datetime as dt
 from reactivex.subject import BehaviorSubject
 from satori import config
+from satori.lib.engine.interfaces.data import DataDiskApi
 
 from satori.lib.engine.structs import Observation, SourceStreamTargetMap, SourceStreamMap
-from satori.lib.apis import disk
 
 class DataManager:
 
-    def __init__(self):
+    def __init__(self, disk:DataDiskApi=None):
         # dictionary of source, streams, and their latest incremental
         self.targets = SourceStreamMap() # must be initialized with keys otherwise we'll post partial predictions
         # dictionary of source, stream, targets and their latest predictions
         self.predictions = SourceStreamTargetMap() # must be initialized with keys otherwise we'll post partial predictions
         self.listeners = []
         self.newData = BehaviorSubject(None)
+        self.disk = disk
 
     def importance(self, inputs:dict = None):
         inputs = inputs or {}
@@ -107,13 +108,16 @@ class DataManager:
         
             def saveIncremental():
                 ''' save these observations to the right parquet file on disk '''
-                disk.Api(source=observation.sourceId, stream=observation.streamId).append(observation.df.copy())
+                self.disk.setAttributes(source=observation.sourceId, stream=observation.streamId).append(observation.df.copy())
             
             def compress():
                 ''' compress if the number of incrementals is high '''
-                x = disk.Api(source=observation.sourceId, stream=observation.streamId)
-                if len(x.incrementals()) > 100:
-                    x.compress()
+                self.disk.setAttributes(source=observation.sourceId, stream=observation.streamId)
+                if len(self.disk.incrementals()) > 100:
+                    try:
+                        self.disk.compress()
+                    except Exception:
+                        pass
                 
             def tellModels():
                 ''' tell the modesl that listen to this stream and these targets '''
@@ -161,12 +165,11 @@ class DataManager:
                 return True
             
             def post():
+                ''' here we save prediction to disk, but that'll change once we can post it somewhere '''
                 if self.predictions.isFilled(key=model.key()):
                     for k, v in self.predictions.getAll(key=model.key()):
                         path = config.root('..', 'predictions', k[0], k[1], k[2] + '.txt')
-                        disk.safetify(path)
-                        with open(path, 'a') as f:
-                            f.write(f'{str(dt.datetime.now())} | {k} | {v}\n')
+                        self.disk.savePrediction(path=path, prediction=f'{str(dt.datetime.now())} | {k} | {v}\n')
                     self.predictions.erase(key=model.key())
                     
             remember()
