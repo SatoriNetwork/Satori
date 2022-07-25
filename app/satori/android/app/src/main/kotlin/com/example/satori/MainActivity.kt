@@ -1,4 +1,4 @@
-package com.example.satori
+package com.satorinetio.satori
 
 import io.flutter.embedding.android.FlutterActivity
 

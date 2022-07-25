@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.satori">
+    package="com.satorinetio.satori">
    <application
-        android:label="satori"
+        android:label="Satori"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
