@@ -20,6 +20,7 @@ sdist/
 var/
 data/
 models/
+wallet*.yaml
 wallet.yaml
 wheels/
 pip-wheel-metadata/
