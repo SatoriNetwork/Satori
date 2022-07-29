@@ -24,3 +24,9 @@ flask_wtf==1.0.1
 python-ravencoinlib==0.2.2
 # grappler
 base58==2.1.1
+# needed for signing messages 
+Crypto==1.4.1
+# needed for Crypto
+Naked==0.1.31 
+# needed for Crypto 
+shellescape==3.8.1

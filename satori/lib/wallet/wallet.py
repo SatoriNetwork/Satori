@@ -4,6 +4,7 @@ from satori.lib.apis.ravencoin import Ravencoin
 from satori.lib.apis.disk import WalletApi
 import ravencoin.base58
 from ravencoin.wallet import P2PKHRavencoinAddress, CRavencoinSecret
+import mnemonic
 
 class Wallet():
     
@@ -11,57 +12,78 @@ class Wallet():
         self._entropy = None
         self._privateKeyObj = None
         self._addressObj = None
+        self.publicKey = None
+        self.privateKey = None
+        self.words = None
         self.address = None
         self.scripthash = None
-        self.privateKey = None
-        self.balance = None
         self.stats = None
         self.banner = None
         self.rvn = None
+        self.balance = None
         self.transactionHistory = None
         self.transactions = [] # TransactionStruct
     
     def __repr__(self):
         return f'''Wallet(
+    publicKey: {self.publicKey}
+    privateKey: {self.privateKey}
+    words: {self.words}
     address: {self.address}
     scripthash: {self.scripthash}
-    privateKey: {self.privateKey}
     balance: {self.balance}
     stats: {self.stats}
     banner: {self.banner})'''
     
     def init(self):
         ''' try to load, else generate and save '''
-        self.load()
-        if (self.address == None):
+        if self.load():
+            self.regenerate()
+        else:
             self.generate()
             self.save()
-        # temp
-        self.scripthash = self._generateScripthash()            
         self.get()
 
     def load(self):
         wallet = WalletApi.load(
             walletPath=config.walletPath('wallet.yaml'))
-        self.scripthash = wallet['scripthash']
-        self.address = wallet['address']
-        self.privateKey = wallet['privateKey']
+        if wallet == False:
+            return False
+        self._entropy = wallet.get('entropy')
+        self.publicKey = wallet.get('publicKey')
+        self.privateKey = wallet.get('privateKey')
+        self.words = wallet.get('words')
+        self.address = wallet.get('address')
+        self.scripthash = wallet.get('scripthash')
+        if self._entropy is None:
+            return False
+        return True
 
     def save(self):
         WalletApi.save(
             wallet={
-                'scripthash': self.scripthash,
+                'entropy': self._entropy,
+                'publicKey': self.publicKey,
+                'privateKey': self.privateKey,
+                'words': self.words,
                 'address': self.address,
-                'privateKey': self.privateKey},
+                'scripthash': self.scripthash,
+                },
             walletPath=config.walletPath('wallet.yaml'))
 
+    def regenerate(self):
+        self.generate()
+        
     def generate(self):
-        self._entropy = self._generateEntropy()
+        self._entropy = self._entropy or self._generateEntropy()
         self._privateKeyObj = self._generatePrivateKey()
         self._addressObj = self._generateAddress()
-        self.address = str(self._addressObj)
-        self.scripthash = self._generateScripthash()
-        self.privateKey = str(self._privateKeyObj)
+        self.words = self.words or self._generateWords()
+        self.privateKey = self.privateKey or str(self._privateKeyObj)
+        self.publicKey = self.publicKey or self._privateKeyObj.pub.hex()
+        self.address = self.address or str(self._addressObj)
+        self.scripthash = self.scripthash or self._generateScripthash()
+
 
     def _generateScripthash(self):
         # possible shortcut:
@@ -81,7 +103,11 @@ class Wallet():
         return scripthash(self.address);
 
     def _generateEntropy(self):
+        #return m.to_entropy(m.generate())
         return os.urandom(32)
+
+    def _generateWords(self):
+        return mnemonic.Mnemonic('english').to_mnemonic(self._entropy)
 
     def _generatePrivateKey(self):
         ravencoin.SelectParams('mainnet')
