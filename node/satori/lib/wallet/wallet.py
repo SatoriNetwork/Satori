@@ -2,6 +2,7 @@ import os
 from satori import config
 from satori.lib.apis.ravencoin import Ravencoin
 from satori.lib.apis.disk import WalletApi
+from satori.lib.wallet import sign
 import ravencoin.base58
 from ravencoin.wallet import P2PKHRavencoinAddress, CRavencoinSecret
 import mnemonic
@@ -160,4 +161,9 @@ class Wallet():
         self.rvn = x.rvn
         self.transactionHistory = x.transactionHistory
         self.transactions = x.transactions
-        
+    
+    def sign(self, message:str):
+        return sign.signMessage(self._privateKeyObj, sign.Message(message))
+    
+    def verify(self, message:str, sig:bytes):
+        return sign.verifyMessage(self.address, sign.Message(message), sig)    
