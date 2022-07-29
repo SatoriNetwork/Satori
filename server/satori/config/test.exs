@@ -1,5 +1,8 @@
 import Config
 
+# Only in tests, remove the complexity from the password hashing algorithm
+config :bcrypt_elixir, :log_rounds, 1
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
@@ -17,7 +20,7 @@ config :satori, Satori.Repo,
 # you can enable the server option below.
 config :satori, SatoriWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "po+3bNcrXH7eBpLgNzI2Jr1HWheC0kITBseeQolehKSTr75lYhkQ7BrDOta8U4D+",
+  secret_key_base: "E2oQbfWKLe7lXDKtHj5JWM2jv1Zo5nmx5GAH1x3AzdxDFavJJ2zC38TNhVpXtu5S",
   server: false
 
 # In test we don't send emails.

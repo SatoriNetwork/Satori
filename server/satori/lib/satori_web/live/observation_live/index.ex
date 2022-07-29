@@ -1,12 +1,12 @@
 defmodule SatoriWeb.ObservationLive.Index do
   use SatoriWeb, :live_view
 
-  alias Satori.Stream
-  alias Satori.Stream.Observation
+  alias Satori.Observations
+  alias Satori.Observations.Observation
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :observation_collection, list_observation())}
+    {:ok, assign(socket, :observations, list_observations())}
   end
 
   @impl true
@@ -17,7 +17,7 @@ defmodule SatoriWeb.ObservationLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Observation")
-    |> assign(:observation, Stream.get_observation!(id))
+    |> assign(:observation, Observations.get_observation!(id))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -28,19 +28,19 @@ defmodule SatoriWeb.ObservationLive.Index do
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Observation")
+    |> assign(:page_title, "Listing Observations")
     |> assign(:observation, nil)
   end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    observation = Stream.get_observation!(id)
-    {:ok, _} = Stream.delete_observation(observation)
+    observation = Observations.get_observation!(id)
+    {:ok, _} = Observations.delete_observation(observation)
 
-    {:noreply, assign(socket, :observation_collection, list_observation())}
+    {:noreply, assign(socket, :observations, list_observations())}
   end
 
-  defp list_observation do
-    Stream.list_observation()
+  defp list_observations do
+    Observations.list_observations()
   end
 end

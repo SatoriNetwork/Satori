@@ -1,6 +1,8 @@
 defmodule SatoriWeb.Router do
   use SatoriWeb, :router
 
+  import SatoriWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +10,7 @@ defmodule SatoriWeb.Router do
     plug :put_root_layout, {SatoriWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
@@ -18,13 +21,6 @@ defmodule SatoriWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-
-    live "/observation", ObservationLive.Index, :index
-    live "/observation/new", ObservationLive.Index, :new
-    live "/observation/:id/edit", ObservationLive.Index, :edit
-
-    live "/observation/:id", ObservationLive.Show, :show
-    live "/observation/:id/show/edit", ObservationLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
@@ -59,5 +55,83 @@ defmodule SatoriWeb.Router do
 
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  ## Authentication routes
+
+  scope "/", SatoriWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/users/register", UserRegistrationController, :new
+    post "/users/register", UserRegistrationController, :create
+    get "/users/log_in", UserSessionController, :new
+    post "/users/log_in", UserSessionController, :create
+    get "/users/reset_password", UserResetPasswordController, :new
+    post "/users/reset_password", UserResetPasswordController, :create
+    get "/users/reset_password/:token", UserResetPasswordController, :edit
+    put "/users/reset_password/:token", UserResetPasswordController, :update
+  end
+
+  scope "/", SatoriWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live "/devices", DeviceLive.Index, :index
+    live "/devices/new", DeviceLive.Index, :new
+    live "/devices/:id/edit", DeviceLive.Index, :edit
+    live "/devices/:id", DeviceLive.Show, :show
+    live "/devices/:id/show/edit", DeviceLive.Show, :edit
+
+    live "/observations", ObservationLive.Index, :index
+    live "/observations/new", ObservationLive.Index, :new
+    live "/observations/:id/edit", ObservationLive.Index, :edit
+    live "/observations/:id", ObservationLive.Show, :show
+    live "/observations/:id/show/edit", ObservationLive.Show, :edit
+
+    live "/streams", StreamLive.Index, :index
+    live "/streams/new", StreamLive.Index, :new
+    live "/streams/:id/edit", StreamLive.Index, :edit
+    live "/streams/:id", StreamLive.Show, :show
+    live "/streams/:id/show/edit", StreamLive.Show, :edit
+
+    live "/subscribers", SubscriberLive.Index, :index
+    live "/subscribers/new", SubscriberLive.Index, :new
+    live "/subscribers/:id/edit", SubscriberLive.Index, :edit
+    live "/subscribers/:id", SubscriberLive.Show, :show
+    live "/subscribers/:id/show/edit", SubscriberLive.Show, :edit
+
+    live "/targets", TargetLive.Index, :index
+    live "/targets/new", TargetLive.Index, :new
+    live "/targets/:id/edit", TargetLive.Index, :edit
+    live "/targets/:id", TargetLive.Show, :show
+    live "/targets/:id/show/edit", TargetLive.Show, :edit
+
+    get "/users/settings", UserSettingsController, :edit
+    put "/users/settings", UserSettingsController, :update
+    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+
+    live "/wallets", WalletLive.Index, :index
+    live "/wallets/new", WalletLive.Index, :new
+    live "/wallets/:id/edit", WalletLive.Index, :edit
+    live "/wallets/:id", WalletLive.Show, :show
+    live "/wallets/:id/show/edit", WalletLive.Show, :edit
+  end
+
+  scope "/", SatoriWeb do
+    pipe_through [:browser]
+
+    delete "/users/log_out", UserSessionController, :delete
+    get "/users/confirm", UserConfirmationController, :new
+    post "/users/confirm", UserConfirmationController, :create
+    get "/users/confirm/:token", UserConfirmationController, :edit
+    post "/users/confirm/:token", UserConfirmationController, :update
+  end
+
+  scope "/" do
+    pipe_through :api
+
+    forward "/api", Absinthe.Plug, schema: SatoriWeb.GraphQL.Schema
+    forward "/graphiql", Absinthe.Plug.GraphiQL,
+      schema: SatoriWeb.GraphQL.Schema,
+      socket: SatoriWeb.UserSocket
   end
 end

@@ -12,14 +12,14 @@ defmodule SatoriWeb.LiveHelpers do
 
   ## Examples
 
-      <.modal return_to={Routes.observation_index_path(@socket, :index)}>
+      <.modal return_to={Routes.wallet_index_path(@socket, :index)}>
         <.live_component
-          module={SatoriWeb.ObservationLive.FormComponent}
-          id={@observation.id || :new}
+          module={SatoriWeb.WalletLive.FormComponent}
+          id={@wallet.id || :new}
           title={@page_title}
           action={@live_action}
-          return_to={Routes.observation_index_path(@socket, :index)}
-          observation: @observation
+          return_to={Routes.wallet_index_path(@socket, :index)}
+          wallet: @wallet
         />
       </.modal>
   """

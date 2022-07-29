@@ -2,11 +2,11 @@ defmodule SatoriWeb.ObservationLiveTest do
   use SatoriWeb.ConnCase
 
   import Phoenix.LiveViewTest
-  import Satori.StreamFixtures
+  import Satori.ObservationsFixtures
 
-  @create_attrs %{source_id: 42, stream_id: 42, target_id: 42, value: "some value", wallet_id: 42}
-  @update_attrs %{source_id: 43, stream_id: 43, target_id: 43, value: "some updated value", wallet_id: 43}
-  @invalid_attrs %{source_id: nil, stream_id: nil, target_id: nil, value: nil, wallet_id: nil}
+  @create_attrs %{stream_id: 42, target_id: 42, value: "some value", wallet_id: 42}
+  @update_attrs %{stream_id: 43, target_id: 43, value: "some updated value", wallet_id: 43}
+  @invalid_attrs %{stream_id: nil, target_id: nil, value: nil, wallet_id: nil}
 
   defp create_observation(_) do
     observation = observation_fixture()
@@ -16,10 +16,10 @@ defmodule SatoriWeb.ObservationLiveTest do
   describe "Index" do
     setup [:create_observation]
 
-    test "lists all observation", %{conn: conn, observation: observation} do
+    test "lists all observations", %{conn: conn, observation: observation} do
       {:ok, _index_live, html} = live(conn, Routes.observation_index_path(conn, :index))
 
-      assert html =~ "Listing Observation"
+      assert html =~ "Listing Observations"
       assert html =~ observation.value
     end
 

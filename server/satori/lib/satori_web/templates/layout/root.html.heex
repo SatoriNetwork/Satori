@@ -7,24 +7,20 @@
     <meta name="csrf-token" content={csrf_token_value()}>
     <%= live_title_tag assigns[:page_title] || "Satori", suffix: " · Phoenix Framework" %>
     <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/assets/app.css")}/>
+    <script src="//unpkg.com/alpinejs" defer></script>
     <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/assets/app.js")}></script>
   </head>
   <body>
     <header>
-      <section class="container">
-        <nav>
-          <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
-            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
-              <li><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
-            <% end %>
-          </ul>
-        </nav>
-        <a href="https://phoenixframework.org/" class="phx-logo">
-          <img src={Routes.static_path(@conn, "/images/phoenix.png")} alt="Phoenix Framework Logo"/>
-        </a>
-      </section>
+      <%= render "_user_menu.html", assigns %>
     </header>
-    <%= @inner_content %>
+
+    <%= if @conn.request_path == "/" do %>
+      <%= @inner_content %>
+    <% else %>
+      <div class="mt-16 container mx-auto px-4 sm:px-6 lg:px-8">
+        <%= @inner_content %>
+      </div>
+    <% end %>
   </body>
 </html>

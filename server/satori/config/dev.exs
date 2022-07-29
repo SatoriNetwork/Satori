@@ -2,13 +2,14 @@ import Config
 
 # Configure your database
 config :satori, Satori.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: System.get_env("DB_USERNAME"),
+  password: System.get_env("DB_PASSWORD"),
   hostname: "localhost",
   database: "satori_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
+
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -23,10 +24,11 @@ config :satori, SatoriWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "yu4NlCNE9qBZTumRjQbZSdnj6kS+pVTtPySzaCfwkiBziFiKUmz5rmDfYZrO08+4",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
+    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
 # ## SSL Support

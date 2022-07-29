@@ -15,7 +15,7 @@ config :satori, SatoriWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [view: SatoriWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Satori.PubSub,
-  live_view: [signing_salt: "CHGKg6lz"]
+  live_view: [signing_salt: "vPq92UzS"]
 
 # Configures the mailer
 #
@@ -46,6 +46,16 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+# TailwindCSS Configuration
+config :tailwind, version: "3.1.2", default: [
+  args: ~w(
+    --config=tailwind.config.js
+    --input=css/app.css
+    --output=../priv/static/assets/app.css
+  ),
+  cd: Path.expand("../assets", __DIR__)
+]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

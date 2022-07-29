@@ -1,7 +1,7 @@
 defmodule SatoriWeb.ObservationLive.Show do
   use SatoriWeb, :live_view
 
-  alias Satori.Stream
+  alias Satori.Observations
 
   @impl true
   def mount(_params, _session, socket) do
@@ -13,7 +13,7 @@ defmodule SatoriWeb.ObservationLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:observation, Stream.get_observation!(id))}
+     |> assign(:observation, Observations.get_observation!(id))}
   end
 
   defp page_title(:show), do: "Show Observation"

@@ -1,11 +1,11 @@
 defmodule SatoriWeb.ObservationLive.FormComponent do
   use SatoriWeb, :live_component
 
-  alias Satori.Stream
+  alias Satori.Observations
 
   @impl true
   def update(%{observation: observation} = assigns, socket) do
-    changeset = Stream.change_observation(observation)
+    changeset = Observations.change_observation(observation)
 
     {:ok,
      socket
@@ -17,7 +17,7 @@ defmodule SatoriWeb.ObservationLive.FormComponent do
   def handle_event("validate", %{"observation" => observation_params}, socket) do
     changeset =
       socket.assigns.observation
-      |> Stream.change_observation(observation_params)
+      |> Observations.change_observation(observation_params)
       |> Map.put(:action, :validate)
 
     {:noreply, assign(socket, :changeset, changeset)}
@@ -28,7 +28,7 @@ defmodule SatoriWeb.ObservationLive.FormComponent do
   end
 
   defp save_observation(socket, :edit, observation_params) do
-    case Stream.update_observation(socket.assigns.observation, observation_params) do
+    case Observations.update_observation(socket.assigns.observation, observation_params) do
       {:ok, _observation} ->
         {:noreply,
          socket
@@ -41,7 +41,7 @@ defmodule SatoriWeb.ObservationLive.FormComponent do
   end
 
   defp save_observation(socket, :new, observation_params) do
-    case Stream.create_observation(observation_params) do
+    case Observations.create_observation(observation_params) do
       {:ok, _observation} ->
         {:noreply,
          socket

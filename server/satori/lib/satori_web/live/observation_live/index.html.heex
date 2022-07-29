@@ -1,4 +1,13 @@
-<h1>Listing Observation</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <section class="flex">
+    <div class="flex-grow">
+      <h1 class="text-sky-700">Listing Observations</h1>
+    </div>
+    <div class="flex flex-row-reverse">
+      <%= live_patch "New Observation", to: Routes.observation_index_path(@socket, :new), class: "button-small" %>
+    </div>
+  </section>
+<h1>Listing Observations</h1>
 
 <%= if @live_action in [:new, :edit] do %>
   <.modal return_to={Routes.observation_index_path(@socket, :index)}>
@@ -13,35 +22,16 @@
   </.modal>
 <% end %>
 
-<table>
-  <thead>
-    <tr>
-      <th>Source</th>
-      <th>Stream</th>
-      <th>Target</th>
-      <th>Wallet</th>
-      <th>Value</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="observation">
-    <%= for observation <- @observation_collection do %>
-      <tr id={"observation-#{observation.id}"}>
-        <td><%= observation.source_id %></td>
-        <td><%= observation.stream_id %></td>
-        <td><%= observation.target_id %></td>
-        <td><%= observation.wallet_id %></td>
-        <td><%= observation.value %></td>
-
-        <td>
-          <span><%= live_redirect "Show", to: Routes.observation_show_path(@socket, :show, observation) %></span>
-          <span><%= live_patch "Edit", to: Routes.observation_index_path(@socket, :edit, observation) %></span>
-          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: observation.id, data: [confirm: "Are you sure?"] %></span>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<span><%= live_patch "New Observation", to: Routes.observation_index_path(@socket, :new) %></span>
+  <ul role="list"  class="mt-6 space-y-3">
+    <%= for observation <- @observations do %>
+      <.live_component
+      module={SatoriWeb.ObservationLive.Components.ObservationComponent}
+      observation={observation}
+      id={observation.id}
+      live_action={@live_action}
+      page_title={@page_title}
+      return_to={Routes.observation_index_path(@socket, :index)}
+      />
+      <% end %>
+  </ul>
+</div>

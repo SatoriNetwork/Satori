@@ -3,14 +3,15 @@ defmodule Satori.MixProject do
 
   def project do
     [
-      app: :satori,
-      version: "0.1.0",
-      elixir: "~> 1.12",
-      elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:gettext] ++ Mix.compilers(),
-      start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      app: :satori,
+      compilers: [:gettext] ++ Mix.compilers(),
+      deps: deps(),
+      elixir: "~> 1.12",
+      elixirc_options: [warnings_as_errors: true],
+      elixirc_paths: elixirc_paths(Mix.env()),
+      start_permanent: Mix.env() == :prod,
+      version: "0.1.0"
     ]
   end
 
@@ -33,22 +34,29 @@ defmodule Satori.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.9"},
-      {:phoenix_ecto, "~> 4.4"},
+      {:absinthe, "~> 1.7"},
+      {:absinthe_phoenix, "~> 2.0"},
+      {:absinthe_plug, "~> 1.5"},
+      {:bcrypt_elixir, "~> 3.0"},
       {:ecto_sql, "~> 3.6"},
-      {:postgrex, ">= 0.0.0"},
-      {:phoenix_html, "~> 3.0"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_view, "~> 0.17.5"},
-      {:floki, ">= 0.30.0", only: :test},
-      {:phoenix_live_dashboard, "~> 0.6"},
       {:esbuild, "~> 0.4", runtime: Mix.env() == :dev},
-      {:swoosh, "~> 1.3"},
-      {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_poller, "~> 1.0"},
+      {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:libcluster, "~> 3.3"},
+      {:phoenix, "~> 1.6.9"},
+      {:phoenix_ecto, "~> 4.4"},
+      {:phoenix_html, "~> 3.0"},
+      {:phoenix_live_dashboard, "~> 0.6"},
+      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_view, "~> 0.17.5"},
+      {:plug_cowboy, "~> 2.5"},
+      {:postgrex, ">= 0.0.0"},
+      {:swoosh, "~> 1.3"},
+      {:tailwind, "~> 0.1.6"},
+      {:telemetry_metrics, "~> 0.6"},
+      {:telemetry_poller, "~> 1.0"},
+      {:timex, "~> 3.7"}
     ]
   end
 
@@ -64,7 +72,7 @@ defmodule Satori.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.deploy": ["esbuild default --minify", "phx.digest"]
+      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
     ]
   end
 end

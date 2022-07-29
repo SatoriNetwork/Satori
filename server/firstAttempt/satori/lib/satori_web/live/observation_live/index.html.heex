@@ -1,0 +1,47 @@
+<h1>Listing Observation</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.observation_index_path(@socket, :index)}>
+    <.live_component
+      module={SatoriWeb.ObservationLive.FormComponent}
+      id={@observation.id || :new}
+      title={@page_title}
+      action={@live_action}
+      observation={@observation}
+      return_to={Routes.observation_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Source</th>
+      <th>Stream</th>
+      <th>Target</th>
+      <th>Wallet</th>
+      <th>Value</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="observation">
+    <%= for observation <- @observation_collection do %>
+      <tr id={"observation-#{observation.id}"}>
+        <td><%= observation.source_id %></td>
+        <td><%= observation.stream_id %></td>
+        <td><%= observation.target_id %></td>
+        <td><%= observation.wallet_id %></td>
+        <td><%= observation.value %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.observation_show_path(@socket, :show, observation) %></span>
+          <span><%= live_patch "Edit", to: Routes.observation_index_path(@socket, :edit, observation) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: observation.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Observation", to: Routes.observation_index_path(@socket, :new) %></span>

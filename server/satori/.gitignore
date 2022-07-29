@@ -32,3 +32,7 @@ satori-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Ignore Emacs files.
+*~
+# Ignore .env files
+*/.env
