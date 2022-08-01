@@ -3,30 +3,35 @@ defmodule Satori.WalletAuth do
   Satori.WalletAuth represents a process whereby the client
   authenticates through signature verification.
 
-  Upon connection the client will provide it's wallet address
-  (a version of it's public key), the server will generate a
-  random string, send it to the client, and the client will
-  respond with a signature which the server will verify.
-  https://elixirforum.com/t/right-way-to-use-crypto-verify/19014
-  https://github.com/ntrepid8/ex_crypto
-  https://hexdocs.pm/web3x/0.6.3/Web3x.Wallet.html#verify_message?/4 eth
-  https://blog.lelonek.me/how-to-calculate-bitcoin-address-in-elixir-68939af4f0e9
-  https://hexdocs.pm/curvy/Curvy.html
+  Upon connection the client will provide it's wallet public key,
+  a message that it signed which is the current datetime, which
+  must be within 5 seconds of what the server thinks is now, and a
+  signature the server will then verify the signature and if it is
+  valid, authenticate the client (not sure exactly what that means).
   """
-  def index() do
-    # ExPublicKey.verify(message, signature, rsa_public_key)
-    #or
-    #message = "whatever"
-    #signature_base64 = "zFuf7bRH4RHwyktaqHQwmX5rn3LfSb4dKo..." # truncated
-    #signature = Base.decode64!(signature_base64)
-    #:crypto.verify(:rsa, :sha256, message, signature, public_key)
-    # actually I think this is best
-    #:crypto.verify(
-    #  :ecdsa,
-    #  :sha256,
-    #  "message",
-    #  signature,
-    #  [public_key, :secp256k1]
-    #)
+  use Timex
+  use DateTime
+
+  def initialConnection(message, signature, pubkey) do
+    if messageIsRecent(message) do
+      case System.cmd("satori", ["verify", message, signature, pubkey]) do
+        {"True\r\n", 0} -> authenticate(pubkey)
+      end
+    end
+    # otherwise ignore them?
+  end
+
+  @doc """
+  message should look like this: "2022-08-01 17:28:44.748691"
+  """
+  def messageIsRecent(message, ago \\ -5) do
+    {:ok, compare} = Timex.parse(message, "%Y-%m-%d %H:%M:%S.%f", :strftime)
+    messageTime = DateTime.from_naive!(compare, "Etc/UTC")
+    {:gt, :gt} == {DateTime.compare(Timex.now(), messageTime), DateTime.compare(messageTime, Timex.shift(Timex.now(), seconds: ago))}
+  end
+
+  def authenticate(pubkey) do
+    # I don't know what to do here - give them a session? connection? idk.
+    # but now the client should be able to do stuff without having to prove it's identity with each request.
   end
 end
