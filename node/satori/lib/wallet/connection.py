@@ -6,20 +6,7 @@ import datetime as dt
 from satori.lib.wallet import Wallet
 
 def payloadForServer(wallet: Wallet):
-    '''
-    we can avoid sending the message if we just go off date, otherwise, we'll send it
-    we always want to make sure the message is different each time we connect, 
-    so snoopers can't attack. but we don't want to keep a record of each login on the
-    server so, the server checks that the date is recent (same day, or same hour),
-    or if we send the full message we can verify the message and verify the date
-    down to within a few seconds. anyway. thats the idea. 
-    # elixir code [h, _] = String.split(DateTime.to_string(DateTime.utc_now)," ")
-    
-    we could save the last login time on the user object or something. then verify
-    the date is current, but get the whole message and verify that the messge is
-    greater than the saved message as the last time they logged in.
-    # verify DateTime.compare(more_recent_dt, preivous_dt) is :gt
-    '''
+    ''' see wallet_auth in server '''
     dateMessage = getFullDateMessage()
     return {
         'message': dateMessage,
