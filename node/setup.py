@@ -42,9 +42,9 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    #entry_points={
-    #    "console_scripts": [
-    #        f"spe = {get_name()}.cli.{get_name()}:main",
-    #    ]
-    #},
+    entry_points={
+        "console_scripts": [
+            f"{get_name()} = {get_name()}.cli:main",
+        ]
+    },
 )
