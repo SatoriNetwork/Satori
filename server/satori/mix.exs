@@ -40,7 +40,6 @@ defmodule Satori.MixProject do
       {:bcrypt_elixir, "~> 3.0"},
       {:curvy, "~> 0.3.0"},
       {:ecto_sql, "~> 3.6"},
-      {:erlport, "~> 0.10.1"},
       {:esbuild, "~> 0.4", runtime: Mix.env() == :dev},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.18"},

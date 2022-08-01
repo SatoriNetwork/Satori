@@ -1,5 +1,4 @@
-# to be called by elixir since verification works well in python 
-# https://medium.com/stuart-engineering/how-we-use-python-within-elixir-486eb4d266f9
+# by elixir server in commandline utility
 
 from ravencoin.signmessage import RavencoinMessage, VerifyMessage
 
