@@ -10,15 +10,19 @@ defmodule Satori.WalletAuth do
   valid, authenticate the client (not sure exactly what that means).
   """
   use Timex
-  use DateTime
+  #use DateTime
 
   def initialConnection(message, signature, pubkey) do
     if messageIsRecent(message) do
-      case System.cmd("satori", ["verify", message, signature, pubkey]) do
-        {"True\r\n", 0} -> authenticate(pubkey)
+      ## work around solution:
+      #case System.cmd("satori", ["verify", message, signature, pubkey]) do
+      #  {"True\r\n", 0} -> authenticate(pubkey)
+      #end
+      case Satori.Wallets.Signature.verify!(message, signature, public_key) do
+        true -> authenticate(pubkey)
+        false -> false # otherwise ignore them?
       end
     end
-    # otherwise ignore them?
   end
 
   @doc """
@@ -31,6 +35,7 @@ defmodule Satori.WalletAuth do
   end
 
   def authenticate(pubkey) do
+    pubkey
     # I don't know what to do here - give them a session? connection? idk.
     # but now the client should be able to do stuff without having to prove it's identity with each request.
   end
