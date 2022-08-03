@@ -1,55 +1,58 @@
-# Satori
-_A Future Network_
+# A Brief Description of Satori
 
-To the end user, Satori is a network they can join as a node by downloading a program and running it. Every node finds a primary data stream(s) to predict the future of and they work together to produce the best predictions possible. Every data stream that is consumed by the Satori network has a forecast that can be queried as a public good.
+### Vision
 
-## Current State
+Satori aims at predicting the future of all things.
 
-Satori is a work in progress. It involves 3 major components:
+### Value Proposition
 
-1. the use of a pub-sub network
-2. a blockchain for bounty and subscriber tracking
-3. a node/miner: houses the automated prediction engine
+Satori produces 2 main forms of value: 
+1. A Public Good Offering
+2. A Prediction Market
 
-So far, the automated prediction engine is the only component with any valuable work done on it, and most of it is prototypical. Still, that represents progress towards the goal.
+The public good offering consists of the network predicting all popular, and publicly available data streams.
 
-### Automated Prediction Engine
+The prediction market is where private actors can pay the Satori network to predict their own or any specific data stream.
 
-The automated prediction engine is made of mainly two parts: the DataManager and a ModelManager.
+### Systems
 
-A ModelManager builds models that predict the future of one particular datastream. They may consume more than one datastream to help them predict, but their prediction is always aimed at one datastream. They constantly train and retrain models, searching for the best one to predict the future of the datastream. (This essentially comes down to automated feature engineering, selection and hyperparameter tuning).
-
-The DataManager is in charge of getting data for the ModelManager(s). This includes getting updates for all (primary) streams that are predicted by the ModelManager(s) and getting updates on all (secondary) streams they use to help them predict. Aside from getting updates, the DataManager also searches for potentially useful datastreams, downloads their histories, and notifies the ModelManager(s) so they can further evaluate the candidate streams.
-
-## Simplifying Assumptions
-
-Datastreams should have a simple format and a unique identity. They should have a time column (when the observation took place), and a value column (what the observation was). Using the pub-sub network, or the blockchain, metadata could be saved to describe each datastream. Metadata is not yet primarily relied upon by the system so its format should be a simple json structure. The datetime column could be called 'dt' 'datetime' 'time' or 'date', while the value column should be called 'observation' 'value' or the same as the streams unique identifier. The datetime column should support multiple formats, but UTC time should be preferred in order to easily merge datasets on the correct timing.
-
-ModelManagers produce a prediction of the future, specifically the immediate future, the next timestep. This may sound like a limiting factor, as it seems to be a limit on versatility. However, producing a forecast of multiple observations into the future creates a substantial amount of complexity for the rest of the system. We can push that complexity into a simple structure: have multiple datastreams describing the same data on various timescales: hourly, daily, monthly, etc. With this design, to get a mid- or long-term forecast one merely needs to query multiple predictors.
-
-Speaking of querying predictors, predictors are never literally queried. Instead each predictor (every ModelManager) produces a new datastream of their predictions. In this way their predictions become a freely accessible public good by default, as well as automatically becoming a new datastream other nodes can use in their own models.
-
-## How to get involved
-
-Review the code, feel free to submit pull requests, review the issues for things that need to be done.
-
-### Social 
-
-- http://www.satorinet.io
-- https://www.reddit.com/r/SatoriNetwork
-
-### Green Fields
-
-There are a lot of minor components to the system that are not yet even started, as well as major components.
-
-The connection to a pub sub network has not been explored. The Streamr network or Ocean protocol seem like good candidates.
-
-The underlying DLT (blockchain) has not been designed.
-
-As far as ML related things, an extra set of eyes on the practices employed thus far would be very useful. We're solely using the XGBoost regressor as a prototype because it works well and is easily automated and trains quickly. However, the final product would probably benefit by a broader view of automated ML procedures. Improving the current Model Manager or even building an alternative automated ML prediction engine would also be useful.
-
-### how to install
+From a systems perspective Satori is made up of 3 parts: 
+1. A Node
+2. A Blockchain
+3. A Pub/Sub network
 
 ```
-> python setup.py develop
+B   P/S
+ \ /
+  N
 ```
+
+The Node is a piece of software running on many computers which communicates with other Nodes through the Pub/Sub network(s) and the Blockchain.
+
+The Blockchain is used to incentivize people to run the Node on their computer. It also will eventually serve as a marketplace for trading future predictions.
+
+The Pub/Sub network facilitates communication between Nodes in the form of data streams. Each Node publishes one or more data streams and subscribes to many.
+
+### The Node
+
+The Node is made up of an Engine, a layer of application logic, and interfaces with the user, Blockchain, and Pub/Sub network(s).
+
+Its function is to subscribe to one or more data streams and publish predictions about one or more of those data streams. These predictions are of the same data type and cadence as the target data stream.
+
+For example, a Node may subscribe to the 4-hour-gold-price data stream. Every 4 hours, when a new observation is received, the Node will immediately produce a prediction of the next observation 4 hours in the future. This prediction is then pushed to a corresponding prediction stream, for instance, 4-hour-gold-price-prediction. That is the function of the Node software.
+
+In order to achieve this predictive ability, it constantly generates new models, searching the parameter and feature space for the most predictive model. To that end, it may subscribe to other data streams which help it predict its primary data stream. A single Node may have several primary data streams that it produces predictions for.
+
+### Roadmap
+
+Generally speaking, 3 phases of development can be foreseen.
+
+The first phase is the MVP phase where the focus is on creating an MVP version of the Node software, an in-house Pub/Sub server (the Satori Server) as well as integration with a distributed Pub/Sub solution (Streamr), and rudimentary use of a blockchain for incentivization purposes only (Ravencoin). By the end of this phase, people will be able to download and run the fully automatic Node software and earn tokens at a standard rate for providing Satori's public good offering.
+
+The second phase is devoted to building out the blockchain with the prediction market platform, allowing buyers and sellers of data and predictions to transact. That is, phase two is about commercializing and commoditizing this new form of computational labor which specializes in prediction. This prediction market platform can be fully decentralized from the beginning of its development, unlike the public good offering which needs some centralizing policing to keep out bad actors.
+
+The third phase of development is meant to circle back to the public good offering, and using the blockchain built in phase two, establishes as much decentralized control and coordination as possible to provide the public good offering. That is to say, the third phase is devoted to removing the training wheels of phase one (mainly parts of the Satori Server) and making Satori a fully legitimized distributed autonomous organization.
+
+### Summary
+
+In summary, Satori is a network of computing nodes, all constantly building better models to predict the future of specific data streams. All communication within the network is either a raw data stream or a prediction data stream. Anyone can subscribe to any data stream, giving the public at large the ability to know what the Satori network is predicting at any moment.
