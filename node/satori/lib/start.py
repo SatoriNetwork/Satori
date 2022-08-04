@@ -12,9 +12,7 @@ from satori.lib.apis import memory
 
 def establishConnection():
     ''' establishes a connection to the satori server, returns connection object '''
-    payload = {
-        'ram_total_gb': satori.apis.system.getRam(),
-        'ram_available_percent': satori.apis.system.getRamAvailablePercentage()}
+    payload = satori.apis.system.getPayload()
     # todo: implement connection
     # we'll tell the server we're up and running, and have these resources
     # it will give us a list of streams to predict
