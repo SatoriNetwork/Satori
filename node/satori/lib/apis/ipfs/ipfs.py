@@ -1,6 +1,28 @@
 '''
 https://docs.ipfs.tech/reference/kubo/rpc/#getting-started
 https://github.com/lastmeta/Satori/issues/43
+
+model: clients will pin the long term storage history of 
+the streams they subscribe to and the streams they publish.
+
+each time they get a new observation on a stream they
+subscribe to they will also tell the server of their ipfs
+hash.
+
+when a client wants the historic data of a stream-target
+they will ask the server for the ipfs hash. the server will
+look up the most popular if there are multiple and provide.
+
+the server will keep a recent history of observations: 110.
+
+the client will download the historic data via ipfs. the
+client will spend some time evaluating the new data, so if 
+they find it useful they will redownload the history by
+asking the server again for the ipfs hash, and they'll
+download the recent history from the server, and combine by
+where they overlap with the historic data (should be at 
+least 9) and they'll get subscribe, thereby getting the the
+lastest observation from the server.
 '''
 
 import requests
@@ -234,7 +256,9 @@ def fixConfig(configPath=None):
         f.write(x)
  
         
-#import subprocess
-#def run(self, cmd):
-#    cmd = ipfs files --nocopy cp /ipfs/$(ipfs add -r -Q <local-folder>) "/pin/<dest-name>" 
-#    completed = subprocess.run(["powershell", "-Command", cmd], capture_output=True)
+def pinDirectoryByCLI(abspath: str, name: str):
+    '''all attempts to use the api for this ended in disaster.'''
+    import subprocess
+    cmd = f'ipfs files cp /ipfs/$(ipfs add -r -Q {abspath}) "{name}"'
+    completed = subprocess.run(["powershell", "-Command", cmd], capture_output=True)
+    print(completed)
