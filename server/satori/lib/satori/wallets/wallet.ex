@@ -5,16 +5,16 @@ defmodule Satori.Wallets.Wallet do
   alias Satori.Devices.Device
   alias Satori.Streams.Stream
 
-  @fields ~w(user_id address script_hash)a
-  @required ~w(address)a
+  @fields ~w(user_id address public_key)a
+  @required ~w(user_id address public_key)a
 
   schema "wallets" do
-    field(:address, :string)
-    field(:script_hash, :string)
+    field :address, :string
+    field :public_key, :string
 
-    belongs_to(:user, User)
-    has_many(:devices, Device)
-    has_many(:stream, Stream)
+    belongs_to :user, User
+    has_one :devices, Device
+    has_many :stream, Stream
 
     timestamps()
   end

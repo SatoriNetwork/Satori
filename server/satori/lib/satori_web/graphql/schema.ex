@@ -3,7 +3,7 @@ defmodule SatoriWeb.GraphQL.Schema do
   #   @desc "Get a list of wallets"
   #   field :wallets, list_of(:wallet) do
   #     arg(:address, :string)
-  #     arg(:script_hash, :string)
+  #     arg(:public_key, :string)
   #   end
   # end
 end

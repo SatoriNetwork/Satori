@@ -12,7 +12,7 @@ defmodule Satori.WalletsFixtures do
       attrs
       |> Enum.into(%{
         address: "some address",
-        script_hash: "some script_hash",
+        public_key: "some public_key",
         user_id: 42
       })
       |> Satori.Wallets.create_wallet()
