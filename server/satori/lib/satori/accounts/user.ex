@@ -3,18 +3,19 @@ defmodule Satori.Accounts.User do
   import Ecto.Changeset
   alias Satori.Wallets.Wallet
 
-  @fields ~w(first_name last_name email password)a
+  @fields ~w(first_name last_name email password public_key)a
   # @required ~w(first_name last_name email password)a
 
   schema "users" do
-    field :confirmed_at, :naive_datetime
-    field :email, :string
-    field :first_name, :string
-    field :hashed_password, :string, redact: true
-    field :last_name, :string
-    field :password, :string, virtual: true, redact: true
+    field(:confirmed_at, :naive_datetime)
+    field(:public_key, :string)
+    field(:email, :string)
+    field(:first_name, :string)
+    field(:hashed_password, :string, redact: true)
+    field(:last_name, :string)
+    field(:password, :string, virtual: true, redact: true)
 
-    has_many :wallets, Wallet
+    has_many(:wallets, Wallet)
 
     timestamps()
   end

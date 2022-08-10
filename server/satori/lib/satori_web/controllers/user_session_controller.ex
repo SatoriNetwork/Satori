@@ -8,6 +8,19 @@ defmodule SatoriWeb.UserSessionController do
     render(conn, "new.html", error_message: nil)
   end
 
+  def wallet(conn, _params) do
+    render(conn, "wallet.html", error_message: nil)
+  end
+
+  def create(conn, %{"user" => %{"public_key" => public_key} = user_params}) do
+    ## Add verify wallet here
+    if user = Accounts.get_user_by_public_key(public_key) do
+      UserAuth.log_in_user(conn, user, user_params)
+    else
+      render(conn, "wallet.html", error_message: "Invalid wallet")
+    end
+  end
+
   def create(conn, %{"user" => user_params}) do
     %{"email" => email, "password" => password} = user_params
 

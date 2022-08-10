@@ -10,17 +10,18 @@ defmodule Satori.WalletAuth do
   valid, authenticate the client (not sure exactly what that means).
   """
   use Timex
-  #use DateTime
+  # use DateTime
 
   def initialConnection(message, signature, pubkey) do
     if messageIsRecent(message) do
       ## work around solution:
-      #case System.cmd("satori", ["verify", message, signature, pubkey]) do
+      # case System.cmd("satori", ["verify", message, signature, pubkey]) do
       #  {"True\r\n", 0} -> authenticate(pubkey)
-      #end
-      case Satori.Wallets.Signature.verify!(message, signature, public_key) do
+      # end
+      case Satori.Wallets.Signature.verify!(message, signature, pubkey) do
         true -> authenticate(pubkey)
-        false -> false # otherwise ignore them?
+        # otherwise ignore them?
+        false -> false
       end
     end
   end
@@ -31,12 +32,35 @@ defmodule Satori.WalletAuth do
   def messageIsRecent(message, ago \\ -5) do
     {:ok, compare} = Timex.parse(message, "%Y-%m-%d %H:%M:%S.%f", :strftime)
     messageTime = DateTime.from_naive!(compare, "Etc/UTC")
-    {:gt, :gt} == {DateTime.compare(Timex.now(), messageTime), DateTime.compare(messageTime, Timex.shift(Timex.now(), seconds: ago))}
+
+    {:gt, :gt} ==
+      {DateTime.compare(Timex.now(), messageTime),
+       DateTime.compare(messageTime, Timex.shift(Timex.now(), seconds: ago))}
   end
 
   def authenticate(pubkey) do
     pubkey
-    # I don't know what to do here - give them a session? connection? idk.
-    # but now the client should be able to do stuff without having to prove it's identity with each request.
+    # Sign to create `token` when first create account/login
+    # token = Phoenix.Token.sign(SatoriWeb.Endpoint, salt, pubkey)
+    # Store the {session, token}
+
+    # Maybe timer for {session, token}
+
+    # Session is generated when ever client connect to server
+
+    # At the next login
+    # Fetch `token` by pubkey from DB by `session`
+    # If `token` found --> verify token
+    # case Phoenix.Token.verify(SatoriWeb.Endpoint, salt, token) do
+    #   {:ok, pubkey} ->
+    #     # Do something with return pubkey
+    #     {:ok, assign(socket, :pubkey, pubkey)}
+
+    #   {:error, _error} ->
+    #     # Error case ->> re-login
+    #     {:ok, socket}
+    # end
+
+    # `token` not found (expired) --> re-login
   end
 end
