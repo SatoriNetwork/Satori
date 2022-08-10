@@ -44,6 +44,11 @@ defmodule Satori.Accounts do
     if User.valid_password?(user, password), do: user
   end
 
+  def get_user_by_public_key(public_key)
+      when is_binary(public_key) do
+    Repo.get_by(User, public_key: public_key)
+  end
+
   @doc """
   Gets a single user.
 

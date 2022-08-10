@@ -18,16 +18,17 @@ defmodule Satori.Wallets.Ravencoin do
   defp serialize_integer(value) do
     cond do
       value < 0 -> raise "varint must be a non-negative integer"
-      value < 0xfd -> <<value>>
-      value <= 0xffff -> <<0xfd, value::16-little>>
-      value <= 0xffffffff -> <<0xfe, value::32-little>>
-      true -> <<0xff, value::64-little>>
+      value < 0xFD -> <<value>>
+      value <= 0xFFFF -> <<0xFD, value::16-little>>
+      value <= 0xFFFFFFFF -> <<0xFE, value::32-little>>
+      true -> <<0xFF, value::64-little>>
     end
   end
 end
 
 defmodule Satori.Wallets.Signature do
   alias Satori.Wallets.Ravencoin
+
   @doc """
   Verify a signature.
 
@@ -36,7 +37,7 @@ defmodule Satori.Wallets.Signature do
   - signature: signature encoded in base 64
   - public_key: the public key encoded in base 16
   """
-  @spec verify!(binary, String.t, String.t) :: true | false
+  @spec verify!(binary, String.t(), String.t()) :: true | false
   def verify!(message, signature, public_key) do
     dersig = der_from_signature(signature |> Base.decode64!(ignore: :whitespace))
     public_key = [public_key |> Base.decode16!(case: :mixed), :secp256k1]
@@ -45,7 +46,7 @@ defmodule Satori.Wallets.Signature do
   end
 
   @doc "Ditto"
-  @spec verify(binary, String.t, String.t) :: {:ok, true} | {:ok, false} | {:err, String.t}
+  @spec verify(binary, String.t(), String.t()) :: {:ok, true} | {:ok, false} | {:err, String.t()}
   def verify(message, signature, public_key) do
     {:ok, verify!(message, signature, public_key)}
   rescue
@@ -58,6 +59,7 @@ defmodule Satori.Wallets.Signature do
     unless byte_size(sig) == 65 do
       raise "expected signature to be 65 bytes long, got #{byte_size(sig)} bytes"
     end
+
     <<_, r::binary-size(32), s::binary-size(32)>> = sig
     r = redo_der_integer_padding(r)
     s = redo_der_integer_padding(s)
@@ -88,16 +90,16 @@ defmodule Satori.Wallets.Signature do
   end
 end
 
-unless length(System.argv()) == 3 do
-  IO.puts "Verify a signature."
-  IO.puts "usage: <message> <signature-in-base64> <private-key-in-base16>"
-  System.halt(1)
-end
+# unless length(System.argv()) == 3 do
+#   IO.puts "Verify a signature."
+#   IO.puts "usage: <message> <signature-in-base64> <private-key-in-base16>"
+#   System.halt(1)
+# end
 
-[message, signature, public_key] = System.argv()
+# [message, signature, public_key] = System.argv()
 
-case Satori.Wallets.Signature.verify(message, signature, public_key) do
-  {:ok, true} -> IO.puts "Signature Verified Successfully"
-  {:ok, false} -> IO.puts "Signature Verification Failure"
-  {:error, error} -> IO.puts "error: #{error}"
-end
+# case Satori.Wallets.Signature.verify(message, signature, public_key) do
+#   {:ok, true} -> IO.puts "Signature Verified Successfully"
+#   {:ok, false} -> IO.puts "Signature Verification Failure"
+#   {:error, error} -> IO.puts "error: #{error}"
+# end

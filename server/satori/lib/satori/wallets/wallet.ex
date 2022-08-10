@@ -3,7 +3,7 @@ defmodule Satori.Wallets.Wallet do
   import Ecto.Changeset
   alias Satori.Accounts.User
   alias Satori.Devices.Device
-  alias Satori.Devices.Stream
+  alias Satori.Streams.Stream
 
   @fields ~w(user_id address public_key)a
   @required ~w(user_id address public_key)a
