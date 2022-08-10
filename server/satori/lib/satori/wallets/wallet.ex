@@ -6,13 +6,13 @@ defmodule Satori.Wallets.Wallet do
   alias Satori.Streams.Stream
 
   @fields ~w(user_id address public_key)a
-  @required ~w(user_id address public_key)a
+  @required ~w(address public_key)a
 
   schema "wallets" do
     field :address, :string
     field :public_key, :string
 
-    belongs_to :user, User
+    belongs_to :user, User # may belong to
     has_one :devices, Device
     has_many :stream, Stream
 

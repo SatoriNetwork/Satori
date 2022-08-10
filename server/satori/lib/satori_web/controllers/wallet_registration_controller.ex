@@ -4,7 +4,7 @@ defmodule SatoriWeb.WalletRegistrationController do
   alias Satori.Wallets
   alias Satori.Wallets.Wallet
   alias SatoriWeb.WalletAuth
-  # alias Satori.Wallets.Signature
+  alias Satori.Wallets.Signature
   # alias SatoriWeb.UserAuth
 
   def new(conn, _params) do
@@ -15,13 +15,11 @@ defmodule SatoriWeb.WalletRegistrationController do
 
   def create(conn, %{
         "wallet" =>
-          %{"message" => message, "signature" => signature, "address" => pubkey} = _user_params
+          %{"message" => message, "signature" => signature, "public_key" => public_key, "address" => address} = _user_params
       }) do
-    ## verify wallet here
-    # case Signature.verify!(message, signature, pubkey) do
-    case verify!(message, signature, pubkey) do
+    case verify!(message, signature, public_key) do
       true ->
-        case Wallets.create_wallet(%{"address" => pubkey}) do
+        case Wallets.create_wallet(%{"public_key" => public_key}) do
           {:ok, wallet} ->
             conn
             |> put_flash(:info, "Wallet created successfully.")
@@ -36,7 +34,19 @@ defmodule SatoriWeb.WalletRegistrationController do
     end
   end
 
-  defp verify!(_message, _signature, _pubkey) do
-    true
+  defp verify!(_message, _signature, _public_key) do
+    if messageIsRecent(_message) do
+      Satori.Wallets.Signature.verify!(_message, _signature, _public_key)
+    end
+    false
+  end
+
+  defp messageIsRecent(_message, _ago \\ -5) do
+    {:ok, _compare} = Timex.parse(_message, "%Y-%m-%d %H:%M:%S.%f", :strftime)
+    _messageTime = DateTime.from_naive!(_compare, "Etc/UTC")
+
+    {:gt, :gt} ==
+      {DateTime.compare(Timex.now(), _messageTime),
+       DateTime.compare(_messageTime, Timex.shift(Timex.now(), seconds: _ago))}
   end
 end

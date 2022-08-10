@@ -11,11 +11,11 @@ defmodule SatoriWeb.WalletSessionController do
 
   def create(conn, %{
         "wallet" =>
-          %{"message" => message, "signature" => signature, "address" => pubkey} = params
+          %{"message" => message, "signature" => signature, "public_key" => public_key, "address" => address} = params
       }) do
     ## Add verify wallet here
-    if verify!(message, signature, pubkey) do
-      if wallet = Wallets.get_wallet_by_address(pubkey) do
+    if verify!(message, signature, public_key) do
+      if wallet = Wallets.get_wallet_by_address(public_key) do
         WalletAuth.log_in_wallet(conn, wallet, params)
       else
         # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
@@ -38,7 +38,19 @@ defmodule SatoriWeb.WalletSessionController do
     |> WalletAuth.log_out_wallet()
   end
 
-  defp verify!(_message, _signature, _pubkey) do
-    true
+  defp verify!(_message, _signature, _public_key) do
+    if messageIsRecent(_message) do
+      Satori.Wallets.Signature.verify!(_message, _signature, _public_key)
+    end
+    false
+  end
+
+  defp messageIsRecent(_message, _ago \\ -5) do
+    {:ok, _compare} = Timex.parse(_message, "%Y-%m-%d %H:%M:%S.%f", :strftime)
+    _messageTime = DateTime.from_naive!(_compare, "Etc/UTC")
+
+    {:gt, :gt} ==
+      {DateTime.compare(Timex.now(), _messageTime),
+       DateTime.compare(_messageTime, Timex.shift(Timex.now(), seconds: _ago))}
   end
 end

@@ -21,20 +21,27 @@ defmodule SatoriWeb.WalletAuth do
   @remember_me_cookie "_satori_web_user_remember_me"
   @remember_me_options [sign: true, max_age: @max_age, same_site: "Lax"]
 
-  def initialConnection(message, signature, pubkey) do
+  ## unused - replaced by wallet registration controller and wallet session controller
+  def initialConnection(message, signature, public_key) do
     if messageIsRecent(message) do
       ## work around solution:
-      # case System.cmd("satori", ["verify", message, signature, pubkey]) do
-      #  {"True\r\n", 0} -> authenticate(pubkey)
-      # end
-      case Satori.Wallets.Signature.verify!(message, signature, pubkey) do
-        true -> authenticate(pubkey)
-        # otherwise ignore them?
-        false -> false
+      # case System.cmd("satori", ["verify", message, signature, public_key]) do
+        #  {"True\r\n", 0} -> authenticate(public_key)
+        # end
+        case Satori.Wallets.Signature.verify!(message, signature, public_key) do
+          true -> authenticate(public_key)
+          # otherwise ignore them?
+          false -> false
+        end
       end
     end
+
+  ## unused - replaced by wallet registration controller and wallet session controller
+  def authenticate(public_key) do
+    public_key
   end
 
+  ## unused - replaced by wallet registration controller and wallet session controller
   @doc """
   message should look like this: "2022-08-01 17:28:44.748691"
   """
@@ -45,10 +52,6 @@ defmodule SatoriWeb.WalletAuth do
     {:gt, :gt} ==
       {DateTime.compare(Timex.now(), messageTime),
        DateTime.compare(messageTime, Timex.shift(Timex.now(), seconds: ago))}
-  end
-
-  def authenticate(pubkey) do
-    pubkey
   end
 
   def fetch_current_wallet(conn, _opts) do
