@@ -1,9 +1,24 @@
 defmodule SatoriWeb.GraphQL.Schema do
-  # query do
-  #   @desc "Get a list of wallets"
-  #   field :wallets, list_of(:wallet) do
-  #     arg(:address, :string)
-  #     arg(:public_key, :string)
-  #   end
-  # end
+  use Absinthe.Schema
+
+  object :test do
+    field :id, :id
+  end
+
+  query do
+    @desc "Test query"
+    field :test, :test do
+      resolve(fn _, _, _ ->
+        {:ok, %{id: Ecto.UUID.generate()}}
+      end)
+    end
+  end
+
+  subscription do
+    field :test_sub, :test do
+      config fn _, _ ->
+        {:ok, topic: "test"}
+      end
+    end
+  end
 end
