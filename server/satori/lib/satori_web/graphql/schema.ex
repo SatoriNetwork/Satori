@@ -5,6 +5,14 @@ defmodule SatoriWeb.GraphQL.Schema do
     field :id, :id
   end
 
+  object :observation do
+    field :id, :id
+    field :stream_id, :id
+    field :target_id, :id
+
+    field :value, :string
+  end
+
   query do
     @desc "Test query"
     field :test, :test do
@@ -16,9 +24,17 @@ defmodule SatoriWeb.GraphQL.Schema do
 
   subscription do
     field :test_sub, :test do
-      config fn _, _ ->
+      config(fn _, _ ->
         {:ok, topic: "test"}
-      end
+      end)
+    end
+
+    field :observations, :observation do
+      arg(:topic, non_null(:string))
+
+      config(fn args, _ ->
+        {:ok, topic: args.topic}
+      end)
     end
   end
 end
