@@ -44,7 +44,7 @@
       <div class="flex items-center">
         <%= unless @current_user do %>
         <div class="flex-shrink-0 px-2">
-          <%= link "Login with Wallet", to: Routes.user_session_path(@conn, :wallet), class: "relative inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500" %>
+          <%= link "Login with Wallet", to: Routes.wallet_session_path(@conn, :new), class: "relative inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500" %>
           
         </div>
         <div class="flex-shrink-0">
@@ -84,10 +84,11 @@
                 <!-- Active: "bg-gray-100", Not Active: "" -->
                 <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
                 <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
-                <%= if @current_user != nil do %>
-                  <%= link "Sign Out", to: Routes.user_session_path(@conn, :delete), method: :delete, class: "block px-4 py-2 text-sm text-gray-700" %>
-                <% else %>
-                  <%= link "Sign In", to: Routes.user_session_path(@conn, :new), class: "block px-4 py-2 text-sm text-gray-700" %>
+                <%= case @current_user do %>
+                  <% %Satori.Wallets.Wallet{} -> %>
+                    <%= link "Sign Out", to: Routes.wallet_session_path(@conn, :delete), method: :delete, class: "block px-4 py-2 text-sm text-gray-700" %>
+                  <% _ -> %>
+                    <%= link "Sign Out", to: Routes.user_session_path(@conn, :delete), method: :delete, class: "block px-4 py-2 text-sm text-gray-700" %>
                 <% end %>
               </div>
             </div>

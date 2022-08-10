@@ -6,7 +6,7 @@ defmodule Satori.Wallets do
   import Ecto.Query, warn: false
   alias Satori.Repo
 
-  alias Satori.Wallets.Wallet
+  alias Satori.Wallets.{Wallet, WalletToken}
 
   @doc """
   Returns the list of wallets.
@@ -100,5 +100,31 @@ defmodule Satori.Wallets do
   """
   def change_wallet(%Wallet{} = wallet, attrs \\ %{}) do
     Wallet.changeset(wallet, attrs)
+  end
+
+  ## Session
+
+  @doc """
+  Generates a session token.
+  """
+  def generate_wallet_session_token(wallet) do
+    {token, wallet_token} = WalletToken.build_session_token(wallet)
+    Repo.insert!(wallet_token)
+    token
+  end
+
+  def get_wallet_by_session_token(token) do
+    {:ok, query} = WalletToken.verify_session_token_query(token)
+    Repo.one(query)
+  end
+
+  def get_wallet_by_address(address)
+      when is_binary(address) do
+    Repo.get_by(Wallet, address: address)
+  end
+
+  def delete_session_token(token) do
+    Repo.delete_all(WalletToken.token_and_context_query(token, "session"))
+    :ok
   end
 end

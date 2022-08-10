@@ -2,6 +2,7 @@ defmodule SatoriWeb.Router do
   use SatoriWeb, :router
 
   import SatoriWeb.UserAuth
+  import SatoriWeb.WalletAuth
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -11,6 +12,7 @@ defmodule SatoriWeb.Router do
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
     plug(:fetch_current_user)
+    plug(:fetch_current_wallet)
   end
 
   pipeline :api do
@@ -63,12 +65,13 @@ defmodule SatoriWeb.Router do
     pipe_through([:browser, :redirect_if_user_is_authenticated])
 
     get("/users/register", UserRegistrationController, :new)
-    get("/users/wallet/register", UserRegistrationController, :wallet)
+    get("/wallet/register", WalletRegistrationController, :new)
     post("/users/register", UserRegistrationController, :create)
-    post("/users/wallet/register", UserRegistrationController, :create_with_wallet)
-    get("/users/wallet/log_in", UserSessionController, :wallet)
+    post("/wallet/register", WalletRegistrationController, :create)
+    get("/wallet/log_in", WalletSessionController, :new)
     get("/users/log_in", UserSessionController, :new)
     post("/users/log_in", UserSessionController, :create)
+    post("/wallet/log_in", WalletSessionController, :create)
     get("/users/reset_password", UserResetPasswordController, :new)
     post("/users/reset_password", UserResetPasswordController, :create)
     get("/users/reset_password/:token", UserResetPasswordController, :edit)
@@ -122,6 +125,7 @@ defmodule SatoriWeb.Router do
   scope "/", SatoriWeb do
     pipe_through([:browser])
 
+    delete("/wallet/log_out", WalletSessionController, :delete)
     delete("/users/log_out", UserSessionController, :delete)
     get("/users/confirm", UserConfirmationController, :new)
     post("/users/confirm", UserConfirmationController, :create)

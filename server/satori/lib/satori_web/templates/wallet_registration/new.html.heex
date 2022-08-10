@@ -6,11 +6,11 @@
         Create a new account with wallet
       </h2>
       <p class="account-subtitle">
-        Or <%= link "sign into an existing wallet", to: Routes.user_session_path(@conn, :wallet), class: "hyperlink" %>
+        Or <%= link "sign into an existing wallet", to: Routes.wallet_session_path(@conn, :create), class: "hyperlink" %>
       </p>
     </div>
 
-    <.form let={f} for={@changeset} action={Routes.user_registration_path(@conn, :create_with_wallet)} class="mt-8 space-y-6">
+    <.form let={f} for={@changeset} action={Routes.wallet_registration_path(@conn, :create)} class="mt-8 space-y-6">
       <%= if @changeset.action do %>
         <div class="form-error">
           <p>Something went wrong. Please correct the errors below and try again.</p>
@@ -20,9 +20,21 @@
       <input type="hidden" name="remember" value="true">
       <div class="rounded-md shadow-sm -space-y-px">
         <div>
-          <%= label f, :public_key, class: "sr-only" %>
-          <%= text_input f, :public_key, required: true, class: "form-field", placeholder: "Public Key" %>
-          <%= error_tag f, :public_key %>
+          <%= label f, :message, class: "sr-only" %>
+          <%= text_input f, :message, required: true, class: "form-field", placeholder: "Message" %>
+          <%= error_tag f, :message %>
+        </div>
+
+        <div>
+          <%= label f, :signature, class: "sr-only" %>
+          <%= text_input f, :signature, required: true, class: "form-field", placeholder: "Signature" %>
+          <%= error_tag f, :signature %>
+        </div>
+
+        <div>
+          <%= label f, :address, class: "sr-only" %>
+          <%= text_input f, :address, required: true, class: "form-field", placeholder: "Public Key" %>
+          <%= error_tag f, :address %>
         </div>
 
         <%# <div>

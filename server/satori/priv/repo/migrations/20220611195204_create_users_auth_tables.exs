@@ -6,7 +6,6 @@ defmodule Satori.Repo.Migrations.CreateUsersAuthTables do
 
     create table(:users) do
       add(:confirmed_at, :naive_datetime)
-      add(:public_key, :string)
       add(:email, :citext, null: false)
       add(:first_name, :string)
       add(:hashed_password, :string, null: false)
@@ -15,7 +14,7 @@ defmodule Satori.Repo.Migrations.CreateUsersAuthTables do
       timestamps()
     end
 
-    create(unique_index(:users, [:email, :public_key]))
+    create(unique_index(:users, [:email]))
 
     create table(:users_tokens) do
       add(:user_id, references(:users, on_delete: :delete_all), null: false)
