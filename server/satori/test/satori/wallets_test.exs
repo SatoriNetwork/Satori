@@ -8,7 +8,7 @@ defmodule Satori.WalletsTest do
 
     import Satori.WalletsFixtures
 
-    @invalid_attrs %{address: nil, script_hash: nil, user_id: nil}
+    @invalid_attrs %{address: nil, public_key: nil, user_id: nil}
 
     test "list_wallets/0 returns all wallets" do
       wallet = wallet_fixture()
@@ -21,11 +21,11 @@ defmodule Satori.WalletsTest do
     end
 
     test "create_wallet/1 with valid data creates a wallet" do
-      valid_attrs = %{address: "some address", script_hash: "some script_hash", user_id: 42}
+      valid_attrs = %{address: "some address", public_key: "some public_key", user_id: 42}
 
       assert {:ok, %Wallet{} = wallet} = Wallets.create_wallet(valid_attrs)
       assert wallet.address == "some address"
-      assert wallet.script_hash == "some script_hash"
+      assert wallet.public_key == "some public_key"
       assert wallet.user_id == 42
     end
 
@@ -35,11 +35,11 @@ defmodule Satori.WalletsTest do
 
     test "update_wallet/2 with valid data updates the wallet" do
       wallet = wallet_fixture()
-      update_attrs = %{address: "some updated address", script_hash: "some updated script_hash", user_id: 43}
+      update_attrs = %{address: "some updated address", public_key: "some updated public_key", user_id: 43}
 
       assert {:ok, %Wallet{} = wallet} = Wallets.update_wallet(wallet, update_attrs)
       assert wallet.address == "some updated address"
-      assert wallet.script_hash == "some updated script_hash"
+      assert wallet.public_key == "some updated public_key"
       assert wallet.user_id == 43
     end
 

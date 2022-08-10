@@ -2,27 +2,59 @@
 https://docs.ipfs.tech/reference/kubo/rpc/#getting-started
 https://github.com/lastmeta/Satori/issues/43
 
-model: clients will pin the long term storage history of 
-the streams they subscribe to and the streams they publish.
+model: the client will pin the entire history, long term and 
+recent term storage history, of the streams they subscribe 
+to and the streams they publish.
 
-each time they get a new observation on a stream they
-subscribe to they will also tell the server of their ipfs
-hash.
+they will add these ipfs pins to the ipns as well. to that
+end they will generate a key for each stream they subscribe
+to and each they publish.
 
-when a client wants the historic data of a stream-target
-they will ask the server for the ipfs hash. the server will
-look up the most popular if there are multiple and provide.
+https://docs.ipfs.tech/concepts/ipns/#example-ipns-setup-with-cli
 
-the server will keep a recent history of observations: 110.
+we will make a table in the database called pins:
+- wallet_id
+- stream_id
+- target_id
+- ipns_key
 
-the client will download the historic data via ipfs. the
-client will spend some time evaluating the new data, so if 
-they find it useful they will redownload the history by
-asking the server again for the ipfs hash, and they'll
-download the recent history from the server, and combine by
-where they overlap with the historic data (should be at 
-least 9) and they'll get subscribe, thereby getting the the
-lastest observation from the server.
+the client will tell the server all of it's ipns keys when
+it subscribes to a stream and it will remove the record from
+the server when it unsubscribes.
+
+when a client wants the entire history of a stream they will
+ask the server for the ipns and the server will provide all
+the ipns_keys for that stream_id-target_id
+
+the client will pull one or more of them to evaluate it. if
+the client pulls multiple it will keep the longest one - that
+is the one that is most likely still active. it will report
+inactive ones to the server who will remove them unless it's
+the only one left for that stream_id target_id, it may do a
+comparison itself just to be safe.
+
+after the evalutation it will download it again to make sure 
+it got the most recent data, and subscribe to the stream.
+
+To do list:
+1. clean up wallet table:
+    - id,
+    - address
+    - public_key
+    - user_id
+2. enforce 1-1 relationship for wallet to devices
+3. create pins table
+    - wallet_id
+    - stream_id
+    - target_id
+    - ipns_key
+4. create flow for saving ipfs
+5. create functions for ipfs needs
+6. integrate functions into flows
+    - subscribing process
+    - evaluating process
+    - etc.
+7. server stuff.
 '''
 
 import requests
