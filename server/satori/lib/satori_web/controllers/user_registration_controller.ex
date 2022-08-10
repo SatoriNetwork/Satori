@@ -33,9 +33,8 @@ defmodule SatoriWeb.UserRegistrationController do
     end
   end
 
-  def create_with_wallet(conn, %{"user" => %{"public_key" => public_key} = user_params}) do
-    IO.inspect(user_params)
-
+  def create_with_wallet(conn, %{"user" => %{"public_key" => public_key} = _user_params}) do
+    ## Add verify wallet here
     case Accounts.register_user(%{
            "email" => String.replace(public_key, " ", "") <> "@test.com",
            "password" => "123456789abc",
