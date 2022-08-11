@@ -15,7 +15,8 @@ defmodule Satori.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Satori.PubSub},
       # Start the Endpoint (http/https)
-      SatoriWeb.Endpoint
+      SatoriWeb.Endpoint,
+      {Absinthe.Subscription, SatoriWeb.Endpoint}
       # Start a worker by calling: Satori.Worker.start_link(arg)
       # {Satori.Worker, arg}
     ]

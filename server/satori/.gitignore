@@ -36,3 +36,5 @@ npm-debug.log
 *~
 # Ignore .env files
 */.env
+
+config/*.secret.exs
