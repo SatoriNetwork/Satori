@@ -57,7 +57,8 @@ defmodule Satori.MixProject do
       {:tailwind, "~> 0.1.6"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
-      {:timex, "~> 3.7"}
+      {:timex, "~> 3.7"},
+      {:mox, "~> 1.0", only: :test}
     ]
   end
 
