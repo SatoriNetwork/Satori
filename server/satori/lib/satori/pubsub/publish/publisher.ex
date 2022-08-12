@@ -8,3 +8,6 @@ defmodule Satori.PubSub.Publish.Publisher do
     Application.get_env(:satori, __MODULE__)
   end
 end
+
+if function_exported?(Mox, :defmock, 2),
+  do: Mox.defmock(Satori.PubSub.Publish.PublisherMock, for: Satori.PubSub.Publish.Publisher)
