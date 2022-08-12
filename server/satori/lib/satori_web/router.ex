@@ -93,6 +93,12 @@ defmodule SatoriWeb.Router do
     live("/observations/:id", ObservationLive.Show, :show)
     live("/observations/:id/show/edit", ObservationLive.Show, :edit)
 
+    live "/pins", PinLive.Index, :index
+    live "/pins/new", PinLive.Index, :new
+    live "/pins/:id/edit", PinLive.Index, :edit
+    live "/pins/:id", PinLive.Show, :show
+    live "/pins/:id/show/edit", PinLive.Show, :edit
+
     live("/streams", StreamLive.Index, :index)
     live("/streams/new", StreamLive.Index, :new)
     live("/streams/:id/edit", StreamLive.Index, :edit)
@@ -120,6 +126,8 @@ defmodule SatoriWeb.Router do
     live("/wallets/:id/edit", WalletLive.Index, :edit)
     live("/wallets/:id", WalletLive.Show, :show)
     live("/wallets/:id/show/edit", WalletLive.Show, :edit)
+
+
   end
 
   scope "/", SatoriWeb do

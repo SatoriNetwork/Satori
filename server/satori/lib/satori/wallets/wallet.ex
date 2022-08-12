@@ -12,7 +12,7 @@ defmodule Satori.Wallets.Wallet do
     field :address, :string
     field :public_key, :string
 
-    belongs_to :user, User # may belong to
+    belongs_to :user, User
     has_one :devices, Device
     has_many :stream, Stream
 

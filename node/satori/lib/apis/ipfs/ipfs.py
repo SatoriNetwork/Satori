@@ -48,6 +48,7 @@ To do list:
     - stream_id
     - target_id
     - ipns_key
+    
 4. create flow for saving ipfs
 5. create functions for ipfs needs
 6. integrate functions into flows
