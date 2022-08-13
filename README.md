@@ -1,3 +1,38 @@
+### Getting Started
+
+This is a monorepo. Serverside code is in the server folder, client code is in the node folder (the software is called the Satori Node). If you want to install the entire system for development purposes install the python this way:
+
+```
+...satori/node> python setup.py develop
+```
+
+and install the server this way
+```
+...satori/server/satori> mix deps.get
+...satori/server/satori> mix deps.compile
+...satori/server/satori> mix ecto.create
+...satori/server/satori> mix ecto.migrate
+```
+
+you can run the client this way
+```
+...satori/node/web> python app.py
+```
+
+and you can run the server this way
+```
+...satori/server/satori> iex -S mix phx.server
+```
+
+Some helpful things to know: clients authenticate to the server automatically with signing a message with their private key and the server authenticates it with their public key. The client doesn't have to be running to use it's helpful CLI commands: 
+
+```
+...> satori create_test_wallet_auth_payload
+{'message': '2022-08-13 18:22:51.728322', 'pubkey': '024babc70bb0252c6aee5494ae4a9f4c69fbaa1eb748e5384d058c554ef341d7d9', 'sig': 'IFPa+snVqDzzy6mlv3m/nD8UcbPSeoACAIwrkFfANjyRXRKasFVUc2d2n2IcR8PHJOHPTJ8bbBdM1xZvIWJYLsg='}
+```
+
+that is all.
+
 # A Brief Description of Satori
 
 ### Vision
