@@ -21,38 +21,7 @@ defmodule SatoriWeb.WalletAuth do
   @remember_me_cookie "_satori_web_user_remember_me"
   @remember_me_options [sign: true, max_age: @max_age, same_site: "Lax"]
 
-  ## unused - replaced by wallet registration controller and wallet session controller
-  def initialConnection(message, signature, public_key) do
-    if messageIsRecent(message) do
-      ## work around solution:
-      # case System.cmd("satori", ["verify", message, signature, public_key]) do
-        #  {"True\r\n", 0} -> authenticate(public_key)
-        # end
-        case Satori.Wallets.Signature.verify!(message, signature, public_key) do
-          true -> authenticate(public_key)
-          # otherwise ignore them?
-          false -> false
-        end
-      end
-    end
 
-  ## unused - replaced by wallet registration controller and wallet session controller
-  def authenticate(public_key) do
-    public_key
-  end
-
-  ## unused - replaced by wallet registration controller and wallet session controller
-  @doc """
-  message should look like this: "2022-08-01 17:28:44.748691"
-  """
-  def messageIsRecent(message, ago \\ -5) do
-    {:ok, compare} = Timex.parse(message, "%Y-%m-%d %H:%M:%S.%f", :strftime)
-    messageTime = DateTime.from_naive!(compare, "Etc/UTC")
-
-    {:gt, :gt} ==
-      {DateTime.compare(Timex.now(), messageTime),
-       DateTime.compare(messageTime, Timex.shift(Timex.now(), seconds: ago))}
-  end
 
   def fetch_current_wallet(conn, _opts) do
     {wallet_token, conn} = ensure_wallet_token(conn)
@@ -115,5 +84,48 @@ defmodule SatoriWeb.WalletAuth do
         {nil, conn}
       end
     end
+  end
+
+
+  # TODO: finish this - coppied from user_auth.ex
+  @doc """
+  Used for routes that require the user to be authenticated.
+
+  we need to ensure only those wallets that are authenticated
+  and assigned to a stream can publish to it. would that be
+  ensured here?
+  """
+  # is conn even used since it's websockets?
+  def require_authenticated_wallet(conn, _opts) do
+    # what should this be for wallet authentication?
+    if conn.assigns[:current_user] do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You must log in to access this page.")
+      |> redirect(to: Routes.page_path(conn, :index))
+      |> halt()
+    end
+  end
+
+  def verify!(message, signature, public_key) do
+    if messageIsRecent(message) do
+      ## work around solution:
+      # case System.cmd("satori", ["verify", message, signature, public_key]) do
+        #  {"True\r\n", 0} -> authenticate(public_key)
+        # end
+      Satori.Wallets.Signature.verify!(message, signature, public_key)
+    end
+    false
+  end
+
+  # message should look like this: "2022-08-01 17:28:44.748691"
+  defp messageIsRecent(message, ago \\ -5) do
+    {:ok, compare} = Timex.parse(message, "%Y-%m-%d %H:%M:%S.%f", :strftime)
+    messageTime = DateTime.from_naive!(compare, "Etc/UTC")
+
+    {:gt, :gt} ==
+      {DateTime.compare(Timex.now(), messageTime),
+       DateTime.compare(messageTime, Timex.shift(Timex.now(), seconds: ago))}
   end
 end
