@@ -108,15 +108,9 @@ defmodule SatoriWeb.WalletAuth do
     end
   end
 
-  def verify!(message, signature, public_key) do
-    if messageIsRecent(message) do
-      ## work around solution:
-      # case System.cmd("satori", ["verify", message, signature, public_key]) do
-        #  {"True\r\n", 0} -> authenticate(public_key)
-        # end
-      Satori.Wallets.Signature.verify!(message, signature, public_key)
-    end
-    false
+  def verify?(message, signature, public_key) do
+    messageIsRecent(message) && Satori.Wallets.Signature.verify!(
+      message, signature, public_key)
   end
 
   # message should look like this: "2022-08-01 17:28:44.748691"

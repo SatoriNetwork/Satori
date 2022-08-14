@@ -50,6 +50,8 @@ To do list:
     - ipns_key
     
 4. create flow for saving ipfs
+    - upon subscription to a stream the client will provide the ipns key to the server
+    - upon publishing a stream the client will provide the ipns key to the server
 5. create functions for ipfs needs
 6. integrate functions into flows
     - subscribing process

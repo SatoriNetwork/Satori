@@ -127,4 +127,9 @@ defmodule Satori.Wallets do
     Repo.delete_all(WalletToken.token_and_context_query(token, "session"))
     :ok
   end
+
+  #############################################################################
+  # Data Loader Functions
+  #############################################################################
+
 end

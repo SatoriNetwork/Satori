@@ -101,4 +101,9 @@ defmodule Satori.Pins do
   def change_pin(%Pin{} = pin, attrs \\ %{}) do
     Pin.changeset(pin, attrs)
   end
+
+  #############################################################################
+  # Data Loader Functions
+  #############################################################################
+
 end

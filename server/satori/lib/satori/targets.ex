@@ -101,4 +101,9 @@ defmodule Satori.Targets do
   def change_target(%Target{} = target, attrs \\ %{}) do
     Target.changeset(target, attrs)
   end
+
+  #############################################################################
+  # Data Loader Functions
+  #############################################################################
+
 end

@@ -101,4 +101,9 @@ defmodule Satori.Streams do
   def change_stream(%Stream{} = stream, attrs \\ %{}) do
     Stream.changeset(stream, attrs)
   end
+
+  #############################################################################
+  # Data Loader Functions
+  #############################################################################
+
 end

@@ -129,4 +129,9 @@ defmodule Satori.Observations do
   end
 
   defp _broadcast_observation({:error, _changeset} = error, _event), do: error
+
+  #############################################################################
+  # Data Loader Functions
+  #############################################################################
+
 end

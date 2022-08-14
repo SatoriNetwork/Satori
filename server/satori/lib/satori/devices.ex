@@ -101,4 +101,9 @@ defmodule Satori.Devices do
   def change_device(%Device{} = device, attrs \\ %{}) do
     Device.changeset(device, attrs)
   end
+
+  #############################################################################
+  # Data Loader Functions
+  #############################################################################
+
 end

@@ -101,4 +101,8 @@ defmodule Satori.Subscribers do
   def change_subscriber(%Subscriber{} = subscriber, attrs \\ %{}) do
     Subscriber.changeset(subscriber, attrs)
   end
+  #############################################################################
+  # Data Loader Functions
+  #############################################################################
+
 end
