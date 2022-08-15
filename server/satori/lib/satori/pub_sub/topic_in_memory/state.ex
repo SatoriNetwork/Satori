@@ -3,6 +3,7 @@ defmodule Satori.PubSub.TopicInMemory.State do
 
   @type t :: %__MODULE__{topics: MapSet.t()}
 
+  @spec new() :: t()
   @spec new(topics :: [binary()]) :: t()
   def new(topics \\ []), do: %__MODULE__{topics: MapSet.new(topics)}
 
