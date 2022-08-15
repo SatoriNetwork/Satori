@@ -12,7 +12,6 @@ defmodule Satori.PubSub.SubscribeTest do
   @mock_input %Input{topic: @mock_topic}
 
   describe "subscribe/1" do
-    @tag :current
     test "calls Topic.validate_exists with topic from input" do
       TopicMock
       |> expect(:validate_exists, fn received_topic ->
@@ -24,7 +23,6 @@ defmodule Satori.PubSub.SubscribeTest do
       Subscribe.subscribe(@mock_input)
     end
 
-    @tag :current
     test "returns %Output{} with nil error" do
       TopicMock
       |> expect(:validate_exists, fn _ ->
@@ -36,7 +34,6 @@ defmodule Satori.PubSub.SubscribeTest do
   end
 
   describe "subscribe/1 when topic does not exist" do
-    @tag :current
     test "returns %Output{} with nil error" do
       error_mock = :topic_not_found
 
