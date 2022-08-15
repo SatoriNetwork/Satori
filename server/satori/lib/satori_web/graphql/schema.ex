@@ -1,6 +1,8 @@
 defmodule SatoriWeb.GraphQL.Schema do
   use Absinthe.Schema
 
+  alias Satori.PubSub.Subscribe
+
   object :test do
     field :id, :id
   end
@@ -33,7 +35,17 @@ defmodule SatoriWeb.GraphQL.Schema do
       arg(:topic, non_null(:string))
 
       config(fn args, _ ->
-        {:ok, topic: args.topic}
+        output =
+          %Subscribe.Input{
+            topic: args.topic
+          }
+          |> Subscribe.subscribe()
+
+        if output.error == nil do
+          {:ok, topic: args.topic}
+        else
+          {:error, output.error}
+        end
       end)
     end
   end
