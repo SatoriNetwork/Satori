@@ -16,9 +16,8 @@ defmodule Satori.Application do
       {Phoenix.PubSub, name: Satori.PubSub},
       # Start the Endpoint (http/https)
       SatoriWeb.Endpoint,
-      {Absinthe.Subscription, SatoriWeb.Endpoint}
-      # Start a worker by calling: Satori.Worker.start_link(arg)
-      # {Satori.Worker, arg}
+      {Absinthe.Subscription, SatoriWeb.Endpoint},
+      Satori.PubSub.TopicInMemory
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

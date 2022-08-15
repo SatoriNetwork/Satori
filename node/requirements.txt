@@ -33,3 +33,6 @@ Crypto==1.4.1
 Naked==0.1.31 
 # needed for Crypto 
 shellescape==3.8.1
+
+pyOpenSSL==22.0.0
+cryptography==37.0.4

@@ -4,6 +4,7 @@ This is a monorepo. Serverside code is in the server folder, client code is in t
 
 ```
 ...satori/node> python setup.py develop
+( or ...satori/node> pip3 install -e .)
 ```
 
 and install the server this way
