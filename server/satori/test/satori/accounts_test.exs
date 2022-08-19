@@ -71,7 +71,6 @@ defmodule Satori.AccountsTest do
       too_long = String.duplicate("db", 100)
       {:error, changeset} = Accounts.register_user(%{email: too_long, password: too_long})
       assert "should be at most 160 character(s)" in errors_on(changeset).email
-      assert "should be at most 72 character(s)" in errors_on(changeset).password
     end
 
     test "validates email uniqueness" do
@@ -278,7 +277,7 @@ defmodule Satori.AccountsTest do
       {:error, changeset} =
         Accounts.update_user_password(user, valid_user_password(), %{password: too_long})
 
-      assert "should be at most 72 character(s)" in errors_on(changeset).password
+      assert "should be at most 72 byte(s)" in errors_on(changeset).password
     end
 
     test "validates current password", %{user: user} do
@@ -484,7 +483,7 @@ defmodule Satori.AccountsTest do
     test "validates maximum values for password for security", %{user: user} do
       too_long = String.duplicate("db", 100)
       {:error, changeset} = Accounts.reset_user_password(user, %{password: too_long})
-      assert "should be at most 72 character(s)" in errors_on(changeset).password
+      assert "should be at most 72 byte(s)" in errors_on(changeset).password
     end
 
     test "updates the password", %{user: user} do

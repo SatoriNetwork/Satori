@@ -1,8 +1,8 @@
 defmodule Satori.Targets.Target do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Satori.Subscriber.Subscriber
-  alias Satori.Observation.Observation
+  alias Satori.Subscribers.Subscriber
+  alias Satori.Observations.Observation
 
   @fields ~w(name)a
   @required ~w(name)a
