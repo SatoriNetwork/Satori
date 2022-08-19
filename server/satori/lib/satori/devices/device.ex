@@ -4,6 +4,9 @@ defmodule Satori.Devices.Device do
   alias Satori.Wallets.Wallet
   alias Satori.Subscriber.Subscriber
 
+  @fields ~w(name cpu disk bandwidth ram wallet_id)a
+  @required ~w(disk ram wallet_id)a
+
   schema "devices" do
     field :bandwidth, :string
     field :cpu, :string
@@ -20,7 +23,7 @@ defmodule Satori.Devices.Device do
   @doc false
   def changeset(device, attrs) do
     device
-    |> cast(attrs, [:name, :cpu, :disk, :bandwidth, :ram, :wallet_id])
-    |> validate_required([:name, :cpu, :disk, :bandwidth, :ram, :wallet_id])
+    |> cast(attrs, @fields)
+    |> validate_required(@required)
   end
 end
