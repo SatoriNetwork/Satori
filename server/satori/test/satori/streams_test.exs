@@ -21,7 +21,13 @@ defmodule Satori.StreamsTest do
     end
 
     test "create_stream/1 with valid data creates a stream" do
-      valid_attrs = %{cadence: "some cadence", name: "some name", sanctioned: true, source_name: "some source_name", wallet_id: 42}
+      valid_attrs = %{
+        cadence: "some cadence",
+        name: "some name",
+        sanctioned: true,
+        source_name: "some source_name",
+        wallet_id: 42
+      }
 
       assert {:ok, %Stream{} = stream} = Streams.create_stream(valid_attrs)
       assert stream.cadence == "some cadence"
@@ -37,7 +43,14 @@ defmodule Satori.StreamsTest do
 
     test "update_stream/2 with valid data updates the stream" do
       stream = stream_fixture()
-      update_attrs = %{cadence: "some updated cadence", name: "some updated name", sanctioned: false, source_name: "some updated source_name", wallet_id: 43}
+
+      update_attrs = %{
+        cadence: "some updated cadence",
+        name: "some updated name",
+        sanctioned: false,
+        source_name: "some updated source_name",
+        wallet_id: 43
+      }
 
       assert {:ok, %Stream{} = stream} = Streams.update_stream(stream, update_attrs)
       assert stream.cadence == "some updated cadence"

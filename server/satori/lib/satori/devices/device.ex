@@ -2,7 +2,7 @@ defmodule Satori.Devices.Device do
   use Ecto.Schema
   import Ecto.Changeset
   alias Satori.Wallets.Wallet
-  alias Satori.Subscriber.Subscriber
+  alias Satori.Subscribers.Subscriber
 
   @fields ~w(name cpu disk bandwidth ram wallet_id)a
   @required ~w(disk ram wallet_id)a

@@ -1,9 +1,8 @@
 defmodule Satori.Observations.Observation do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Satori.Stream.Stream
-  alias Satori.Target.Target
-  alias Satori.Wallet.Wallet
+  alias Satori.Streams.Stream
+  alias Satori.Targets.Target
 
   @fields ~w(stream_id target_id value)a
   @required ~w(stream_id target_id value)a

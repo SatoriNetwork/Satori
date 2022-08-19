@@ -21,13 +21,12 @@ defmodule Satori.ObservationsTest do
     end
 
     test "create_observation/1 with valid data creates a observation" do
-      valid_attrs = %{stream_id: 42, target_id: 42, value: "some value", wallet_id: 42}
+      valid_attrs = %{stream_id: 42, target_id: 42, value: "some value"}
 
       assert {:ok, %Observation{} = observation} = Observations.create_observation(valid_attrs)
       assert observation.stream_id == 42
       assert observation.target_id == 42
       assert observation.value == "some value"
-      assert observation.wallet_id == 42
     end
 
     test "create_observation/1 with invalid data returns error changeset" do
@@ -36,18 +35,22 @@ defmodule Satori.ObservationsTest do
 
     test "update_observation/2 with valid data updates the observation" do
       observation = observation_fixture()
-      update_attrs = %{stream_id: 43, target_id: 43, value: "some updated value", wallet_id: 43}
+      update_attrs = %{stream_id: 43, target_id: 43, value: "some updated value"}
 
-      assert {:ok, %Observation{} = observation} = Observations.update_observation(observation, update_attrs)
+      assert {:ok, %Observation{} = observation} =
+               Observations.update_observation(observation, update_attrs)
+
       assert observation.stream_id == 43
       assert observation.target_id == 43
       assert observation.value == "some updated value"
-      assert observation.wallet_id == 43
     end
 
     test "update_observation/2 with invalid data returns error changeset" do
       observation = observation_fixture()
-      assert {:error, %Ecto.Changeset{}} = Observations.update_observation(observation, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Observations.update_observation(observation, @invalid_attrs)
+
       assert observation == Observations.get_observation!(observation.id)
     end
 
