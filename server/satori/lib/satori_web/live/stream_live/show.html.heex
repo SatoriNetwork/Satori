@@ -40,6 +40,11 @@
     <%= @stream.sanctioned %>
   </li>
 
+  <li>
+    <strong>Preidction of:</strong>
+    <%= @stream.prediction_of %>
+  </li>
+
 </ul>
 
 <span><%= live_patch "Edit", to: Routes.stream_show_path(@socket, :edit, @stream), class: "button" %></span> |

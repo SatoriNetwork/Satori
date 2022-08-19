@@ -28,7 +28,11 @@
     <%= label f, :sanctioned %>
     <%= checkbox f, :sanctioned %>
     <%= error_tag f, :sanctioned %>
-  
+
+    <%= label f, :prediction_of %>
+    <%= text_input f, :prediction_of %>
+    <%= error_tag f, :prediction_of %>
+
     <div>
       <%= submit "Save", phx_disable_with: "Saving..." %>
     </div>

@@ -4,9 +4,9 @@ defmodule SatoriWeb.StreamLiveTest do
   import Phoenix.LiveViewTest
   import Satori.StreamsFixtures
 
-  @create_attrs %{cadence: "some cadence", name: "some name", sanctioned: true, source_name: "some source_name", wallet_id: 42}
-  @update_attrs %{cadence: "some updated cadence", name: "some updated name", sanctioned: false, source_name: "some updated source_name", wallet_id: 43}
-  @invalid_attrs %{cadence: nil, name: nil, sanctioned: false, source_name: nil, wallet_id: nil}
+  @create_attrs %{cadence: "some cadence", name: "some name", sanctioned: true, source_name: "some source_name", wallet_id: 42, prediction_of: nil}
+  @update_attrs %{cadence: "some updated cadence", name: "some updated name", sanctioned: false, source_name: "some updated source_name", wallet_id: 43, prediction_of: nil}
+  @invalid_attrs %{cadence: nil, name: nil, sanctioned: false, source_name: nil, wallet_id: nil, prediction_of: nil}
 
   defp create_stream(_) do
     stream = stream_fixture()

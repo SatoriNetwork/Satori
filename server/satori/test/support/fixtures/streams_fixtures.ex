@@ -15,6 +15,7 @@ defmodule Satori.StreamsFixtures do
         name: "some name",
         sanctioned: true,
         source_name: "some source_name",
+        prediction_of: nil,
         wallet_id: 42
       })
       |> Satori.Streams.create_stream()

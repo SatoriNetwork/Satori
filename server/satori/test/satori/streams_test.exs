@@ -8,7 +8,7 @@ defmodule Satori.StreamsTest do
 
     import Satori.StreamsFixtures
 
-    @invalid_attrs %{cadence: nil, name: nil, sanctioned: nil, source_name: nil, wallet_id: nil}
+    @invalid_attrs %{cadence: nil, name: nil, sanctioned: nil, source_name: nil, wallet_id: nil, prediction_of: nil}
 
     test "list_streams/0 returns all streams" do
       stream = stream_fixture()
@@ -26,6 +26,7 @@ defmodule Satori.StreamsTest do
         name: "some name",
         sanctioned: true,
         source_name: "some source_name",
+        prediction_of: nil,
         wallet_id: 42
       }
 
@@ -34,6 +35,7 @@ defmodule Satori.StreamsTest do
       assert stream.name == "some name"
       assert stream.sanctioned == true
       assert stream.source_name == "some source_name"
+      assert stream.prediction_of == nil
       assert stream.wallet_id == 42
     end
 
@@ -49,6 +51,7 @@ defmodule Satori.StreamsTest do
         name: "some updated name",
         sanctioned: false,
         source_name: "some updated source_name",
+        prediction_of: nil,
         wallet_id: 43
       }
 
@@ -57,6 +60,7 @@ defmodule Satori.StreamsTest do
       assert stream.name == "some updated name"
       assert stream.sanctioned == false
       assert stream.source_name == "some updated source_name"
+      assert stream.prediction_of == nil
       assert stream.wallet_id == 43
     end
 
