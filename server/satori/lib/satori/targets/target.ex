@@ -4,6 +4,9 @@ defmodule Satori.Targets.Target do
   alias Satori.Subscriber.Subscriber
   alias Satori.Observation.Observation
 
+  @fields ~w(name)a
+  @required ~w(name)a
+
   schema "targets" do
     field :name, :string
 
@@ -16,7 +19,7 @@ defmodule Satori.Targets.Target do
   @doc false
   def changeset(target, attrs) do
     target
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, @fields)
+    |> validate_required(@required)
   end
 end

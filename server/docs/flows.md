@@ -32,12 +32,12 @@
 2. compile history for one chosen by a module (random at first, by recommender later)
 3. load data into memory
 4. evaluate
-5. discard or make permanent after a random time
+5. discard if unused after a period of time
 6. repeat 
 
 # server only flows 
 
-forth coming 
+see usecases.md
 
 # client-server communication flows
 

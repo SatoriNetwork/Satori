@@ -5,11 +5,10 @@ defmodule Satori.Subscribers.Subscriber do
   alias Satori.Stream.Stream
   alias Satori.Target.Target
 
-  schema "subscribers" do
-    #field :device_id, :integer
-    #field :stream_id, :integer
-    #field :target_id, :integer
+  @fields ~w(stream_id device_id target_id)a
+  @required ~w(stream_id device_id target_id)a
 
+  schema "subscribers" do
     belongs_to :device, Device
     belongs_to :stream, Stream
     belongs_to :target, Target
@@ -20,7 +19,7 @@ defmodule Satori.Subscribers.Subscriber do
   @doc false
   def changeset(subscriber, attrs) do
     subscriber
-    |> cast(attrs, [:stream_id, :device_id, :target_id])
-    |> validate_required([:stream_id, :device_id, :target_id])
+    |> cast(attrs, @fields)
+    |> validate_required(@required)
   end
 end
