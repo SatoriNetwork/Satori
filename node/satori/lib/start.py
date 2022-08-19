@@ -3,19 +3,19 @@ from itertools import product
 from functools import partial
 import pandas as pd
 import satori
-import os
 
 from satori.lib.engine.structs import SourceStreamTargets
 import satori.lib.engine.model.metrics as metrics
 from satori.lib.apis import disk
 from satori.lib.apis import memory
+from satori.lib.wallet import Wallet
 
-def establishConnection():
+
+def establishConnection(wallet: Wallet):
     ''' establishes a connection to the satori server, returns connection object '''
     payload = satori.apis.system.getPayload()
-    # todo: implement connection
-    # we'll tell the server we're up and running, and have these resources
-    # it will give us a list of streams to predict
+    connectionPayload = wallet.payload()
+    
     
     
 # accept optional data necessary to generate models data and learner

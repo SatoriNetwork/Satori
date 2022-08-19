@@ -6,6 +6,7 @@ from satori.lib.wallet import sign, verify as satori_verify
 import ravencoin.base58
 from ravencoin.wallet import P2PKHRavencoinAddress, CRavencoinSecret
 import mnemonic
+from satori.lib.wallet import connection
 
 class Wallet():
     
@@ -35,6 +36,12 @@ class Wallet():
     balance: {self.balance}
     stats: {self.stats}
     banner: {self.banner})'''
+
+    def payload(self): 
+        return connection.payloadForServer(self)
+    
+    def __call__(self):
+        self.init()
     
     def init(self):
         ''' try to load, else generate and save '''

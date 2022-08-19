@@ -33,6 +33,9 @@ Crypto==1.4.1
 Naked==0.1.31 
 # needed for Crypto 
 shellescape==3.8.1
+# needed for Satori server connection
+websockets==10.3
 
-pyOpenSSL==22.0.0
-cryptography==37.0.4
+## attempt to avoid error on macos about unsafe use of cryptolib
+#pyOpenSSL==22.0.0
+#cryptography==37.0.4
