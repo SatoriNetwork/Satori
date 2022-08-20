@@ -3,9 +3,8 @@
 # a message to sign. so the client just sends up the public key and the sig. done.
 
 import datetime as dt
-from satori.lib.wallet import Wallet
 
-def payloadForServer(wallet: Wallet):
+def payloadForServer(wallet):
     ''' see wallet_auth in server '''
     dateMessage = getFullDateMessage()
     return {

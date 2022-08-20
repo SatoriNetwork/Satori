@@ -152,6 +152,8 @@ class Wallet():
         if rvn:
             balance = self.rvn / int('1' + ('0'*8))
         else:
+            if self.balance == 'unknown':
+                return self.balance
             balance = self.balance / int('1' + ('0'*invertDivisibility(int(self.stats.get('divisions', 8)))))
         headTail = str(balance).split('.')
         if headTail[1] == '0':
