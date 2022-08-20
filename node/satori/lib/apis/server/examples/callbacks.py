@@ -1,9 +1,12 @@
 ''' here's a callback example that seems to have everything we need. '''
+import threading 
 import websocket
+
+
 
 def on_message(ws, message):
     ''' send message to flask or correct actor '''
-    print(message)
+    print(f'message:{message}')
 
 def on_error(ws, error):
     ''' send message to flask to re-establish connection '''
@@ -27,6 +30,18 @@ if __name__ == "__main__":
                               on_message=on_message,
                               on_error=on_error,
                               on_close=on_close)
-    
+    #ws.run_forever()
+    from time import sleep
+    wst = threading.Thread(target=ws.run_forever, daemon=True)
+    wst.start()
 
-    ws.run_forever()
+    conn_timeout = 5
+    while not ws.sock.connected and conn_timeout:
+        sleep(1)
+        conn_timeout -= 1
+
+    msg_counter = 0
+    while ws.sock.connected:
+        ws.send('Hello world %d'%msg_counter)
+        sleep(1)
+        msg_counter += 1

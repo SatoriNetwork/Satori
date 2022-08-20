@@ -42,6 +42,7 @@ class Wallet():
     
     def __call__(self):
         self.init()
+        return self
     
     def init(self):
         ''' try to load, else generate and save '''

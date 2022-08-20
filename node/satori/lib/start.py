@@ -9,13 +9,15 @@ import satori.lib.engine.model.metrics as metrics
 from satori.lib.apis import disk
 from satori.lib.apis import memory
 from satori.lib.wallet import Wallet
+from satori.lib.apis.server import ClientConnection
 
 
 def establishConnection(wallet: Wallet):
     ''' establishes a connection to the satori server, returns connection object '''
-    payload = satori.apis.system.getPayload()
     connectionPayload = wallet.payload()
-    
+    return ClientConnection(payload=connectionPayload)
+    # todo send this at some point
+    #systemPayload = satori.apis.system.getPayload()
     
     
 # accept optional data necessary to generate models data and learner

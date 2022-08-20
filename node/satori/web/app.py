@@ -33,6 +33,7 @@ from waitress import serve
 import webbrowser
 from satori.web import forms
 from satori.lib.engine.structs import Observation
+from satori.lib import wallet
 
 
 ###############################################################################
@@ -51,13 +52,6 @@ def spoofStreamer():
     ).run, daemon=True)
     thread.start()
 
-def getWallet():
-    from satori.lib.wallet import Wallet
-    wallet = Wallet()
-    wallet.init()
-    return wallet
-
-
 ###############################################################################
 ## Globals ####################################################################
 ###############################################################################
@@ -69,12 +63,12 @@ debug = True
 # singletons
 Connection = None
 Engine = None
-Wallet = getWallet()
+Wallet = wallet.Wallet()()
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 if full:
-    Wallet = getWallet()
+    Wallet = wallet.Wallet()()
     Connection = satori.start.establishConnection()
     Engine = satori.start.getEngine(Connection)
     Engine.run()

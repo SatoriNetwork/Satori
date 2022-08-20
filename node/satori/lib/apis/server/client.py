@@ -1,10 +1,51 @@
-import asyncio
-import websockets
- 
-async def test():
-    async with websockets.connect('wss://demo.piesocket.com/v3/channel_1?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV') as websocket:
-        await websocket.send("hello")
-        response = await websocket.recv()
-        print(response)
- 
-asyncio.get_event_loop().run_until_complete(test())
+''' manages our websocket connection to the server '''
+from time import sleep
+import threading 
+import websocket
+
+
+class ClientConnection(object):
+    def __init__(self, timeout=5, payload=None):
+        self.received = None
+        self.sent = None
+        self.thread = None
+        self.timeout = timeout
+        self.payload = payload
+        self.establishConnection()
+        
+    def onMessage(self, ws, message):
+        ''' send message to flask or correct actor '''
+        self.received = message
+        print(f'message:{message}')
+
+    def onError(self, ws, error):
+        ''' send message to flask to re-establish connection '''
+        print(error)
+        # exit thread
+
+    def onClose(self, ws, close_status_code, close_msg):
+        ''' send message to flask to re-establish connection '''
+        print('### closed ###')
+        # exit thread
+
+    def onOpen(self, ws):
+        print('Opened connection')
+        self.send(self.payload)
+
+    def send(self, message: str):
+        self.sent = message
+        self.ws.send(message)
+
+    def establishConnection(self):
+        websocket.enableTrace(True)
+        self.ws = websocket.WebSocketApp(
+            'ws://localhost:8000',
+            on_open=self.onOpen,
+            on_message=self.onMessage,
+            on_error=self.onError,
+            on_close=self.onClose)
+        self.thread = threading.Thread(target=self.ws.run_forever, daemon=True)
+        self.thread.start()
+        while not self.ws.sock.connected and self.timeout:
+            sleep(1)
+            self.timeout -= 1
