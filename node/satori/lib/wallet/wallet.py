@@ -10,7 +10,7 @@ from satori.lib.wallet import connection
 
 class Wallet():
     
-    def __init__(self):
+    def __init__(self, temporary=False):
         self._entropy = None
         self._privateKeyObj = None
         self._addressObj = None
@@ -25,6 +25,7 @@ class Wallet():
         self.balance = None
         self.transactionHistory = None
         self.transactions = [] # TransactionStruct
+        self.temporary = temporary
     
     def __repr__(self):
         return f'''Wallet(
@@ -51,7 +52,8 @@ class Wallet():
         else:
             self.generate()
             self.save()
-        self.get()
+        if not self.temporary:
+            self.get()
 
     def load(self):
         wallet = WalletApi.load(

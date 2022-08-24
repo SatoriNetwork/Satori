@@ -16,7 +16,6 @@ class Ravencoin():
         self.rvn = None
         self.transactionHistory = None
         self.transactions = None
-                
         
     def connect(self):
         hostPorts = config.electrumxServers()

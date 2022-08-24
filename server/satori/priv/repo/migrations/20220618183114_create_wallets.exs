@@ -10,7 +10,7 @@ defmodule Satori.Repo.Migrations.CreateWallets do
       timestamps()
     end
 
-    create(unique_index(:wallets, [:address]))
+    create(unique_index(:wallets, [:public_key]))
 
     create table(:wallets_tokens) do
       add(:wallet_id, references(:wallets, on_delete: :delete_all), null: false)

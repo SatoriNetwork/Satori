@@ -10,7 +10,7 @@ defmodule SatoriWeb.WalletSessionController do
 
   def create(conn, %{
         "wallet" =>
-          %{"message" => message, "signature" => signature, "public_key" => public_key, "address" => _address} = params
+          %{"message" => message, "signature" => signature, "public_key" => public_key} = params
       }) do
     ## Add verify wallet here
     if WalletAuth.verify?(message, signature, public_key) do

@@ -30,10 +30,16 @@
           <%= text_input f, :signature, required: true, class: "form-field", placeholder: "Signature" %>
           <%= error_tag f, :signature %>
         </div>
+        
+        <div>
+          <%= label f, :public_key, class: "sr-only" %>
+          <%= text_input f, :public_key, required: true, class: "form-field", placeholder: "Public Key" %>
+          <%= error_tag f, :public_key %>
+        </div>
 
         <div>
           <%= label f, :address, class: "sr-only" %>
-          <%= text_input f, :address, required: true, class: "form-field", placeholder: "Public Key" %>
+          <%= text_input f, :address, required: true, class: "form-field", placeholder: "Address" %>
           <%= error_tag f, :address %>
         </div>
 

@@ -9,8 +9,9 @@ def payloadForServer(wallet):
     dateMessage = getFullDateMessage()
     return {
         'message': dateMessage,
-        'pubkey': wallet.publicKey,
-        'sig': wallet.sign(dateMessage).decode()}
+        'public_key': wallet.publicKey,
+        'address': wallet.address,
+        'signature': wallet.sign(dateMessage).decode()}
     
 def getFullDateMessage():
     ''' returns a string of today's date in UTC like this: "2022-08-01 17:28:44.748691" '''
