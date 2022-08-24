@@ -23,6 +23,16 @@ defmodule SatoriWeb.WalletAuth do
 
 
 
+  #Hari — Today at 3:07 PM
+  #while I was looking through the code and executing, I found that login flow is broken.
+  #And I narrowed down the problem to plugs in pipeline. When the user has session token,
+  #current user is set. But in the next plug, you are trying to access wallet token and
+  #setting the current user to nil if no wallet token is found. You may want to check for
+  #wallet token only if current user is nil.
+  #In the router where plugs and pipelines are implemented
+  #plug(:fetch_current_user)
+  #plug(:fetch_current_wallet)
+  #Definition of fetch current wallet plug should be updated
   def fetch_current_wallet(conn, _opts) do
     {wallet_token, conn} = ensure_wallet_token(conn)
     user = wallet_token && Wallets.get_wallet_by_session_token(wallet_token)
