@@ -35,6 +35,11 @@
     <%= @pin.ipns %>
   </li>
 
+  <li>
+    <strong>Ipfs:</strong>
+    <%= @pin.ipfs %>
+  </li>
+
 </ul>
 
 <span><%= live_patch "Edit", to: Routes.pin_show_path(@socket, :edit, @pin), class: "button" %></span> |

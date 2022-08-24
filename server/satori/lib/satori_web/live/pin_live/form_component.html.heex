@@ -25,6 +25,10 @@
     <%= text_input f, :ipns %>
     <%= error_tag f, :ipns %>
   
+    <%= label f, :ipfs %>
+    <%= text_input f, :ipfs %>
+    <%= error_tag f, :ipfs %>
+
     <div>
       <%= submit "Save", phx_disable_with: "Saving..." %>
     </div>

@@ -5,11 +5,12 @@ defmodule Satori.Pins.Pin do
   alias Satori.Target.Target
   alias Satori.Wallet.Wallet
 
-  @fields ~w(wallet_id stream_id target_id ipns)a
-  @required ~w(wallet_id stream_id target_id ipns)a
+  @fields ~w(wallet_id stream_id target_id ipns ipfs)a
+  @required ~w(wallet_id stream_id target_id ipns ipfs)a
 
   schema "pins" do
     field :ipns, :string
+    field :ipfs, :string
 
     belongs_to :stream, Stream
     belongs_to :wallet, Wallet

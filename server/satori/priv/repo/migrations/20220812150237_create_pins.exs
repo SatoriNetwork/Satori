@@ -7,6 +7,7 @@ defmodule Satori.Repo.Migrations.CreatePins do
       add :stream_id, :integer
       add :target_id, :integer
       add :ipns, :string
+      add :ipfs, :string
 
       timestamps()
     end
