@@ -23,10 +23,14 @@ defmodule GraphqlPubsubWeb.Resolvers.Streams do
 
 
   defp publish_observation_change(observation) do
+    s_id = Integer.to_string(observation.stream_id)
+    t_id = Integer.to_string(observation.target_id)
+    topic_id = Enum.join([s_id, t_id], "-")
+
     Absinthe.Subscription.publish(
       GraphqlPubsubWeb.Endpoint,
       observation,
-      observation_change: observation.id
+      observation_change: topic_id
     )
   end
 end
