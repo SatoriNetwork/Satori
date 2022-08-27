@@ -5,11 +5,12 @@ import websocket
 
 
 class ClientConnection(object):
-    def __init__(self, timeout=5, payload=None):
+    def __init__(self, timeout=5, url='ws://localhost:8000', payload=None):
         self.received = None
         self.sent = None
         self.thread = None
         self.timeout = timeout
+        self.url = url
         self.payload = payload
         self.establishConnection()
         
@@ -39,7 +40,7 @@ class ClientConnection(object):
     def establishConnection(self):
         websocket.enableTrace(True)
         self.ws = websocket.WebSocketApp(
-            'ws://localhost:8000',
+            self.url,
             on_open=self.onOpen,
             on_message=self.onMessage,
             on_error=self.onError,

@@ -63,7 +63,7 @@ debug = True
 # singletons
 Connection = None
 Engine = None
-Wallet = wallet.Wallet()()
+Wallet = None
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)

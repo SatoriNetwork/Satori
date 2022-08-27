@@ -5,12 +5,16 @@ import websockets
 async def handle_connections(websocket, path):
     while True: 
         data = await websocket.recv()
-        reply = f"Data recieved as: {data}!"
+        print(f"Data recieved as: {data}")
+        print(f"echoing...")
+        reply = f"Data recieved as: {data}"
         await websocket.send(reply)
     
 async def handle_endpoint(websocket, path):
         data = await websocket.recv()
-        reply = f"Data recieved as: {data}!"
+        print(f"Data recieved as: {data}")
+        print(f"echoing...")
+        reply = f"Data recieved as: {data}"
         await websocket.send(reply)
  
 #start_server = websockets.serve(handle_endpoint, "localhost", 8000)
