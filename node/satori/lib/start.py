@@ -14,8 +14,7 @@ from satori.lib.apis.server import ClientConnection
 
 def establishConnection(wallet: Wallet):
     ''' establishes a connection to the satori server, returns connection object '''
-    connectionPayload = wallet.payload()
-    return ClientConnection(payload=connectionPayload)
+    return ClientConnection(payload=wallet.authPayload())
     # todo send this at some point
     #systemPayload = satori.apis.system.getPayload()
     

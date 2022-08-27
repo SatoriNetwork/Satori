@@ -39,7 +39,7 @@ class Wallet():
     stats: {self.stats}
     banner: {self.banner})'''
 
-    def payload(self, asDict=False): 
+    def authPayload(self, asDict=False): 
         return connection.payloadForServer(self, asDict=asDict)
     
     def __call__(self):
