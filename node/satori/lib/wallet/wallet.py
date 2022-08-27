@@ -1,4 +1,5 @@
 import os
+import json
 from satori import config
 from satori.lib.apis.ravencoin import Ravencoin
 from satori.lib.apis.disk import WalletApi
@@ -38,8 +39,8 @@ class Wallet():
     stats: {self.stats}
     banner: {self.banner})'''
 
-    def payload(self): 
-        return connection.payloadForServer(self)
+    def payload(self, asDict=False): 
+        return connection.payloadForServer(self, asDict=asDict)
     
     def __call__(self):
         self.init()
