@@ -38,7 +38,7 @@ class ClientConnection(object):
         self.ws.send(message)
 
     def establishConnection(self):
-        websocket.enableTrace(True)
+        #websocket.enableTrace(True)
         self.ws = websocket.WebSocketApp(
             self.url,
             on_open=self.onOpen,
