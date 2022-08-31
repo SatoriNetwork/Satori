@@ -3,7 +3,7 @@ defmodule GraphqlPubsubWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    plug GraphqlPubsubWeb.Plugs.SetCurrentUser
+    # plug GraphqlPubsubWeb.Plugs.SetCurrentUser
   end
 
   scope "/" do
@@ -12,13 +12,9 @@ defmodule GraphqlPubsubWeb.Router do
     forward "/api", Absinthe.Plug,
       schema: GraphqlPubsubWeb.Schema.Schema
 
-    forward "/satori", Absinthe.Plug.GraphiQL,
-    schema: GraphqlPubsubWeb.Schema.Schema,
-    socket: GraphqlPubsubWeb.UserSocket
-
-    # forward "/graphiql", Absinthe.Plug.GraphiQL,
-    #   schema: GraphqlPubsubWeb.Schema.Schema,
-    #   socket: GraphqlPubsubWeb.UserSocket
+    forward "/graphiql", Absinthe.Plug.GraphiQL,
+      schema: GraphqlPubsubWeb.Schema.Schema,
+      socket: GraphqlPubsubWeb.UserSocket
     end
 
 

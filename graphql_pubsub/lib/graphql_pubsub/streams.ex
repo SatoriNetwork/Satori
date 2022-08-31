@@ -6,6 +6,7 @@ defmodule GraphqlPubsub.Streams do
   alias GraphqlPubsub.Streams.{Observation, TargetSubscription}
   # alias GraphqlPubsub.Accounts.User
 
+  require Logger
 
   def list_observations do
     Repo.all(Observation)
@@ -19,16 +20,21 @@ defmodule GraphqlPubsub.Streams do
   end
 
 
-  def get_subscription!(attrs) do
-    Repo.get_by!(TargetSubscription, device_id: attrs.device_id, stream_id: attrs.stream_id, target_id: attrs.target_id)
+  def get_subscription(attrs) do
+    Repo.one from p in TargetSubscription, where: p.device_id == ^attrs.device_id and p.stream_id == ^attrs.stream_id and p.target_id == ^attrs.target_id
+    # Repo.get_by!(TargetSubscription, device_id: attrs.device_id, stream_id: attrs.stream_id, target_id: attrs.target_id)
+    # Repo.get_by!(TargetSubscription, device_id: attrs.device_id).first
   end
 
 
   # @spec find_or_create_subscription(attrs) :: {:ok, TargetSubscription} | {:error, String}
   def find_or_create_subscription(attrs) do
-    case get_subscription!(attrs) do
-      {:ok, _subscription} -> {:error, "already subscribed"}
-      _ -> create_subscription(attrs)
+    case get_subscription(attrs) do
+      subs ->
+        case subs do
+          nil -> create_subscription(attrs)
+          _ -> {:ok, subs}
+        end
     end
   end
 
