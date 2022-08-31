@@ -7,7 +7,7 @@ defmodule GraphqlPubsubWeb.Endpoint do
     websocket: true,
     longpoll: false
 
-  plug CORSPlug
+  # plug CORSPlug
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.

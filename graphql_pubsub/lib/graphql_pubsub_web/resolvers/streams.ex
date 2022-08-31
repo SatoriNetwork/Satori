@@ -8,7 +8,7 @@ defmodule GraphqlPubsubWeb.Resolvers.Streams do
   end
 
   def create_observation(_, args, _) do
-    case Streams.create_observation(args) do
+    case Streams.find_or_create_subscription(args) do
       {:error, changeset} ->
         {:error,
          message: "Could not create observation",
@@ -23,9 +23,9 @@ defmodule GraphqlPubsubWeb.Resolvers.Streams do
 
 
   defp publish_observation_change(observation) do
-    s_id = Integer.to_string(observation.stream_id)
-    t_id = Integer.to_string(observation.target_id)
-    topic_id = Enum.join([s_id, t_id], "-")
+    stream_id = Integer.to_string(observation.stream_id)
+    target_id = Integer.to_string(observation.target_id)
+    topic_id = Enum.join([stream_id, target_id], "-")
 
     Absinthe.Subscription.publish(
       GraphqlPubsubWeb.Endpoint,
@@ -33,4 +33,26 @@ defmodule GraphqlPubsubWeb.Resolvers.Streams do
       observation_change: topic_id
     )
   end
+
+
+  def create_subscription(_, args, _) do
+    case Streams.find_or_create_subscription(args) do
+      {:error, changeset} ->
+        {:error,
+         message: "Could not create subscription",
+         details: ChangesetErrors.error_details(changeset)
+        }
+
+        {:ok, subscription} ->
+          {:ok, subscription}
+    end
+  end
+
+
+  @spec client_subscriptions(any, any, any) :: {:ok, any}
+  def client_subscriptions(_, args, _) do
+    {:ok, Streams.list_subscription(args)}
+  end
+
+
 end

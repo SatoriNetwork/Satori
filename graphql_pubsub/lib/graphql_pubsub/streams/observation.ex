@@ -1,7 +1,7 @@
 defmodule GraphqlPubsub.Streams.Observation do
   use Ecto.Schema
   import Ecto.Changeset
-  import Ecto.Query
+  #import Ecto.Query
 
 
   schema "observations" do
