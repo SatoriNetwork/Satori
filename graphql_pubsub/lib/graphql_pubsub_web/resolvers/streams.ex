@@ -8,7 +8,7 @@ defmodule GraphqlPubsubWeb.Resolvers.Streams do
   end
 
   def create_observation(_, args, _) do
-    case Streams.find_or_create_subscription(args) do
+    case Streams.create_observation(args) do
       {:error, changeset} ->
         {:error,
          message: "Could not create observation",

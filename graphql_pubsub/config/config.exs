@@ -15,7 +15,8 @@ config :graphql_pubsub, GraphqlPubsubWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [view: GraphqlPubsubWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: GraphqlPubsub.PubSub,
-  live_view: [signing_salt: "RVyjafqO"]
+  live_view: [signing_salt: "RVyjafqO"],
+  check_origin: false
 
 # Configures the mailer
 #

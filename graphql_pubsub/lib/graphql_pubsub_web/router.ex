@@ -3,7 +3,7 @@ defmodule GraphqlPubsubWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-    # plug GraphqlPubsubWeb.Plugs.SetCurrentUser
+    plug GraphqlPubsubWeb.Plugs.SetCurrentUser
   end
 
   scope "/" do

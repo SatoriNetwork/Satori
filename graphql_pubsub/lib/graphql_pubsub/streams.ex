@@ -12,7 +12,6 @@ defmodule GraphqlPubsub.Streams do
     Repo.all(Observation)
   end
 
-
   def create_observation(attrs) do
     %Observation{}
     |> Observation.changeset(attrs)
@@ -30,10 +29,10 @@ defmodule GraphqlPubsub.Streams do
   # @spec find_or_create_subscription(attrs) :: {:ok, TargetSubscription} | {:error, String}
   def find_or_create_subscription(attrs) do
     case get_subscription(attrs) do
-      subs ->
-        case subs do
+      subscription ->
+        case subscription do
           nil -> create_subscription(attrs)
-          _ -> {:ok, subs}
+          _ -> {:ok, subscription}
         end
     end
   end
@@ -44,8 +43,6 @@ defmodule GraphqlPubsub.Streams do
     |> TargetSubscription.changeset(attrs)
     |> Repo.insert()
   end
-
-
 
 
   @spec list_subscription(any) :: any
