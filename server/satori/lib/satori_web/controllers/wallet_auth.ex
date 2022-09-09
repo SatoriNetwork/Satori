@@ -124,7 +124,7 @@ defmodule SatoriWeb.WalletAuth do
   end
 
   # message should look like this: "2022-08-01 17:28:44.748691"
-  defp messageIsRecent(message, ago \\ -60) do
+  defp messageIsRecent(message, ago \\ -60*60*24) do
     {:ok, compare} = Timex.parse(message, "%Y-%m-%d %H:%M:%S.%f", :strftime)
     messageTime = DateTime.from_naive!(compare, "Etc/UTC")
 
