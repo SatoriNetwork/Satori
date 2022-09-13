@@ -15,7 +15,7 @@ def establishConnection(wallet: wallet.Wallet):
                  '"event":"unknown", '
                  '"payload":"what", '
                  '"ref":"what" '
-                 '}'), # authentication payload, not implemented yet on server api
+                 '}'), # phx payload? idk what this is
         )
 
 if __name__ == '__main__':
