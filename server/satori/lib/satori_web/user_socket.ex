@@ -6,11 +6,12 @@ defmodule SatoriWeb.UserSocket do
 
   @impl true
   def connect(params, socket) do
-    if authorized?(params) do
-      {:ok, socket}
-    else
-      :error
-    end
+    {:ok, socket}
+    #if authorized?(params) do
+    #  {:ok, socket}
+    #else
+    #  :error
+    #end
   end
 
   @impl true

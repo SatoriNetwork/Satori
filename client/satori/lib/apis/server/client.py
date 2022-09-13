@@ -47,6 +47,6 @@ class ClientConnection(object):
             on_close=self.onClose)
         self.thread = threading.Thread(target=self.ws.run_forever, daemon=True)
         self.thread.start()
-        while not self.ws.sock.connected and self.timeout:
+        while (self.ws.sock == None or not self.ws.sock.connected) and self.timeout:
             sleep(1)
             self.timeout -= 1

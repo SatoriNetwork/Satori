@@ -1,9 +1,9 @@
 defmodule Satori.Pins.Pin do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Satori.Stream.Stream
-  alias Satori.Target.Target
-  alias Satori.Wallet.Wallet
+  alias Satori.Streams.Stream
+  alias Satori.Targets.Target
+  alias Satori.Wallets.Wallet
 
   @fields ~w(wallet_id stream_id target_id ipns ipfs)a
   @required ~w(wallet_id stream_id target_id ipns ipfs)a

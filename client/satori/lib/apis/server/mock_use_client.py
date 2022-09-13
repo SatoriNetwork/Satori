@@ -7,8 +7,8 @@ def establishConnection(wallet: wallet.Wallet):
     #connectionPayload = wallet.authPayload()
     print(f'establishing a connection...')# with payload: {connectionPayload}')
     return ClientConnection(
-        url='ws://localhost:8000', # mock_server.py
-        #url='ws://localhost:4000', # satori server? 
+        #url='ws://localhost:8000', # mock_server.py
+        url='ws://localhost:4000/user_socket', # satori server? 
         #payload=connectionPayload, # authentication payload, not implemented yet on server api
         )
 
