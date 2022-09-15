@@ -15,6 +15,13 @@ defmodule SatoriWeb.GraphQL.Schema do
     field :value, :string
   end
 
+  #object :ipfs do
+  #  field :id, :id
+  #  field :stream_id, :id
+  #  field :target_id, :id
+  #  field :ipfs, :string
+  #end
+
   query do
     @desc "Test query"
     field :test, :test do
@@ -22,6 +29,15 @@ defmodule SatoriWeb.GraphQL.Schema do
         {:ok, %{id: Ecto.UUID.generate()}}
       end)
     end
+
+    #@desc "Get a list of ipfs hashes by stream and target"
+    #field :ipfs, :ipfs do
+    #  arg :stream_id, non_null(:int)
+    #  arg :target_id, non_null(:int)
+    #  resolve(fn _, %{stream_id: stream_id, target_id: target_id}, _ ->
+    #    {:ok, Satori.Pins.list_pins_by_stream_target(stream_id, target_id)}
+    #  end)
+    #end
   end
 
   subscription do

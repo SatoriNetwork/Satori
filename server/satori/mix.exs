@@ -41,6 +41,7 @@ defmodule Satori.MixProject do
       {:curvy, "~> 0.3.0"},
       {:ecto_sql, "~> 3.6"},
       {:esbuild, "~> 0.4", runtime: Mix.env() == :dev},
+      {:dataloader, "~> 1.0"},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},

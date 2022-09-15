@@ -103,6 +103,28 @@ defmodule Satori.Pins do
   end
 
   #############################################################################
+  # Resolver Functions
+  #############################################################################
+
+  @doc """
+  Gets a list of pins by stream and target id.
+
+  Raises `Ecto.NoResultsError` if the Pin does not exist.
+
+  ## Examples
+
+      iex> get_pin!(123)
+      %Pin{}
+
+      iex> get_pin!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def list_pins_by_stream_target(stream_id, target_id) do
+    Repo.get_by(Pin, stream_id: stream_id, target_id: target_id)
+  end
+
+  #############################################################################
   # Data Loader Functions
   #############################################################################
 
