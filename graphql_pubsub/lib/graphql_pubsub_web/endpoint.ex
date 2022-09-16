@@ -1,6 +1,6 @@
 defmodule GraphqlPubsubWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :graphql_pubsub
-  use Absinthe.Phoenix.Endpoint
+  # use Absinthe.Phoenix.Endpoint
 
 
   socket "/socket", GraphqlPubsubWeb.UserSocket,

@@ -1,9 +1,11 @@
 defmodule GraphqlPubsubWeb.UserSocket do
   use Phoenix.Socket
-  use Absinthe.Phoenix.Socket, schema: GraphqlPubsubWeb.Schema.Schema
+  # use Absinthe.Phoenix.Socket, schema: GraphqlPubsubWeb.Schema.Schema
+
 
   ## Channels
-  # channel "room:*", GetawaysWeb.RoomChannel
+  channel "stream:*", GraphqlPubsubWeb.RoomChannel
+
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
@@ -18,7 +20,10 @@ defmodule GraphqlPubsubWeb.UserSocket do
   # performing token verification on connect.
 
 
+  # @spec connect(any, any, any) :: {:ok, any}
   def connect(_params, socket, _connect_info) do
+    # IO.puts("connect: ")
+    # IO.puts(params)
     {:ok, socket}
   end
 

@@ -24,19 +24,19 @@ defmodule GraphqlPubsubWeb.Schema.Schema do
   end
 
 
-  subscription do
-    @desc "Subscribe to observation changes"
-    field :observation_change, :observation do
-      arg :stream_id, non_null(:integer)
-      arg :target_id, non_null(:integer)
-      config fn args, _res ->
-        stream_id = Integer.to_string(args.stream_id)
-        target_id = Integer.to_string(args.target_id)
-        topic_id = Enum.join([stream_id, target_id], "-")
-        {:ok, topic: topic_id}
-      end
-    end
-  end
+  # subscription do
+  #   @desc "Subscribe to observation changes"
+  #   field :observation_change, :observation do
+  #     arg :stream_id, non_null(:integer)
+  #     arg :target_id, non_null(:integer)
+  #     config fn args, _res ->
+  #       stream_id = Integer.to_string(args.stream_id)
+  #       target_id = Integer.to_string(args.target_id)
+  #       topic_id = Enum.join([stream_id, target_id], "-")
+  #       {:ok, topic: topic_id}
+  #     end
+  #   end
+  # end
 
 
   query do

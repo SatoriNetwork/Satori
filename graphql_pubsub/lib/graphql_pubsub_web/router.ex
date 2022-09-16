@@ -17,5 +17,4 @@ defmodule GraphqlPubsubWeb.Router do
       socket: GraphqlPubsubWeb.UserSocket
     end
 
-
 end

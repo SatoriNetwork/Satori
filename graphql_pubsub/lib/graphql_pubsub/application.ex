@@ -16,8 +16,10 @@ defmodule GraphqlPubsub.Application do
       GraphqlPubsubWeb.Endpoint,
 
       # Start the PubSub system
-      {Phoenix.PubSub, [name: GraphqlPubsub.PubSub, adapter: Phoenix.PubSub.PG2]},
-      {Absinthe.Subscription, GraphqlPubsubWeb.Endpoint}
+      {Phoenix.PubSub, [name: GraphqlPubsub.PubSub, adapter: Phoenix.PubSub.PG2]}
+
+      # {Absinthe.Subscription, GraphqlPubsubWeb.Endpoint}
+
       # Start a worker by calling: GraphqlPubsub.Worker.start_link(arg)
       # {GraphqlPubsub.Worker, arg}
     ]
