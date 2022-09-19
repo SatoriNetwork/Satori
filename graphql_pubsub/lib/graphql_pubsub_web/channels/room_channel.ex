@@ -1,20 +1,23 @@
 defmodule GraphqlPubsubWeb.RoomChannel do
   use GraphqlPubsubWeb, :channel
 
+  alias GraphqlPubsubWeb.Resolvers
+
+  # @impl true
+  # def join("sat:*", payload, socket) do
+  #   {:ok, socket}
+
+
+
+  #   # if authorized?(payload) do
+  #   #   {:ok, socket}
+  #   # else
+  #   #   {:error, %{reason: "unauthorized"}}
+  #   # end
+  # end
+
+
   @impl true
-  def join("sat:*", payload, socket) do
-    {:ok, socket}
-
-
-
-    # if authorized?(payload) do
-    #   {:ok, socket}
-    # else
-    #   {:error, %{reason: "unauthorized"}}
-    # end
-  end
-
-
   def join("stream:" <> _private_room_id, _params, socket) do
     {:ok, socket}
   end
@@ -27,23 +30,13 @@ defmodule GraphqlPubsubWeb.RoomChannel do
   end
 
 
-  # def handle_in("UPDATE", %{"body" => body}, socket) do
-  #   broadcast!(socket, "UPDATE", %{body: body})
-  #   {:noreply, socket}
-  # end
-
-  # Channels can be used in a request/response fashion
-  # by sending replies to requests from the client
-  @impl true
-  def handle_in("UPDATE", payload, socket) do
-    {:reply, {:ok, payload}, socket}
-  end
-
   # It is also common to receive messages from the client and
   # broadcast to everyone in the current topic (room:lobby).
   @impl true
-  def handle_in("shout", payload, socket) do
-    broadcast(socket, "shout", payload)
+  def handle_in("published_observation", payload, socket) do
+    broadcast(socket, "published_observation", payload)
+    # IO.puts(payload)
+    Resolvers.Streams.create_client_observation(payload)
     {:noreply, socket}
   end
 

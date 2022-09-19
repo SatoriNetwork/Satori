@@ -16,7 +16,22 @@ defmodule GraphqlPubsubWeb.Resolvers.Streams do
         }
 
       {:ok, observation} ->
-        publish_observation_change(observation)
+        # publish_observation_change(observation)
+        {:ok, observation}
+    end
+  end
+
+
+  def create_client_observation(json) do
+    case Streams.create_observation(json) do
+      {:error, changeset} ->
+        {:error,
+         message: "Could not create observation",
+         details: ChangesetErrors.error_details(changeset)
+        }
+
+      {:ok, observation} ->
+        IO.puts("observation insert success")
         {:ok, observation}
     end
   end
