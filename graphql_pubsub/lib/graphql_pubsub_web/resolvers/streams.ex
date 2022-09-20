@@ -70,4 +70,9 @@ defmodule GraphqlPubsubWeb.Resolvers.Streams do
   end
 
 
+  def primary_subscription(_, args, _) do
+    {:ok, Streams.get_primary_subscription(args)}
+  end
+
+
 end

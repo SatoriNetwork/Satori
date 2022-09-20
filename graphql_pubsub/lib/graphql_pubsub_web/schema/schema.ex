@@ -56,6 +56,15 @@ defmodule GraphqlPubsubWeb.Schema.Schema do
       resolve &Resolvers.Streams.client_subscriptions/3
     end
 
+
+    @desc "Get primary subscription"
+    field :primary_subscription, :target_subscription do
+      arg :wallet_id, :integer
+      arg :device_id, :integer
+      resolve &Resolvers.Streams.primary_subscription/3
+    end
+
+
   end
 
 

@@ -2,8 +2,8 @@ defmodule GraphqlPubsub.Streams do
 
   import Ecto.Query, warn: false
   alias GraphqlPubsub.Repo
-
   alias GraphqlPubsub.Streams.{Observation, TargetSubscription}
+
   # alias GraphqlPubsub.Accounts.User
 
   require Logger
@@ -26,7 +26,16 @@ defmodule GraphqlPubsub.Streams do
   end
 
 
+  def get_primary_subscription(_attrs) do
+    Repo.one from p in TargetSubscription, limit: 1
+  end
+
+
   # @spec find_or_create_subscription(attrs) :: {:ok, TargetSubscription} | {:error, String}
+  @spec find_or_create_subscription(
+          atom
+          | %{:device_id => any, :stream_id => any, :target_id => any, optional(any) => any}
+        ) :: any
   def find_or_create_subscription(attrs) do
     case get_subscription(attrs) do
       subscription ->
