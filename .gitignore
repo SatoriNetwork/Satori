@@ -141,3 +141,5 @@ dmypy.json
 predictions/
 .vscode
 .elixir_ls
+
+!server/docs/example-stream.json
