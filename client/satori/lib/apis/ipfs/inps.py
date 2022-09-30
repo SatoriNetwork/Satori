@@ -38,7 +38,6 @@ def getMostPopular(ipnsKeys):
 def randomlyChooseKeyFromMostPopular(ipnsKeys):
     '''get a key'''
     import random
-
     x = getMostPopular(ipnsKeys)
     candidates = {key: value for key, value in ipnsKeys.items() if value == x}
     return random.choice(list(candidates.keys()))

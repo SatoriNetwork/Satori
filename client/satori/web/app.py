@@ -68,6 +68,7 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 if full:
+    ipfsDaemon = satori.start.startIPFS()
     Wallet = wallet.Wallet()()
     Connection = satori.start.establishConnection()
     Engine = satori.start.getEngine(Connection)

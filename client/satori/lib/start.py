@@ -1,4 +1,5 @@
 # todo create config if no config present, use config if config present
+import threading
 from itertools import product
 from functools import partial
 import pandas as pd
@@ -10,14 +11,18 @@ from satori.lib.apis import disk
 from satori.lib.apis import memory
 from satori.lib.wallet import Wallet
 from satori.lib.apis.server import ClientConnection
+from satori.lib.apis.ipfs import cli as ipfs
 
+def startIPFS():
+    thread = threading.Thread(target=ipfs.start, daemon=True)
+    thread.start()
+    return thread 
 
 def establishConnection(wallet: Wallet):
     ''' establishes a connection to the satori server, returns connection object '''
     return ClientConnection(payload=wallet.authPayload())
     # todo send this at some point
     #systemPayload = satori.apis.system.getPayload()
-    
     
 # accept optional data necessary to generate models data and learner
 def getEngine(connection):

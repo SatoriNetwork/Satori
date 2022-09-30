@@ -17,6 +17,7 @@ we will make a table in the database called pins:
 - stream_id
 - target_id
 - ipns_key
+- ipfs_key
 
 the client will tell the server all of it's ipns keys when
 it subscribes to a stream and it will remove the record from
@@ -234,21 +235,21 @@ def call(endpoint, kwargs=None, headers=None, payload=None):
     except simplejson.errors.JSONDecodeError:
         return r.text
 
-call(
-    endpoint=validateEndpoints('files/ls'),
-    kwargs={'long':True})
-call(
-    endpoint=validateEndpoints('filestore/ls'),
-    kwargs={'long':True})
-
-
-# this is giving me so much trouble why not just use the shell?
-# ipfs files cp /ipfs/$(ipfs add -r -Q <local-folder>) "/<dest-name>"
-call(
-    endpoint=validateEndpoints('add'),
-    kwargs={'pin':True, 'nocopy':True, },
-    #files={'path': 'C:\pin'}
-    )
+#call(
+#    endpoint=validateEndpoints('files/ls'),
+#    kwargs={'long':True})
+#call(
+#    endpoint=validateEndpoints('filestore/ls'),
+#    kwargs={'long':True})
+#
+#
+## this is giving me so much trouble why not just use the shell?
+## ipfs files cp /ipfs/$(ipfs add -r -Q <local-folder>) "/<dest-name>"
+#call(
+#    endpoint=validateEndpoints('add'),
+#    kwargs={'pin':True, 'nocopy':True, },
+#    #files={'path': 'C:\pin'}
+#    )
 
 def interpret(endpoint, response, extra=None):
     '''
@@ -260,9 +261,10 @@ def interpret(endpoint, response, extra=None):
         return {file.get('Name'): file.get('hash') for file in response.get('Entries', {})} if extra else [file.get('Name') for file in response.get('Entries', {})]
     
 #import requests
-headers={
-            'x-api-key': os.environ.get('INSIGHT_REPORT_KEY', ''),
-            },
+#import os
+#headers={
+#            'x-api-key': os.environ.get('INSIGHT_REPORT_KEY', ''),
+#            },
 #with open('c:\\pin\\testfile1.txt', mode='rb') as f:
 #    requests.post(url='http://127.0.0.1:5001/api/v0/add?pin=True',headers={'Content-Disposition':'form-data; name="pin"; filename="C:\\pin"','Content-Type':'application/x-directory'},
 #        body={'Content-Type': 'application/json'},
@@ -290,10 +292,3 @@ def fixConfig(configPath=None):
     with open(configPath, mode='w') as f:
         f.write(x)
  
-        
-def pinDirectoryByCLI(abspath: str, name: str):
-    '''all attempts to use the api for this ended in disaster.'''
-    import subprocess
-    cmd = f'ipfs files cp /ipfs/$(ipfs add -r -Q {abspath}) "{name}"'
-    completed = subprocess.run(["powershell", "-Command", cmd], capture_output=True)
-    print(completed)
