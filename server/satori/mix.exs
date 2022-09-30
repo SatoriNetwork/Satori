@@ -8,7 +8,7 @@ defmodule Satori.MixProject do
       compilers: [:gettext] ++ Mix.compilers(),
       deps: deps(),
       elixir: "~> 1.12",
-      elixirc_options: [warnings_as_errors: true],
+      elixirc_options: [warnings_as_errors: false],
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       version: "0.1.0"
