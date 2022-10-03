@@ -57,7 +57,7 @@ def spoofStreamer():
 ###############################################################################
 
 # development flags
-full = False # just web or everything
+full = True # just web or everything
 debug = True
 
 # singletons
@@ -70,7 +70,7 @@ app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 if full:
     ipfsDaemon = satori.start.startIPFS()
     Wallet = wallet.Wallet()()
-    Connection = satori.start.establishConnection()
+    Connection = satori.start.establishConnection(Wallet)
     Engine = satori.start.getEngine(Connection)
     Engine.run()
 

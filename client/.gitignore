@@ -22,6 +22,7 @@ data/
 models/
 wallet-original.yaml
 wallet.yaml
+wallet*.yaml
 wheels/
 pip-wheel-metadata/
 share/python-wheels/

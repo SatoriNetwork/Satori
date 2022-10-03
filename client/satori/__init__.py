@@ -14,3 +14,4 @@ from satori.lib.engine.view import View
 from satori.lib.engine.view import JupyterView
 from satori.lib.engine.view import JupyterViewReactive
 
+# https://stackoverflow.com/questions/12059509/create-a-single-executable-from-a-python-project
