@@ -59,9 +59,27 @@ class ModelApi(ModelDiskApi):
         if os.path.exists(modelPath):
             return joblib.load(modelPath)
         return False
+    
+    @staticmethod
+    def getModelRootSize(modelPath: str=None):
+        total = 0
+        with os.scandir(modelPath) as it:
+            for entry in it:
+                if entry.is_file():
+                    total += entry.stat().st_size
+                elif entry.is_dir():
+                    total += ModelApi.getModelRootSize(entry.path)
+        return total
+    
+    @staticmethod
+    def getModelSize(modelPath: str=None):
+        if os.path.isfile(modelPath):
+            return os.path.getsize(modelPath)
+        elif os.path.isdir(modelPath):
+            return ModelApi.getModelRootSize(modelPath)
         
             
-class Disk(DataDiskApi, ModelDataDiskApi):
+class Disk(DataDiskApi, ModelDataDiskApi, ):
     ''' single point of contact for interacting with disk '''
     
     def __init__(self,
@@ -112,6 +130,10 @@ class Disk(DataDiskApi, ModelDataDiskApi):
     @staticmethod
     def loadWallet(walletPath:str=None):
         return WalletApi.load(walletPath=walletPath)
+
+    @staticmethod
+    def getModelSize(modelPath: str=None):
+        return ModelApi.getModelSize(modelPath)
 
     def path(self, source:str=None, stream:str=None, permanent:bool=False):
         ''' Layer 0 get the path of a file '''
@@ -317,8 +339,10 @@ class Disk(DataDiskApi, ModelDataDiskApi):
                     for stream, targets in values]),
                 targetColumn=targetColumn)
         return dropIf(self.read(source, stream), (source, stream, 'StreamObservationId'))
+    
+
         
-  
+        
 '''
 from satori.lib.apis import disk
 x = disk.Api(source='streamrSpoof', stream='simpleEURCleaned') 
