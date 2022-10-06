@@ -10,9 +10,59 @@ defmodule Satori.WalletsTest do
 
     @invalid_attrs %{address: nil, public_key: nil, user_id: nil}
 
-    test "list_wallets/0 returns all wallets" do
-      wallet = wallet_fixture()
-      assert Wallets.list_wallets() == [wallet]
+    # test "list_wallets/0 returns all wallets" do
+    #   wallet = wallet_fixture()
+    #   assert Wallets.list_wallets() == [wallet]
+    # end
+
+    describe "list_wallets/1" do
+      test "returns all wallets by default" do
+        wallet = wallet_fixture()
+
+        results = Wallets.list_wallets([])
+
+        assert length(results) == length(wallet)
+      end
+
+      test "returns limited number of wallets" do
+        wallet_fixture()
+
+        criteria = %{limit: 1}
+
+        results = Wallets.list_wallets(criteria)
+
+        assert length(results) == 1
+      end
+
+      test "returns limited and ordered wallets" do
+        wallet_fixture()
+
+        args = %{limit: 3, order: :desc}
+
+        results = Wallets.list_wallets(args)
+
+        assert Enum.map(results, &(&1.address)) == ["Wallet 3", "Wallet 2", "Wallet 1"]
+      end
+
+      test "returns wallets filtered by matching address" do
+        wallet_fixture()
+
+        criteria = %{filter: %{matching: "1"}}
+
+        results = Wallets.list_wallets(criteria)
+
+        assert Enum.map(results, &(&1.address)) == ["Wallet 1"]
+      end
+
+      test "returns wallets filtered by public_key" do
+        wallet_fixture()
+
+        criteria = %{filter: %{public_key: "1"}}
+
+        results = Wallets.list_wallets(criteria)
+
+        assert Enum.map(results, &(&1.address)) == ["Wallet 2", "Wallet 3"]
+      end
     end
 
     test "get_wallet!/1 returns the wallet with given id" do

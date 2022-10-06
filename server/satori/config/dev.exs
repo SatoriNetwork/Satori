@@ -2,8 +2,8 @@ import Config
 
 # Configure your database
 config :satori, Satori.Repo,
-  username: System.get_env("DB_USERNAME"),
-  password: System.get_env("DB_PASSWORD"),
+  username: "db_usr",
+  password: "db_pass",
   hostname: "localhost",
   database: "satori_dev",
   stacktrace: true,

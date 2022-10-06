@@ -19,11 +19,29 @@ defmodule SatoriWeb.Router do
     plug(:accepts, ["json"])
   end
 
-  scope "/", SatoriWeb do
-    pipe_through(:browser)
+  # scope "/", SatoriWeb do
+  #   pipe_through(:browser)
 
-    get("/", PageController, :index)
-  end
+  #   get("/", PageController, :index)
+  # end
+
+
+
+  # scope "/" do
+  #   pipe_through :api
+
+  #   forward "/api", Absinthe.Plug,
+  #     schema: SatoriWeb.Schema.Schema
+
+  #   forward "/graphiql", Absinthe.Plug.GraphiQL,
+  #     schema: SatoriWeb.Schema.Schema,
+  #     # socket: SatoriWeb.UserSocket,
+  #     interface: :simple
+  # end
+
+
+
+
 
   # Other scopes may use custom stacks.
   # scope "/api", SatoriWeb do

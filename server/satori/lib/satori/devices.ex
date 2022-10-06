@@ -21,6 +21,62 @@ defmodule Satori.Devices do
     Repo.all(Device)
   end
 
+  # def my_list_devices(criteria), do: list_devices(criteria) |> Repo.preload(:wallet)
+
+  @doc """
+  Returns the list of devices matching the `criteria`.
+
+  Examples Criteria
+
+    [{:limit, 15}, {:order, :asc}, {:filter, [{:matching, "macbook"}, {:ram, 6}]}]
+
+  """
+
+  def list_devices(criteria) do
+    query = from d in Device
+
+    Enum.reduce(criteria, query, fn
+      {:limit, limit}, query ->
+        from d in query, limit: ^limit
+
+        {:filter, filters}, query ->
+          filter_with(filters, query)
+
+        # {:order, order}, query ->
+        #   from d in query, order_by [{^order, :id}]
+      end)
+      |> IO.inspect()
+      |> Repo.all
+      # |> Repo.preload(:wallet)
+  end
+
+  defp filter_with(filters, query) do
+    Enum.reduce(filters, query, fn
+      {:matching, term}, query ->
+        pattern = "%#{term}%"
+
+        from d in query,
+          where:
+            ilike(d.name, ^pattern) or
+              ilike(d.cpu, ^pattern)
+
+        {:bandwidth, value}, query ->
+          from d in query, where: d.bandwidth == ^value
+
+        {:disk, value}, query ->
+          from d in query, where: d.disk == ^value
+
+        {:ram, value}, query ->
+          from d in query, where: d.ram == ^value
+    end)
+  end
+
+  def wallet_for_device(%Device{} = device) do
+    Wallet
+    |> where(device_id: ^device.id)
+    |> Repo.all
+  end
+
   @doc """
   Gets a single device.
 
@@ -35,7 +91,7 @@ defmodule Satori.Devices do
       ** (Ecto.NoResultsError)
 
   """
-  def get_device!(id), do: Repo.get!(Device, id)
+  def get_device!(id), do: Repo.get!(Device, id) # |> Repo.preload(:wallet)
 
   @doc """
   Creates a device.

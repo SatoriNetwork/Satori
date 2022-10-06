@@ -10,9 +10,89 @@ defmodule Satori.DevicesTest do
 
     @invalid_attrs %{bandwidth: nil, cpu: nil, disk: nil, name: nil, ram: nil, wallet_id: nil}
 
-    test "list_devices/0 returns all devices" do
-      device = device_fixture()
-      assert Devices.list_devices() == [device]
+    # test "list_devices/0 returns all devices" do
+    #   device = device_fixture()
+    #   assert Devices.list_devices() == [device]
+    # end
+
+    describe "list_devices/1" do
+      test "returns all devices by default" do
+        device = device_fixture()
+
+        results = Devices.list_devices([])
+
+        assert length(results) == length(device)
+      end
+
+      test "returns limited number of devices" do
+        device_fixture()
+
+        criteria = %{limit: 1}
+
+        results = Devices.list_devices(criteria)
+
+        assert length(results) == 1
+      end
+
+      test "returns limited and ordered devices" do
+        device_fixture()
+
+        args = %{limit: 3, order: :desc}
+
+        results = Devices.list_devices(args)
+
+        assert Enum.map(results, &(&1.name)) == ["Device 3", "Device 2", "Device 1"]
+      end
+
+      test "returns devices filtered by matching name" do
+        device_fixture()
+
+        criteria = %{filter: %{matching: "1"}}
+
+        results = Devices.list_devices(criteria)
+
+        assert Enum.map(results, &(&1.name)) == ["Device 1"]
+      end
+
+      test "returns devices filtered by bandwidth" do
+        device_fixture()
+
+        criteria = %{filter: %{bandwidth: "1"}}
+
+        results = Devices.list_devices(criteria)
+
+        assert Enum.map(results, &(&1.name)) == ["Device 2", "Device 3"]
+      end
+
+      test "returns devices filtered by cpu" do
+        device_fixture()
+
+        criteria = %{filter: %{cpu: "1"}}
+
+        results = Devices.list_devices(criteria)
+
+        assert Enum.map(results, &(&1.name)) == ["Device 2"]
+      end
+
+      test "returns devices filtered by ram" do
+        device_fixture()
+
+        criteria = %{filter: %{ram: "1"}}
+
+        results = Devices.list_devices(criteria)
+
+        assert Enum.map(results, &(&1.name)) == ["Device 1", "Device 3"]
+      end
+
+      test "returns devices filtered by disk" do
+        device_fixture()
+
+        criteria = %{filter: %{disk: "1"}}
+
+        results = Devices.list_devices(criteria)
+
+        assert Enum.map(results, &(&1.name)) == ["Device 3"]
+      end
     end
 
     test "get_device!/1 returns the device with given id" do

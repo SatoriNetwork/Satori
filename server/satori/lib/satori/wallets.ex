@@ -21,6 +21,57 @@ defmodule Satori.Wallets do
     Repo.all(Wallet)
   end
 
+@doc """
+  Returns the list of Wallets matching the `criteria`.
+
+  Examples Criteria
+
+    [{:limit, 15}, {:order, :asc}, {:filter, [{:matching, "macbook"}, {:ram, 6}]}]
+
+  """
+
+  def list_wallets(criteria) do
+    query = from w in Wallet
+
+    Enum.reduce(criteria, query, fn
+      {:limit, limit}, query ->
+        from w in query, limit: ^limit
+
+        {:filter, filters}, query ->
+          filter_with(filters, query)
+
+        # {:order, order}, query ->
+        #   from w in query, order_by [{^order, :id}]
+      end)
+      |> IO.inspect()
+      |> Repo.preload(:device)
+      |> Repo.all
+  end
+
+  defp filter_with(filters, query) do
+    Enum.reduce(filters, query, fn
+      {:matching, term}, query ->
+        pattern = "%#{term}%"
+
+        from w in query,
+          where:
+            ilike(w.address, ^pattern) or
+              ilike(w.public_key, ^pattern)
+
+        {:address, value}, query ->
+          from w in query, where: w.address == ^value
+
+        {:public_key, value}, query ->
+          from w in query, where: w.public_key == ^value
+    end)
+  end
+
+  def device_for_wallet(%Wallet{} = wallet) do
+    Device
+    |> where(wallet_id: ^wallet.id)
+    |> Repo.all
+  end
+
   @doc """
   Gets a single wallet.
 

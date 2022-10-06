@@ -14,7 +14,7 @@ defmodule Satori.Wallets.Wallet do
     field :public_key, :string
 
     #belongs_to :user, User
-    has_one :devices, Device
+    has_one :device, Device
     has_many :stream, Stream
 
     timestamps()
