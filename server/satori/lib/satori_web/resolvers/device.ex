@@ -1,6 +1,6 @@
 defmodule SatoriWeb.Resolvers.Device do
   alias Satori.Devices
-  alias SatoriWeb.Schema.ChangesetErrors
+  # alias SatoriWeb.Schema.ChangesetErrors
 
   def device(_, %{id: id}, _) do
     {:ok, Devices.get_device!(id)}

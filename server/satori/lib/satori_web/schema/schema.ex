@@ -1,7 +1,7 @@
 defmodule SatoriWeb.Schema.Schema do
   use Absinthe.Schema
-  alias Satori.Devices
-  alias Satori.Wallets
+  # alias Satori.Devices
+  # alias Satori.Wallets
 
   import_types Absinthe.Type.Custom
 

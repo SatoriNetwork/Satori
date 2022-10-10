@@ -14,7 +14,7 @@ defmodule SatoriWeb.WalletAuth do
   import Phoenix.Controller
 
   alias Satori.Wallets
-  alias SatoriWeb.Router.Helpers, as: Routes
+  # alias SatoriWeb.Router.Helpers, as: Routes
   # use DateTime
 
   @max_age 60 * 60 * 24 * 60
@@ -106,6 +106,7 @@ defmodule SatoriWeb.WalletAuth do
   ensured here?
   """
   # is conn even used since it's websockets?
+
   def require_authenticated_wallet(conn, _opts) do
     # what should this be for wallet authentication?
     if conn.assigns[:current_user] do
@@ -113,7 +114,7 @@ defmodule SatoriWeb.WalletAuth do
     else
       conn
       |> put_flash(:error, "You must log in to access this page.")
-      |> redirect(to: Routes.page_path(conn, :index))
+      # |> redirect(to: Routes.page_path(conn, :index))
       |> halt()
     end
   end

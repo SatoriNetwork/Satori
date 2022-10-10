@@ -1,6 +1,6 @@
 defmodule SatoriWeb.Resolvers.Wallet do
   alias Satori.Wallets
-  alias SatoriWeb.Schema.ChangesetErrors
+  # alias SatoriWeb.Schema.ChangesetErrors
 
   def wallet(_, %{id: id}, _) do
     {:ok, Wallets.get_wallet!(id)}

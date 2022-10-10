@@ -7,6 +7,7 @@ defmodule Satori.Wallets do
   alias Satori.Repo
 
   alias Satori.Wallets.{Wallet, WalletToken}
+  alias Satori.Devices.Device
 
   @doc """
   Returns the list of wallets.
@@ -26,7 +27,7 @@ defmodule Satori.Wallets do
 
   Examples Criteria
 
-    [{:limit, 15}, {:order, :asc}, {:filter, [{:matching, "macbook"}, {:ram, 6}]}]
+    [{:limit, 15}, {:order, :asc}, {:filter, [{:matching, "california"}, {:public_key, abce123}]}]
 
   """
 
@@ -44,8 +45,8 @@ defmodule Satori.Wallets do
         #   from w in query, order_by [{^order, :id}]
       end)
       |> IO.inspect()
-      |> Repo.preload(:device)
       |> Repo.all
+      |> Repo.preload(:device)
   end
 
   defp filter_with(filters, query) do
@@ -86,7 +87,10 @@ defmodule Satori.Wallets do
       ** (Ecto.NoResultsError)
 
   """
-  def get_wallet!(id), do: Repo.get!(Wallet, id)
+  def get_wallet!(id) do
+    Repo.get!(Wallet, id)
+   |> Repo.preload(:device)
+  end
 
   @doc """
   Creates a wallet.

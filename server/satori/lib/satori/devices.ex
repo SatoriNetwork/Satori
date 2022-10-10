@@ -7,6 +7,7 @@ defmodule Satori.Devices do
   alias Satori.Repo
 
   alias Satori.Devices.Device
+  alias Satori.Wallets.Wallet
 
   @doc """
   Returns the list of devices.
@@ -47,7 +48,7 @@ defmodule Satori.Devices do
       end)
       |> IO.inspect()
       |> Repo.all
-      # |> Repo.preload(:wallet)
+      |> Repo.preload(:wallet)
   end
 
   defp filter_with(filters, query) do
@@ -91,7 +92,10 @@ defmodule Satori.Devices do
       ** (Ecto.NoResultsError)
 
   """
-  def get_device!(id), do: Repo.get!(Device, id) # |> Repo.preload(:wallet)
+  def get_device!(id) do
+    Repo.get!(Device, id)
+   |> Repo.preload(:wallet)
+  end
 
   @doc """
   Creates a device.
