@@ -3,6 +3,71 @@ import pandas as pd
 import datetime as dt
 from satori import config
 
+class SourceStreamTarget:
+    
+    def __init__(
+        self,
+        stream:str,
+        target:str=None,
+        source:str=None,
+        publisher:str=None,
+    ):
+        self.source = source or config.defaultSource()
+        self.stream = stream
+        self.publsiher = publisher # so far unused
+        self.target = target
+
+    def id(self):
+        ''' id has one target '''
+        return (self.source, self.stream, self.target)
+
+    def key(self):
+        return self.id()
+    
+    def streamKey(self):
+        return (self.source, self.stream)
+    
+    def get(self):
+        ''' easy to combine '''
+        return (self.source, self.stream, self.target)
+
+    def asTuple(self):
+        ''' easy to combine '''
+        return (self.source, self.stream, self.target)
+
+    def asMap(self):
+        ''' hard to combine '''
+        return {self.source: {self.stream: self.target}}
+
+    def asDict(self):
+        ''' hard to combine '''
+        return {(self.source, self.stream): [self.target]}
+    
+    @staticmethod
+    def combine(sourceStreamTargets:list['SourceStreamTarget']):
+        ''' {('x', 'y', 'z1'), ('a', 'b', 'c'), ('x', 'y', 'z2')} '''
+        return {(source, stream, target) for source, stream, target in (sst.asTuple() for sst in sourceStreamTargets)}
+
+    @staticmethod
+    def condense(sourceStreamTargets:list['SourceStreamTarget']):
+        '''
+        SourceStreamTargets.condense(targets)
+        [('x', 'y', ['z1', 'z2']), ('a', 'b', ['c'])]
+        '''
+        existing = {}
+        ret = []
+        
+        for sst in sourceStreamTargets:
+            if (sst.source, sst.stream) in existing.keys():
+                existing[(sst.source, sst.stream)].extend(sst.target)
+                existing[(sst.source, sst.stream)].extend(sst.target)
+            else:
+                existing = {**existing, **sst.asDict()}
+        for key, value in existing.items():
+            ret.append((key[0], key[1], list(set(value))))
+        return ret
+
+
 class SourceStreamTargets:
     
     def __init__(
@@ -10,10 +75,14 @@ class SourceStreamTargets:
         stream:str,
         targets:list[str]=None,
         source:str=None,
+        publisher:str=None,
     ):
-        self.stream = stream
-        self.targets = targets or [stream] 
         self.source = source or config.defaultSource()
+        self.stream = stream
+        self.publsiher = publisher # so far unused
+        self.targets = targets or [stream] 
+        # since source isn't used for any real logic, we can use it to store the publisher
+        self.source = (self.source + '::' + self.publisher) if self.publisher else self.source
 
     def id(self):
         ''' id has one target '''

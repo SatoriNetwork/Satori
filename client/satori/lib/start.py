@@ -5,7 +5,7 @@ from functools import partial
 import pandas as pd
 import satori
 
-from satori.lib.engine.structs import SourceStreamTargets
+from satori.lib.engine.structs import SourceStreamTarget
 import satori.lib.engine.model.metrics as metrics
 from satori.lib.apis import disk
 from satori.lib.apis import memory
@@ -95,76 +95,87 @@ def getEngine(connection):
                     for tx, i in product('sum() max() min() mean() median() std()'.split(), list(range(22, 90, 7)))}
             },
             'features': {
-                ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'): 
+                ('streamrSpoof', 'simpleEURCleaned', 'DiffHighLow'): 
                     partial(
                         generateCombinedFeature, 
                         columns=[
-                            ('streamrSpoof', 'simpleEURCleanedHL', 'High'), 
-                            ('streamrSpoof', 'simpleEURCleanedHL', 'Low')])
+                            ('streamrSpoof', 'simpleEURCleaned', 'High'), 
+                            ('streamrSpoof', 'simpleEURCleaned', 'Low')])
             },
             'override': False}
         return {
             satori.ModelManager(
                 disk=disk.Disk(),
                 memory=memory.Memory,
-                sourceId='streamrSpoof',
-                streamId='simpleEURCleanedHL',
-                targetId='High',
-                targets=[SourceStreamTargets(
-                    source='streamrSpoof', 
-                    stream='simpleEURCleanedHL', 
-                    targets=['High', 'Low'])],
-                pinnedFeatures=[('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow')],
+                primary=SourceStreamTarget(
+                        source='streamrSpoof', 
+                        stream='simpleEURCleaned', 
+                        publisher='none',
+                        target='High'),
+                ancillary=[SourceStreamTarget(
+                        source='streamrSpoof', 
+                        stream='simpleEURCleaned', 
+                        publisher='none',
+                        target='Low')],
+                pinnedFeatures=[('streamrSpoof', 'simpleEURCleaned', 'DiffHighLow')],
                 chosenFeatures=[
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyHigh21'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh14std'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
+                    ('streamrSpoof', 'simpleEURCleaned', 'High'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'Low'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'DiffHighLow'),
+                    ('streamrSpoof', 'simpleEURCleaned', 'DailyHigh21'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'RollingLow50min'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'RollingHigh14std'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'RollingHigh50max')],
                 **kwargs),
             satori.ModelManager(
                 disk=disk.Disk(),
                 memory=memory.Memory,
-                sourceId='streamrSpoof',
-                streamId='simpleEURCleanedHL',
-                targetId='Low',
-                targets=[SourceStreamTargets(
+                primary=SourceStreamTarget(
                     source='streamrSpoof', 
-                    stream='simpleEURCleanedHL', 
-                    targets=['Low', 'High'])],
-                pinnedFeatures=[('streamrSpoof', 'simpleEURCleanedHL', 'Low')],
+                    stream='simpleEURCleaned', 
+                    publisher='none',
+                    target='Low'),
+                ancillary=[
+                    SourceStreamTarget(
+                        source='streamrSpoof', 
+                        stream='simpleEURCleaned', 
+                        publisher='none',
+                        target='High'),],
+                pinnedFeatures=[('streamrSpoof', 'simpleEURCleaned', 'Low')],
                 chosenFeatures=[
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyLow21'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow14std'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'), 
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
+                    ('streamrSpoof', 'simpleEURCleaned', 'Low'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'High'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'DailyLow21'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'DiffHighLow'),
+                    ('streamrSpoof', 'simpleEURCleaned', 'RollingLow14std'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'RollingLow50min'), 
+                    ('streamrSpoof', 'simpleEURCleaned', 'RollingHigh50max')],
                 **kwargs),
             satori.ModelManager(
                 disk=disk.Disk(),
                 memory=memory.Memory,
-                sourceId='streamrSpoof',
-                streamId='simpleEURCleanedC',
-                targetId='Close',
-                targets=[
-                    SourceStreamTargets(
+                primary=SourceStreamTarget(
                         source='streamrSpoof', 
-                        stream='simpleEURCleanedC', 
-                        targets=['Close']),
-                    SourceStreamTargets(
+                        stream='simpleEURCleaned', 
+                        publisher='none',
+                        target='Close'),
+                ancillary=[
+                    SourceStreamTarget(
                         source='streamrSpoof', 
-                        stream='simpleEURCleanedHL', 
-                        targets=['High', 'Low'])],
+                        stream='simpleEURCleaned', 
+                        publisher='none',
+                        target='High'),
+                    SourceStreamTarget(
+                        source='streamrSpoof', 
+                        stream='simpleEURCleaned', 
+                        publisher='none',
+                        target='Low')],
                 chosenFeatures=[
-                    ('streamrSpoof', 'simpleEURCleanedC', 'Close'),
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
-                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyCLose7')],
+                    ('streamrSpoof', 'simpleEURCleaned', 'Close'),
+                    ('streamrSpoof', 'simpleEURCleaned', 'High'),
+                    ('streamrSpoof', 'simpleEURCleaned', 'Low'),
+                    ('streamrSpoof', 'simpleEURCleaned', 'DiffHighLow'),
+                    ('streamrSpoof', 'simpleEURCleaned', 'DailyCLose7')],
                 **kwargs)
             }
     

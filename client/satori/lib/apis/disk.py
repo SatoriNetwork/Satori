@@ -14,7 +14,7 @@ from satori.lib.apis import memory
 from satori.lib.engine.interfaces.data import DataDiskApi
 from satori.lib.engine.interfaces.model import ModelDataDiskApi, ModelDiskApi
 from satori.lib.engine.interfaces.wallet import WalletDiskApi
-from satori.lib.engine.structs import SourceStreamTargets
+from satori.lib.engine.structs import SourceStreamTarget
 
 def safetify(path:str):
     if not os.path.exists(os.path.dirname(path)):
@@ -141,7 +141,7 @@ class Disk(DataDiskApi, ModelDataDiskApi, ):
         stream = stream or self.stream
         return safetify(os.path.join(
                 self.location or config.dataPath(),
-                'permanent' if permanent else 'incremental', # 'incremental', # we need a name for not permanent because what if a stream source is called permanent...
+                'permanent' if permanent else 'incremental',
                 source,
                 f'{stream}.{self.ext}'))
         
@@ -285,11 +285,30 @@ class Disk(DataDiskApi, ModelDataDiskApi, ):
     def gather(
         self, 
         targetColumn:'str|tuple[str]',
+        sourceStreamTargets:list[SourceStreamTarget],
+    ):
+        ''' Layer 2. 
+        retrieves the targets and merges them.
+        '''
+        def dropIf(df:pd.DataFrame, column:tuple):
+            if df is not None:
+                return df.drop(column, axis=1)
+        
+        def filterNone(items:list):
+            return [x for x in items if x is not None]
+        
+        return self.memory.merge(filterNone([
+                dropIf(self.read(source, stream, columns=targets), (source, stream, 'StreamObservationId'))
+                for source, stream, targets in SourceStreamTarget.condense(sourceStreamTargets)]),
+            targetColumn=targetColumn)
+
+    #unused
+    def altGather(
+        self, 
+        targetColumn:'str|tuple[str]',
         targetsByStreamBySource:dict[str, dict[str, list[str]]]=None,
         targetsByStream:dict[str, list[str]]=None,
         targets:list[str]=None,
-        sourceStreamTargets:list=None,
-        sourceStreamTargetss:list[SourceStreamTargets]=None,
         source:str=None,
         stream:str=None,
     ):
@@ -308,16 +327,6 @@ class Disk(DataDiskApi, ModelDataDiskApi, ):
         
         source = source or self.source
         stream = stream or self.stream
-        if sourceStreamTargetss is not None:
-            return self.memory.merge(filterNone([
-                    dropIf(self.read(source, stream, columns=targets), (source, stream, 'StreamObservationId'))
-                    for source, stream, targets in SourceStreamTargets.condense(sourceStreamTargetss)]),
-                targetColumn=targetColumn)
-        if sourceStreamTargets is not None:
-            return self.memory.merge(filterNone([
-                    dropIf(self.read(source, stream, columns=targets), (source, stream, 'StreamObservationId'))
-                    for source, stream, targets in sourceStreamTargets]),
-                targetColumn=targetColumn)
         if targets is not None:
             return self.memory.merge(
                 dropIf(
@@ -339,10 +348,8 @@ class Disk(DataDiskApi, ModelDataDiskApi, ):
                     for stream, targets in values]),
                 targetColumn=targetColumn)
         return dropIf(self.read(source, stream), (source, stream, 'StreamObservationId'))
-    
 
-        
-        
+
 '''
 from satori.lib.apis import disk
 x = disk.Api(source='streamrSpoof', stream='simpleEURCleaned') 
@@ -351,4 +358,4 @@ df
 x.read(columns=['High'])
 exit()
 
-'''            
+'''

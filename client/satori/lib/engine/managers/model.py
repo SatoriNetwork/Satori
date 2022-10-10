@@ -16,7 +16,7 @@ from reactivex.subject import BehaviorSubject
 from sklearn.exceptions import NotFittedError
 
 from satori import config
-from satori.lib.engine.structs import HyperParameter, SourceStreamTargets
+from satori.lib.engine.structs import HyperParameter, SourceStreamTarget
 from satori.lib.engine.model.pilot import PilotModel
 from satori.lib.engine.model.stable import StableModel
 from satori.lib.engine.interfaces.model import ModelDataDiskApi
@@ -35,10 +35,8 @@ class ModelManager:
         chosenFeatures:'list(str)'=None,
         pinnedFeatures:'list(str)'=None,
         exploreFeatures:bool=True,
-        sourceId:str='',
-        streamId:str='',
-        targetId:str='',
-        targets:list[SourceStreamTargets]=None,
+        primary:SourceStreamTarget=None,
+        ancillary:list[SourceStreamTarget]=None,
         split:'int|float'=.2,
         override:bool=False,
     ):
@@ -61,13 +59,10 @@ class ModelManager:
         '''
         self.disk = disk
         self.memory = memory
-        self.sourceId = sourceId
-        self.streamId = streamId
-        self.targetId = targetId
+        self.primary:SourceStreamTarget = primary
+        self.ancillary :list[SourceStreamTarget] = ancillary 
+        self.id = self.primary.id()
         self.modelPath = modelPath or config.root('..', 'models', self.sourceId, self.streamId, self.targetId + '.joblib')
-        #self.sources = {'source': {'stream':['targets']}}
-        self.targets:list[SourceStreamTargets] = targets
-        self.id = SourceStreamTargets(source=sourceId, stream=streamId, targets=[targetId])
         self.setupFlags()
         self.get()
         # how could we use dependency injection here? 
@@ -92,6 +87,23 @@ class ModelManager:
     def prediction(self):
         ''' gets prediction from the stable model '''
         return self.stable.prediction
+    
+    @property
+    def targets(self): #list[SourceStreamTarget]
+        ''' primay and ancillary  '''
+        return [self.primary] + self.ancillary 
+
+    @property
+    def sourceId(self):
+        return self.primary.source
+
+    @property
+    def streamId(self):
+        return self.primary.stream
+
+    @property
+    def targetId(self):
+        return self.primary.target
 
     def buildStable(self):
         self.stable.build()
@@ -113,7 +125,8 @@ class ModelManager:
     def syncManifest(self):
         manifest = config.manifest()
         manifest[self.key()] = {
-            'targets': [x.asTuples() for x in self.targets], 
+            'primary': self.primary.asTuple(), 
+            'ancillary ': [x.asTuple() for x in self.ancillary ], 
             'purged': manifest.get(self.key(), {}).get('purged', [])}
         config.put('manifest', data=manifest)
 
@@ -146,18 +159,18 @@ class ModelManager:
             threshold amount of data.
             '''
             self.data = self.data if self.data is not None else pd.DataFrame(
-                {x: [] for x in SourceStreamTargets.combine(self.targets)})
+                {x: [] for x in SourceStreamTarget.combine(self.targets)})
     
-        self.data = self.disk.gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
+        self.data = self.disk.gather(sourceStreamTargets=self.targets, targetColumn=self.id)
         handleEmpty()
 
     ### TARGET ####################################################################
 
     def key(self):
-        return self.id.id()
-    
+        return self.id
+
     def streamKey(self):
-        return self.id.id()
+        return self.id
 
     ### FEATURE DATA ####################################################################
 
@@ -288,7 +301,7 @@ class ModelManager:
             ## something like this?
             #self.features.append(x)
             # 
-            #self.targets.append(SourceStreamTargets(x))  or something
+            #self.targets.append(SourceStreamTarget(x))  or something
             #self.syncManifest()  then sync manifest when you change targets.
             #maybe remove targets that aren't being used as any features.. somewhere?
             

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from satori.lib.engine.structs import SourceStreamTargets
+from satori.lib.engine.structs import SourceStreamTarget
 
 
 class ModelMemoryApi():
@@ -28,19 +28,10 @@ class ModelDataDiskApi():
     def gather(
         self, 
         targetColumn:'str|tuple[str]',
-        targetsByStreamBySource:dict[str, dict[str, list[str]]]=None,
-        targetsByStream:dict[str, list[str]]=None,
-        targets:list[str]=None,
-        sourceStreamTargets:list=None,
-        sourceStreamTargetss:list[SourceStreamTargets]=None,
-        source:str=None,
-        stream:str=None,
+        sourceStreamTargets:list[SourceStreamTarget],
     ):
         ''' Layer 2. 
         retrieves the targets and merges them.
-        as a prime example of premature optimization I made 
-        this function callable in a myriad of various ways...
-        I don't remember why.
         '''
 
 class ModelDiskApi(object):
