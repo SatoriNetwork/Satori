@@ -1,13 +1,12 @@
 import os
-import json
-from satori import config
-from satori.lib.apis.ravencoin import Ravencoin
-from satori.lib.apis.disk import WalletApi
-from satori.lib.wallet import sign, verify as satori_verify
+import mnemonic
 import ravencoin.base58
 from ravencoin.wallet import P2PKHRavencoinAddress, CRavencoinSecret
-import mnemonic
-from satori.lib.wallet import connection
+from satoriwallet.lib.apis.ravencoin import Ravencoin
+from satoriwallet.lib.wallet import sign, verify as satori_verify
+from satoriwallet.lib.wallet import connection
+from satori import config
+from satori.lib.apis.disk import WalletApi
 
 class Wallet():
     
@@ -166,7 +165,7 @@ class Wallet():
         
     def get(self, allWalletInfo=False):
         ''' gets data from the blockchain, saves to attributes '''
-        x = Ravencoin(self.address, self.scripthash)
+        x = Ravencoin(self.address, self.scripthash, config.electrumxServers())
         x.get(allWalletInfo)
         self.balance = x.balance
         self.stats = x.stats
