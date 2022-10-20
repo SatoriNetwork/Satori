@@ -1,6 +1,6 @@
 ''' interface for a StableModel '''
 
-from satori.lib.engine.structs import HyperParameter
+from satori.engine.structs import HyperParameter
 
 class StableModelInterface:
 

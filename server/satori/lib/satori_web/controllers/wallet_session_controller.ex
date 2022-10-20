@@ -10,11 +10,11 @@ defmodule SatoriWeb.WalletSessionController do
 
   def create(conn, %{
         "wallet" =>
-          %{"message" => message, "signature" => signature, "public_key" => public_key} = params
+          %{"message" => message, "signature" => signature, "pubkey" => pubkey} = params
       }) do
     ## Add verify wallet here
-    if WalletAuth.verify?(message, signature, public_key) do
-      if wallet = Wallets.get_wallet_by_address(public_key) do
+    if WalletAuth.verify?(message, signature, pubkey) do
+      if wallet = Wallets.get_wallet_by_address(pubkey) do
         WalletAuth.log_in_wallet(conn, wallet, params)
       else
         # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
@@ -24,7 +24,7 @@ defmodule SatoriWeb.WalletSessionController do
       render(conn, "new.html", error_message: "Invalid wallet")
     end
 
-    # if user = Accounts.get_user_by_public_key(public_key) do
+    # if user = Accounts.get_user_by_pubkey(pubkey) do
     #   UserAuth.log_in_user(conn, user, user_params)
     # else
     #   render(conn, "wallet.html", error_message: "Invalid wallet")

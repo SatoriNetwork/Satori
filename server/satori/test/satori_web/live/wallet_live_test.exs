@@ -4,9 +4,9 @@ defmodule SatoriWeb.WalletLiveTest do
   import Phoenix.LiveViewTest
   import Satori.WalletsFixtures
 
-  @create_attrs %{address: "some address", public_key: "some public_key", user_id: 42}
-  @update_attrs %{address: "some updated address", public_key: "some updated public_key", user_id: 43}
-  @invalid_attrs %{address: nil, public_key: nil, user_id: nil}
+  @create_attrs %{address: "some address", pubkey: "some pubkey", user_id: 42}
+  @update_attrs %{address: "some updated address", pubkey: "some updated pubkey", user_id: 43}
+  @invalid_attrs %{address: nil, pubkey: nil, user_id: nil}
 
   defp create_wallet(_) do
     wallet = wallet_fixture()

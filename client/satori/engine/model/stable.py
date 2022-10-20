@@ -10,7 +10,7 @@ from functools import partial
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor, XGBClassifier
 
-from satori.lib.engine.model.interfaces.stable import StableModelInterface
+from satori.engine.model.interfaces.stable import StableModelInterface
 
 
 class StableModel(StableModelInterface):

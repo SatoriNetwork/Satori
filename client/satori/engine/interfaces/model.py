@@ -1,6 +1,6 @@
 import pandas as pd
 
-from satori.lib.engine.structs import SourceStreamTargets
+from satori.engine.structs import SourceStreamTargets
 
 
 class ModelMemoryApi():

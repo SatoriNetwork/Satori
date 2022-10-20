@@ -16,11 +16,11 @@ from reactivex.subject import BehaviorSubject
 from sklearn.exceptions import NotFittedError
 
 from satori import config
-from satori.lib.engine.structs import HyperParameter, SourceStreamTargets
-from satori.lib.engine.model.pilot import PilotModel
-from satori.lib.engine.model.stable import StableModel
-from satori.lib.engine.interfaces.model import ModelDataDiskApi
-from satori.lib.engine.interfaces.model import ModelMemoryApi
+from satori.engine.structs import HyperParameter, SourceStreamTargets
+from satori.engine.model.pilot import PilotModel
+from satori.engine.model.stable import StableModel
+from satori.engine.interfaces.model import ModelDataDiskApi
+from satori.engine.interfaces.model import ModelMemoryApi
 
 class ModelManager:
 

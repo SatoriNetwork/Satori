@@ -1,12 +1,14 @@
 import os
+import json
 import mnemonic
 import ravencoin.base58
 from ravencoin.wallet import P2PKHRavencoinAddress, CRavencoinSecret
-from satoriwallet.lib.apis.ravencoin import Ravencoin
-from satoriwallet.lib.wallet import sign, verify as satori_verify
-from satoriwallet.lib.wallet import connection
+from satoriwallet.apis.ravencoin import Ravencoin
+from satoriwallet.lib import sign, verify as satori_verify
+from satoriwallet.lib import connection
+from satori.apis.disk import WalletApi
+from satori.apis import system
 from satori import config
-from satori.lib.apis.disk import WalletApi
 
 class Wallet():
     
@@ -27,6 +29,10 @@ class Wallet():
         self.transactions = [] # TransactionStruct
         self.temporary = temporary
     
+    def __call__(self):
+        self.init()
+        return self
+    
     def __repr__(self):
         return f'''Wallet(
     publicKey: {self.publicKey}
@@ -39,11 +45,18 @@ class Wallet():
     banner: {self.banner})'''
 
     def authPayload(self, asDict=False): 
-        return connection.payloadForServer(self, asDict=asDict)
-    
-    def __call__(self):
-        self.init()
-        return self
+        payload = connection.authPayload(self)
+        if asDict:
+            return payload
+        return json.dumps(payload)
+
+    def registerPayload(self, asDict=False): 
+        payload = {
+            **connection.authPayload(self), 
+            **system.devicePayload(asDict=True)}
+        if asDict:
+            return payload
+        return json.dumps(payload)
     
     def init(self):
         ''' try to load, else generate and save '''

@@ -1,6 +1,6 @@
 mix phx.gen.live Accounts User users name:string age:string
 
-mix phx.gen.live Wallets Wallet wallets user_id:int address:string public_key:string
+mix phx.gen.live Wallets Wallet wallets user_id:int address:string pubkey:string
 
 mix phx.gen.live Devices Device devices name:string cpu:string disk:int bandwidth:string ram:int wallet_id:int
 

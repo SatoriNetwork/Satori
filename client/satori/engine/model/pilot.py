@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 import ppscore
 from xgboost import XGBRegressor, XGBClassifier
 
-from satori.lib.engine.model.interfaces.pilot import PilotModelInterface
+from satori.engine.model.interfaces.pilot import PilotModelInterface
 
 
 class PilotModel(PilotModelInterface):

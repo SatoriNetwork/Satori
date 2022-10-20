@@ -1,6 +1,6 @@
 import json 
-from satori.lib import wallet
-from satori.lib.apis.server import ClientConnection
+from satori import wallet
+from satori.apis.server import ClientConnection
 
 def establishConnection(wallet: wallet.Wallet):
     ''' establishes a connection to the satori server, returns connection object '''

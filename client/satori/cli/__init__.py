@@ -1,8 +1,8 @@
 
 import click
 from satori.lib.wallet import verify as satori_verify
-from satori.lib import wallet
 from satori.lib.wallet import connection
+from satori.lib import wallet
 
 @click.group()
 def main():
@@ -42,12 +42,12 @@ def create_wallet_auth_payload():
     '''uses existing saved wallet to sign a message for authentication'''
     w = wallet.Wallet(temporary=True)
     w.init()
-    print(connection.payloadForServer(w))
+    print(connection.authPayload(w))
     
 @main.command()
 def create_test_wallet_auth_payload():
     '''generates a new wallet and signs a message for authentication'''
     w = wallet.Wallet(temporary=True)
     w.generate()
-    print(connection.payloadForServer(w))
+    print(connection.authPayload(w))
         

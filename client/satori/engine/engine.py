@@ -1,8 +1,8 @@
 import threading
 import time
-from .managers.data import DataManager
-from .managers.model import ModelManager
-from .view import View
+from satori.engine.managers.data import DataManager
+from satori.engine.managers.model import ModelManager
+from satori.engine.view import View
 
 class Engine:
 

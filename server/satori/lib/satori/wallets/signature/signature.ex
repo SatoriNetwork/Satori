@@ -35,20 +35,20 @@ defmodule Satori.Wallets.Signature do
   ## Parameters
   - message: the message in plain text
   - signature: signature encoded in base 64
-  - public_key: the public key encoded in base 16
+  - pubkey: the public key encoded in base 16
   """
   @spec verify!(binary, String.t(), String.t()) :: true | false
-  def verify!(message, signature, public_key) do
+  def verify!(message, signature, pubkey) do
     dersig = der_from_signature(signature |> Base.decode64!(ignore: :whitespace))
-    public_key = [public_key |> Base.decode16!(case: :mixed), :secp256k1]
+    pubkey = [pubkey |> Base.decode16!(case: :mixed), :secp256k1]
     doublehash = :crypto.hash(:sha256, :crypto.hash(:sha256, Ravencoin.serialize(message)))
-    :crypto.verify(:ecdsa, :sha256, {:digest, doublehash}, dersig, public_key)
+    :crypto.verify(:ecdsa, :sha256, {:digest, doublehash}, dersig, pubkey)
   end
 
   @doc "Ditto"
   @spec verify(binary, String.t(), String.t()) :: {:ok, true} | {:ok, false} | {:err, String.t()}
-  def verify(message, signature, public_key) do
-    {:ok, verify!(message, signature, public_key)}
+  def verify(message, signature, pubkey) do
+    {:ok, verify!(message, signature, pubkey)}
   rescue
     e -> {:error, Exception.message(e)}
   end
@@ -96,9 +96,9 @@ end
 #   System.halt(1)
 # end
 
-# [message, signature, public_key] = System.argv()
+# [message, signature, pubkey] = System.argv()
 
-# case Satori.Wallets.Signature.verify(message, signature, public_key) do
+# case Satori.Wallets.Signature.verify(message, signature, pubkey) do
 #   {:ok, true} -> IO.puts "Signature Verified Successfully"
 #   {:ok, false} -> IO.puts "Signature Verification Failure"
 #   {:error, error} -> IO.puts "error: #{error}"

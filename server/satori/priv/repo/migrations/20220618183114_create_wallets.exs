@@ -5,12 +5,12 @@ defmodule Satori.Repo.Migrations.CreateWallets do
     create table(:wallets) do
       #add :user_id, :integer
       add :address, :string
-      add :public_key, :string
+      add :pubkey, :string
 
       timestamps()
     end
 
-    create(unique_index(:wallets, [:public_key]))
+    create(unique_index(:wallets, [:pubkey]))
 
     create table(:wallets_tokens) do
       add(:wallet_id, references(:wallets, on_delete: :delete_all), null: false)

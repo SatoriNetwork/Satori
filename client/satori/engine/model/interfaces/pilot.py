@@ -1,7 +1,7 @@
 ''' interface for a PilotModel '''
 
 import pandas as pd
-from satori.lib.engine.model.interfaces.stable import StableModelInterface
+from satori.engine.model.interfaces.stable import StableModelInterface
 
 class PilotModelInterface():
 

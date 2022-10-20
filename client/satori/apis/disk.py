@@ -10,11 +10,11 @@ from satori import config
 import os
 import joblib
 import pyarrow as pa
-from satori.lib.apis import memory
-from satori.lib.engine.interfaces.data import DataDiskApi
-from satori.lib.engine.interfaces.model import ModelDataDiskApi, ModelDiskApi
-from satori.lib.engine.interfaces.wallet import WalletDiskApi
-from satori.lib.engine.structs import SourceStreamTargets
+from satori.apis import memory
+from satori.engine.interfaces.data import DataDiskApi
+from satori.engine.interfaces.model import ModelDataDiskApi, ModelDiskApi
+from satori.engine.interfaces.wallet import WalletDiskApi
+from satori.engine.structs import SourceStreamTargets
 
 def safetify(path:str):
     if not os.path.exists(os.path.dirname(path)):

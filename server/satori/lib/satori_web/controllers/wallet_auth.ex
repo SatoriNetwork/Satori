@@ -118,9 +118,9 @@ defmodule SatoriWeb.WalletAuth do
     end
   end
 
-  def verify?(message, signature, public_key) do
+  def verify?(message, signature, pubkey) do
     messageIsRecent(message) && Satori.Wallets.Signature.verify!(
-      message, signature, public_key)
+      message, signature, pubkey)
   end
 
   # message should look like this: "2022-08-01 17:28:44.748691"

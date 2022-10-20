@@ -45,10 +45,10 @@ These flows describe what the server will do in response to various types of cli
 
 ## authentication
 
-1. client provides `message` (recent datetime string), `signature` (string), and `public_key` (string), and `address` (string) to 'establish connection' endpoint
+1. client provides `message` (recent datetime string), `signature` (string), and `pubkey` (string), and `address` (string) to 'establish connection' endpoint
 2. server verifies `message` is recent
 3. server verifies `signature` is good
-4. server looks up `public_key` in `wallets` table, if not exists, server creates a wallet using `public_key` and `address`.
+4. server looks up `pubkey` in `wallets` table, if not exists, server creates a wallet using `pubkey` and `address`.
 5. server loads into memory (on the session object? wallet object? idk) the subscriptions this client has so observations on those streams are automatically sent to the client.
 6. server establishes websocket connection with client (via graphql session management)
 7. server provides a token (probably via graphql session management) to client.

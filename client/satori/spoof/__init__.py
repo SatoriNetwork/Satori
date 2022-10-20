@@ -6,7 +6,7 @@ import requests
 import datetime as dt
 import pandas as pd
 from satori import config 
-from satori.lib.apis import disk
+from satori.apis import disk
 
 class Streamr():
     def __init__(self, sourceId:str=None, streamId:str=None):

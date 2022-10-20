@@ -1,8 +1,8 @@
 from functools import reduce
 import pandas as pd
 import warnings
-from satori.lib.apis.interfaces.memory import DiskMemory
-from satori.lib.engine.interfaces.model import ModelMemoryApi
+from satori.apis.interfaces.memory import DiskMemory
+from satori.engine.interfaces.model import ModelMemoryApi
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 

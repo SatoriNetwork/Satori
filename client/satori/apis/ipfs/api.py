@@ -41,7 +41,7 @@ To do list:
 1. clean up wallet table:
     - id,
     - address
-    - public_key
+    - pubkey
     - user_id
 2. enforce 1-1 relationship for wallet to devices
 3. create pins table

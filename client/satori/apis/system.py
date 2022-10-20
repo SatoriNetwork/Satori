@@ -5,17 +5,22 @@ import psutil
 import time
 import shutil
 import multiprocessing
-
-def getPayload():
+import json
+    
+def devicePayload(asDict=False):
     ''' returns payload of metrics '''
     total, _, free = getDisk()
-    return {
+    payload = {
         'ram_total_gb': getRam(),
         'ram_available_percent': getRamAvailablePercentage(), 
         'cpu': getProcessorCount(), 
         'disk_total': total, 
         'disk_free': free, 
-        'bandwidth': 'unknown'}
+        #'bandwidth': 'unknown'
+    }
+    if asDict:
+        return payload
+    return json.dumps(payload)
 
 def getDisk():
     ''' returns ints in gb total, used, free '''

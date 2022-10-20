@@ -5,13 +5,13 @@ from functools import partial
 import pandas as pd
 import satori
 
-from satori.lib.engine.structs import SourceStreamTargets
-import satori.lib.engine.model.metrics as metrics
-from satori.lib.apis import disk
-from satori.lib.apis import memory
-from satori.lib.wallet import Wallet
-from satori.lib.apis.server import ClientConnection
-from satori.lib.apis.ipfs import cli as ipfs
+from satori.engine.structs import SourceStreamTargets
+import satori.engine.model.metrics as metrics
+from satori.apis import disk
+from satori.apis import memory
+from satori.wallet import Wallet
+from satori.apis.server import ClientConnection
+from satori.apis.ipfs import cli as ipfs
 
 def startIPFS():
     thread = threading.Thread(target=ipfs.start, daemon=True)

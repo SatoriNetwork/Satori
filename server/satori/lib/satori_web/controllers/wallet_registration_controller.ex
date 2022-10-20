@@ -20,11 +20,11 @@ defmodule SatoriWeb.WalletRegistrationController do
   """
   def create(conn, %{
         "wallet" =>
-          %{"message" => message, "signature" => signature, "public_key" => public_key, "address" => address} = _user_params
+          %{"message" => message, "signature" => signature, "pubkey" => pubkey, "address" => address} = _user_params
       }) do
-    case WalletAuth.verify?(message, signature, public_key) do
+    case WalletAuth.verify?(message, signature, pubkey) do
       true ->
-        case Wallets.create_wallet(%{"public_key" => public_key, "address" => address}) do
+        case Wallets.create_wallet(%{"pubkey" => pubkey, "address" => address}) do
           {:ok, wallet} ->
             conn
             |> put_flash(:info, "Wallet created successfully.")
