@@ -1,0 +1,49 @@
+<mxfile host="65bd71144e">
+    <diagram id="9V1NOnrOxim7oWxH6y5B" name="Page-1">
+        <mxGraphModel dx="803" dy="307" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="9" style="edgeStyle=none;html=1;" parent="1" source="3" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="450" y="270" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="760" y="220"/>
+                            <mxPoint x="470" y="280"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="3" value="STREAMS&lt;br&gt;&lt;br&gt;wallet_id (publishers)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="710" y="20" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="SUBSCRIBERS&lt;br&gt;&lt;br&gt;device_id&lt;br&gt;stream_id (subscribed to)&lt;br&gt;target_id" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="20" width="190" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="DEVICES&lt;br&gt;&lt;br&gt;wallet_id (subscribers)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="365" y="20" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="&lt;h1&gt;ideal dataloader&lt;/h1&gt;&lt;p&gt;Wallet&lt;br&gt;&amp;nbsp; Devices&lt;br&gt;&amp;nbsp; &amp;nbsp; Streams (subscribers)&lt;br&gt;&amp;nbsp; Streams (publishers)&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="365" y="130" width="215" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="&lt;h1&gt;current dataloader&amp;nbsp;&lt;/h1&gt;&lt;p&gt;Wallet&lt;br&gt;&amp;nbsp; Devices&lt;br&gt;&amp;nbsp; &amp;nbsp; Streams (publishers) (streams.wallet_id)&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="30" width="270" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="to do" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="160" width="140" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="Item 1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" parent="10" vertex="1">
+                    <mxGeometry y="30" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="Item 2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" parent="10" vertex="1">
+                    <mxGeometry y="60" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="Item 3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;" parent="10" vertex="1">
+                    <mxGeometry y="90" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="&lt;h1&gt;Devices removed&lt;/h1&gt;&lt;p&gt;&lt;b&gt;Wallet&lt;br&gt;&amp;nbsp; Streams (publications) (stream.id where wallet.id == stream.wallet_id)&lt;br&gt;&lt;span&gt;&amp;nbsp; Streams (subscriptions) (suberiber.stream_id)&lt;/span&gt;&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;b&gt;&lt;span&gt;Stream&lt;br&gt;&lt;/span&gt;&lt;span&gt;&amp;nbsp; Wallet (publisher) (stream.wallet_id)&lt;br&gt;&lt;/span&gt;&lt;/b&gt;&lt;span&gt;&lt;b&gt;&amp;nbsp; Wallets (subscribers) (subcriber.wallet_id where subscriber.stream_id == stream.id)&lt;/b&gt;&lt;br&gt;&amp;nbsp; Observations (observation.stream_id == stream.id)&lt;br&gt;&amp;nbsp; Targets (list of target_ids on observations table where observation.stream_id == stream.id&lt;br&gt;&lt;br&gt;Observation&lt;br&gt;&amp;nbsp; Stream (observation.stream_id == stream.id)&lt;br&gt;&amp;nbsp; Target (observation.target_id == target.id)&lt;br&gt;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&amp;nbsp;&amp;nbsp;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="250" y="290" width="580" height="270" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
