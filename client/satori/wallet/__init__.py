@@ -57,7 +57,7 @@ class Wallet():
         if asDict:
             return payload
         return json.dumps(payload)
-    
+
     def init(self):
         ''' try to load, else generate and save '''
         if self.load():
