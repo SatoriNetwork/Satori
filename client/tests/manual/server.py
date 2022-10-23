@@ -23,5 +23,5 @@ def register_stream():
     print(r.status_code, r.text)
 
 if __name__ == '__main__':
-    register_wallet();
-    #register_stream();
+    #register_wallet();
+    register_stream();
