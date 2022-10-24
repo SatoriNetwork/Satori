@@ -1,3 +1,4 @@
+import json
 import requests 
 
 def register_wallet():
@@ -19,7 +20,8 @@ def register_stream():
     w = Wallet()()             
     r = requests.post(
         'http://localhost:5002/register/stream',
-        headers=w.authPayload(asDict=True))
+        headers=w.authPayload(asDict=True),
+        json=json.dumps({'source': 'test', 'name': 'test'}))
     print(r.status_code, r.text)
 
 if __name__ == '__main__':
