@@ -1,9 +1,9 @@
 import json
 import requests 
+from satori import Wallet
+w = Wallet()()             
 
 def register_wallet():
-    from satori import Wallet
-    w = Wallet()()             
     r = requests.post(
         'http://localhost:5002/register/wallet',
         headers=w.authPayload(asDict=True),
@@ -16,14 +16,21 @@ def register_wallet():
     #{'ram_total_gb': 32, 'ram_available_percent': 49.16639057975354, 'cpu': 8, 'disk_total': 475, 'disk_free': 66, 'bandwidth': 'unknown'}
 
 def register_stream():
-    from satori import Wallet
-    w = Wallet()()             
     r = requests.post(
         'http://localhost:5002/register/stream',
         headers=w.authPayload(asDict=True),
-        json=json.dumps({'source': 'test', 'name': 'test'}))
+        json=json.dumps({'source': 'test', 'name': 'test2'}))
     print(r.status_code, r.text)
+    
+def request_primary():
+    r = requests.post(
+        'http://localhost:5002/request/primary',
+        headers=w.authPayload(asDict=True),
+        json=json.dumps({'id': '1'}))
+    print(r.status_code, r.text)    
 
 if __name__ == '__main__':
-    #register_wallet();
-    register_stream();
+    register_wallet()
+    #register_stream()
+    #request_primary()
+    
