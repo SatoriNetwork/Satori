@@ -77,7 +77,7 @@ class Engine:
         def subscriber():
             '''
             listens for external updates on subscriptions - 
-            turn this into a steam rather than a loop - 
+            turn this into a stream rather than a loop - 
             triggered from flask app.
             this should probably be broken out into a service
             that subscribes and a service that listens...

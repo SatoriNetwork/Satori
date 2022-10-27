@@ -19,7 +19,7 @@ def register_stream():
     r = requests.post(
         'http://localhost:5002/register/stream',
         headers=w.authPayload(asDict=True),
-        json=json.dumps({'source': 'test', 'name': 'test2'}))
+        json=json.dumps({'source': 'test', 'name': 'test2', 'target':'target'}))
     print(r.status_code, r.text)
     
 def request_primary():
@@ -30,7 +30,7 @@ def request_primary():
     print(r.status_code, r.text)    
 
 if __name__ == '__main__':
-    register_wallet()
+    #register_wallet()
     #register_stream()
-    #request_primary()
+    request_primary()
     
