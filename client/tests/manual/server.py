@@ -3,6 +3,14 @@ import requests
 from satori import Wallet
 w = Wallet()()             
 
+# TODO make a set of fixtures for testing
+
+class fixtures():
+    @staticmethod
+    def streams(): 
+        return {0: {'source': 'test', 'name': 'test2', 'target':'target'}}
+
+
 def register_wallet():
     r = requests.post(
         'http://localhost:5002/register/wallet',
@@ -16,17 +24,26 @@ def register_wallet():
     #{'ram_total_gb': 32, 'ram_available_percent': 49.16639057975354, 'cpu': 8, 'disk_total': 475, 'disk_free': 66, 'bandwidth': 'unknown'}
 
 def register_stream():
+    ''' publish raw data'''
     r = requests.post(
         'http://localhost:5002/register/stream',
         headers=w.authPayload(asDict=True),
-        json=json.dumps({'source': 'test', 'name': 'test2', 'target':'target'}))
+        json=json.dumps(fixtures.streams[0]))
+    print(r.status_code, r.text)
+
+def register_subscription():
+    ''' subscribe to stream '''
+    r = requests.post(
+        'http://localhost:5002/register/subscription',
+        headers=w.authPayload(asDict=True),
+        json=json.dumps(fixtures.streams[0]))
     print(r.status_code, r.text)
     
 def request_primary():
-    r = requests.post(
+    ''' subscribe to primary data stream and and publish prediction '''
+    r = requests.get(
         'http://localhost:5002/request/primary',
-        headers=w.authPayload(asDict=True),
-        json=json.dumps({'id': '1'}))
+        headers=w.authPayload(asDict=True))
     print(r.status_code, r.text)    
 
 if __name__ == '__main__':
