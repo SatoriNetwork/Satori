@@ -8,7 +8,11 @@ w = Wallet()()
 class fixtures():
     @staticmethod
     def streams(): 
-        return {0: {'source': 'test', 'name': 'test2', 'target':'target'}}
+        return {
+            0: {'source': 'test', 'name': 'stream1', 'target':'target'},
+            1: {'source': 'test', 'name': 'stream2', 'target':'target'},
+            2: {'source': 'test', 'name': 'stream3', 'target':'target'},
+        }
 
 
 def register_wallet():
@@ -46,8 +50,28 @@ def request_primary():
         headers=w.authPayload(asDict=True))
     print(r.status_code, r.text)    
 
+
+def get_streams():
+    ''' subscribe to primary data stream and and publish prediction '''
+    r = requests.post(
+        'http://localhost:5002/get/streams',
+        headers=w.authPayload(asDict=True),
+        json='{}')
+    print(r.status_code, r.text)  
+    
+def my_streams():
+    ''' subscribe to primary data stream and and publish prediction '''
+    r = requests.post(
+        'http://localhost:5002/my/streams',
+        headers=w.authPayload(asDict=True),
+        json='{}')
+    print(r.status_code, r.text)  
+    
 if __name__ == '__main__':
     #register_wallet()
     #register_stream()
-    request_primary()
-    
+    #request_primary()
+    #my_streams()
+    get_streams()
+
+# python .\client\tests\manual\server.py
