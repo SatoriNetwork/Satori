@@ -11,22 +11,18 @@ class fixtures():
         return {
             0: {},
             1: {'source': 'test', 'name': 'stream1', 'target':'target'},
-            2: {'source': 'test', 'name': 'stream2', 'target':'target'},
-            3: {'source': 'test', 'name': 'stream3', 'target':'target'},
-            4: {'source': 'source'},
-            5: {'source': 'test'},
+            2: {'source': 'test'},
         }
         
     @staticmethod
     def subscriptions(): 
         return {
             0: {},
-            1: {'wallet_id': 1, 'stream_id': 1},
-            2: {'wallet_id': 1, 'stream_id': 2},
-            3: {'wallet_id': 2, 'stream_id': 1},
-            4: {'wallet_id': 2, 'stream_id': 2},
-            5: {'wallet_id': 3, 'stream_id': 1},
-            6: {'stream_id': 3},
+            1: {'publisher': {'pubkey': '12a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'}, 
+                'stream': {
+                    'source': 'source', 
+                    'name': 'name pred', 
+                    'target': 'target'}},
         }
 
 
@@ -85,12 +81,13 @@ def my_streams():
 if __name__ == '__main__':
     #register_wallet()
     #register_stream()
-    register_subscription(1) # 400 cannot subscribe to your own stream
-    register_subscription(6) # 200 OK
+    #register_subscription(1) # 400 cannot subscribe to your own stream
+    #register_subscription(2) # 200 OK
+    register_subscription(1) # 200 OK
     #request_primary()
     #my_streams()
     #get_streams(0)
-    #get_streams(5)
+    #get_streams(2)
     
 
 # python .\client\tests\manual\server.py
