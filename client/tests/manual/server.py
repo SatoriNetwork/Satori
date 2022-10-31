@@ -9,9 +9,11 @@ class fixtures():
     @staticmethod
     def streams(): 
         return {
-            0: {'source': 'test', 'name': 'stream1', 'target':'target'},
-            1: {'source': 'test', 'name': 'stream2', 'target':'target'},
-            2: {'source': 'test', 'name': 'stream3', 'target':'target'},
+            0: {},
+            1: {'source': 'test', 'name': 'stream1', 'target':'target'},
+            2: {'source': 'test', 'name': 'stream2', 'target':'target'},
+            3: {'source': 'test', 'name': 'stream3', 'target':'target'},
+            4: {'source': 'source'},
         }
 
 
@@ -32,7 +34,7 @@ def register_stream():
     r = requests.post(
         'http://localhost:5002/register/stream',
         headers=w.authPayload(asDict=True),
-        json=json.dumps(fixtures.streams[0]))
+        json=json.dumps(fixtures.streams()[1]))
     print(r.status_code, r.text)
 
 def register_subscription():
@@ -40,7 +42,7 @@ def register_subscription():
     r = requests.post(
         'http://localhost:5002/register/subscription',
         headers=w.authPayload(asDict=True),
-        json=json.dumps(fixtures.streams[0]))
+        json=json.dumps(fixtures.streams()[1]))
     print(r.status_code, r.text)
     
 def request_primary():
@@ -51,12 +53,12 @@ def request_primary():
     print(r.status_code, r.text)    
 
 
-def get_streams():
+def get_streams(x:int):
     ''' subscribe to primary data stream and and publish prediction '''
     r = requests.post(
         'http://localhost:5002/get/streams',
         headers=w.authPayload(asDict=True),
-        json='{}')
+        json=json.dumps(fixtures.streams()[x]))
     print(r.status_code, r.text)  
     
 def my_streams():
@@ -72,6 +74,7 @@ if __name__ == '__main__':
     #register_stream()
     #request_primary()
     #my_streams()
-    get_streams()
+    #get_streams(0)
+    get_streams(4)
 
 # python .\client\tests\manual\server.py
