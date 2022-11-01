@@ -79,12 +79,23 @@ def my_streams():
     print(r.status_code, r.text)  
     
 def checkin():
-    ''' register_wallet, loop to request_primary, my_streams '''
     r = requests.post(
         'http://localhost:5002/checkin',
         headers=w.authPayload(asDict=True),
         json=w.registerPayload())
     print(r.status_code, r.text)  
+    j = r.json
+    # use subscriptions to initialize engine 
+    print('subscriptions', j.get('subscriptions'))
+    # use publications to initialize engine
+    print('publications', j.get('publications'))
+    # use pins to initialize engine and update any missing data
+    print('pins', j.get('pins'))
+    # use server version to use the correct api
+    print('server version', j.get('versions', {}).get('server'))
+    # use client version to know when to update the client
+    print('client version', j.get('versions', {}).get('client'))
+    
     
 if __name__ == '__main__':
     #register_wallet()
