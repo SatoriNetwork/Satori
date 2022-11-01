@@ -78,6 +78,14 @@ def my_streams():
         json='{}')
     print(r.status_code, r.text)  
     
+def checkin():
+    ''' register_wallet, loop to request_primary, my_streams '''
+    r = requests.post(
+        'http://localhost:5002/checkin',
+        headers=w.authPayload(asDict=True),
+        json=w.registerPayload())
+    print(r.status_code, r.text)  
+    
 if __name__ == '__main__':
     #register_wallet()
     #register_stream()
@@ -88,6 +96,7 @@ if __name__ == '__main__':
     #my_streams()
     #get_streams(0)
     #get_streams(2)
+    checkin()
     
 
 # python .\client\tests\manual\server.py
