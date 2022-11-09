@@ -84,7 +84,8 @@ def checkin():
         headers=w.authPayload(asDict=True),
         json=w.registerPayload())
     print(r.status_code, r.text)  
-    j = r.json
+    j = r.json()
+    print('j', j)
     # use subscriptions to initialize engine 
     print('subscriptions', j.get('subscriptions'))
     # use publications to initialize engine
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     #register_stream()
     #register_subscription(1) # 400 cannot subscribe to your own stream
     #register_subscription(2) # 200 OK
-    register_subscription(1) # 200 OK
+    #register_subscription(1) # 200 OK
     #request_primary()
     #my_streams()
     #get_streams(0)
