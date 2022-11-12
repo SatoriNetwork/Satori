@@ -1,0 +1,69 @@
+<mxfile host="65bd71144e">
+    <diagram id="kiqwEoUSPDt0VLsWVj5u" name="Page-1">
+        <mxGraphModel dx="1498" dy="467" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="21" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry width="850" height="1100" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="1. Check-in with server" style="edgeStyle=elbowEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="4">
+                    <mxGeometry x="-0.3793" relative="1" as="geometry">
+                        <mxPoint x="80" y="310" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="130" y="240"/>
+                        </Array>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="9" value="3. uses key to set up&amp;nbsp;&lt;br&gt;websocket connection" style="edgeStyle=elbowEdgeStyle;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="3" target="5">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Client(s)" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+                    <mxGeometry x="385" y="120" width="80" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="2. gives key (if successful)" style="edgeStyle=elbowEdgeStyle;html=1;entryX=0;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="4" target="3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Database Server" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="70" y="340" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="4. pubsub datapoints" style="edgeStyle=elbowEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="5" target="3">
+                    <mxGeometry x="0.4177" relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="680" y="260"/>
+                        </Array>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="5" value="Pubsub Server" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="620" y="340" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="&lt;h1&gt;3. Websocket Connection&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;font-size: 11px ; text-align: center&quot;&gt;We set up a sebsocket connection with the pubsub server using the key provided by the database server. The key contains information about what &quot;topics&quot; (stream-target name) the client is allowed to publish to. It also contains information about what topics the client is subscribing to.&lt;/span&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;It gets decrypted and applied to the connection between the client and the server.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="880" width="360" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="&lt;h1&gt;Pubsub Server&lt;/h1&gt;&lt;p&gt;This is a slim Elixir server which performs one function: publish-subscribe.&lt;/p&gt;&lt;p&gt;It has no concept of our domain (database tables). It has topics and datapoints that can be pushed onto those topics (as channels) that can be subscribed to and datapoints can be pushed onto those topic.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="600" y="440" width="240" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="&lt;h1&gt;Client&lt;/h1&gt;&lt;p&gt;The Satori Node is the client, written in python, running on many computers&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="440" width="240" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="&lt;h1&gt;Database Server&lt;/h1&gt;&lt;p&gt;Written in python, the database server is a simple management of the database.&lt;/p&gt;&lt;p&gt;It handles all the business logic for authenticating clients, allowing them to set up streams to publish or subscribe to; essentially implementing the domain model, and keeping track of who's allowed to do what.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="440" width="240" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="&lt;h1&gt;4. Datapoints&lt;/h1&gt;&lt;p style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 11px&quot;&gt;Through the websocket connection we are able to publish datapoints to all subscribers.&lt;/span&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;align=left;" vertex="1" parent="1">
+                    <mxGeometry x="440" y="880" width="360" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="&lt;h1&gt;2. Key provided&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;font-size: 11px&quot;&gt;The key allows the client to authenticate with the pubsub server. Without a key that it can successfully decrypt, the pubsub server will not allow the client to make a connection.&lt;/span&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="440" y="680" width="360" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="&lt;h1&gt;1. Check-in&lt;/h1&gt;&lt;p&gt;&lt;span style=&quot;font-size: 11px&quot;&gt;Clients connect to the databse server and register themselves as a wallet. They set up streams they can publish to, request primary subscriptions, register secondary subscriptions, request information such as pins and stream lists, etc. When they're all done they request a key to login to the pubsub server.&lt;/span&gt;&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="680" width="360" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="&lt;h1&gt;Server Microservices Model&lt;/h1&gt;&lt;p&gt;lets split the server into two: one server that handles the domain logic, and one server that implements a simple publish-subscribe pattern.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="40" width="800" height="80" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
