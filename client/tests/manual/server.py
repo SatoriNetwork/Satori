@@ -107,7 +107,8 @@ def checkin():
     # use client version to know when to update the client
     print('client version', j.get('versions', {}).get('client'))
     from satoriserver.utils import Crypt
-    print('key', Crypt().decrypt(toDecrypt=j.get('key'), key='thiskeyisfromenv'))
+    print('key', Crypt().decrypt(toDecrypt=j.get('key'),
+          key='thiskeyisfromenv').rsplit('}', 1)[0])
 
 
 if __name__ == '__main__':
