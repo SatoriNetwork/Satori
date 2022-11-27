@@ -22,11 +22,17 @@ class fixtures():
     def subscriptions():
         return {
             0: {},
-            1: {'publisher': {'pubkey': '12a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'},
+            1: {
+                'publisher': {'pubkey': '12a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'},
                 'stream': {
                     'source': 'source',
                     'name': 'name pred',
-                    'target': 'target'}},
+                    'target': 'target'},
+                'reason': {
+                    'source': 'source',
+                    'name': 'name pred pred',
+                    'target': 'target'},
+            },
         }
 
 
