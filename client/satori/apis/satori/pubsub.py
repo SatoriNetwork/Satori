@@ -55,32 +55,3 @@ class SatoriPubsubConn(object):
 # install latest python3 (>3.7)
 # pip3 install websocket-client
 # python3 clientws.py
-
-
-#import json
-#import time
-#from satori.utils import Crypt
-#from satori.apis.server.pubsub import SatoriPubsubConn
-#
-#
-# def router(response: str):
-#    ''' processes reponse, routes data to the right stream; triggers engine '''
-#    pass
-#
-#
-# def run():
-#    wait = 30
-#    conn = SatoriPubsubConn(
-#        uid='pubkey-a',
-#        router=router,
-#        payload={
-#            'publisher': ['stream-a'],
-#            'subscriptions': ['stream-b', 'stream-c', 'stream-d']})
-#    while True:
-#        time.sleep(wait)
-#        conn.publish(topic='stream-a', data='data for stream-a')
-#        time.sleep(wait)
-#    conn.disconnect()
-#
-#
-# run()

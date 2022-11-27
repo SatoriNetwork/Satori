@@ -1,5 +1,6 @@
 '''
-Here's plan for the server - python server, you checkin with it, it returns a key you use to make a websocket connection with the pubsub server.
+Here's plan for the server - python server, you checkin with it,
+it returns a key you use to make a websocket connection with the pubsub server.
 '''
 import json
 import requests
