@@ -1,1 +1,1 @@
-from .client import ClientConnection
+from .websocket.client import ClientConnection
