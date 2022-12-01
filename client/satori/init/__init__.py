@@ -7,43 +7,46 @@ import satori
 from satori.apis.satori.pubsub import SatoriPubsubConn
 from satori.engine.structs import SourceStreamTargets
 import satori.engine.model.metrics as metrics
-from satori.wallet import Wallet
+from satori.apis.wallet import Wallet
 from satori.apis import disk
 from satori.apis import memory
 from satori.apis.ipfs import ipfsCli
 from satori.apis.satori.server import SatoriServerClient
 
 
-def startIPFS():
+def startIpfs():
     thread = threading.Thread(target=ipfsCli.start, daemon=True)
     thread.start()
     return thread
 
 
-def establishConnection(wallet: Wallet):
+def startWallet():
+    return wallet.Wallet()()
+
+
+def checkinWithSatoriServer(wallet: Wallet):
+    return SatoriServerClient(wallet).checkin()
+
+
+def downloadIpfs(ipfsDetails: dict):
+    ''' downloads ipfs data, returns ipfs hashes '''
+
+
+def establishConnection(key: str):
     ''' establishes a connection to the satori server, returns connection object '''
-    def checkinWithSatoriServer(wallet: Wallet):
-        details = SatoriServerClient(wallet).checkin()
-        return details.get('key', '')
 
-    def establishPubsubConnection(key: str):
-        def router(response: str):
-            ''' processes reponse, routes data to the right stream; triggers engine '''
-            pass
+    def router(response: str):
+        ''' processes reponse, routes data to the right stream; triggers engine '''
+        pass
 
-        return SatoriPubsubConn(
-            uid='pubkey-a',
-            router=router,
-            payload=key)
-        # payload={
-        #    'publisher': ['stream-a'],
-        #    'subscriptions': ['stream-b', 'stream-c', 'stream-d']})
+    return SatoriPubsubConn(
+        uid='pubkey-a',
+        router=router,
+        payload=key)
+    # payload={
+    #    'publisher': ['stream-a'],
+    #    'subscriptions': ['stream-b', 'stream-c', 'stream-d']})
 
-    return establishPubsubConnection(checkinWithSatoriServer(wallet))
-
-    # return ClientConnection(payload=wallet.authPayload())
-    # todo send this at some point
-    #systemPayload = satori.apis.system.getPayload()
 
 # accept optional data necessary to generate models data and learner
 

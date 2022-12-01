@@ -33,7 +33,7 @@ from waitress import serve
 import webbrowser
 from satori.web import forms
 from satori.engine.structs import Observation
-from satori import wallet
+from satori.apis import wallet
 
 
 ###############################################################################
@@ -56,27 +56,126 @@ def spoofStreamer():
 ## Globals ####################################################################
 ###############################################################################
 
+
 # development flags
-full = True # just web or everything
-debug = True
+full = False  # just web or everything
+debug = False
 
 # singletons
+IpfsDaemon = None
 Connection = None
 Engine = None
 Wallet = None
+nodeDetails = None
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 if full:
-    ipfsDaemon = satori.start.startIPFS()
-    Wallet = wallet.Wallet()()
-    Connection = satori.start.establishConnection(Wallet)
-    Engine = satori.start.getEngine(Connection)
-    Engine.run()
+    startup_ipfs()
+    startup_wallet()
+    startup_checkin()
+    startup_sync()
+    startup_pubsub()
+    startup_engine()
+
+###############################################################################
+## Startup ####################################################################
+###############################################################################
+
+
+def startup_ipfs():
+    global IpfsDaemon
+    IpfsDaemon = satori.start.startIpfs()
+
+
+def startup_wallet():
+    global Wallet
+    Wallet = satori.start.startWallet()
+
+
+def startup_checkin():
+    global Wallet
+    global nodeDetails
+    nodeDetails = satori.start.checkinWithSatoriServer(Wallet)
+
+
+def startup_sync():
+    global key
+    global nodeDetails
+    global Wallet
+    ipfsHashes = satori.start.downloadIpfs(nodeDetails)
+    nodeDetails = satori.start.checkinWithSatoriServer(Wallet)
+    if nodeDetails.get('ipfsHashes') != ipfsHashes:
+        # download again... loop until hashes match
+        return redirect(url_for('start_sync'))
+    key = nodeDetails.get('key')
+
+
+def startup_pubsub():
+    global key
+    global Connection
+    if key:
+        Connection = satori.start.establishConnection(key)
+    else:
+        raise Exception('no key provided by satori server')
+
+
+def startup_engine():
+    global key
+    global Connection
+    global Engine
+    if key:
+        Engine = satori.start.getEngine(Connection)
+        Engine.run()
+    else:
+        raise Exception('no key provided by satori server')
+
+
+@app.route('/start/ipfs')
+def start_ipfs():
+    startup_ipfs()
+    return redirect(url_for('home'))
+
+
+@app.route('/start/wallet')
+def start_wallet():
+    startup_wallet()
+    return redirect(url_for('home'))
+
+
+@app.route('/start/checkin')
+def start_checkin():
+    startup_checkin()
+    return redirect(url_for('home'))
+
+
+@app.route('/start/sync')
+def start_sync():
+    startup_sync()
+    return redirect(url_for('home'))
+
+
+@app.route('/start/network')
+def start_pubsub():
+    startup_pubsub()
+    return redirect(url_for('home'))
+
+
+@app.route('/start/engine')
+def start_engine():
+    startup_engine()
+    return redirect(url_for('home'))
 
 ###############################################################################
 ## Functions ##################################################################
 ###############################################################################
+
+
+def returnNone():
+    r = flask.Response()
+    #r.set_cookie("My important cookie", value=some_cool_value)
+    return r, 204
+
 
 def get_user_id():
     return session.get('user_id', '0')
@@ -84,6 +183,7 @@ def get_user_id():
 ###############################################################################
 ## Errors #####################################################################
 ###############################################################################
+
 
 @app.errorhandler(404)
 def not_found(e):
@@ -93,12 +193,14 @@ def not_found(e):
 ## Routes - static ############################################################
 ###############################################################################
 
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(
         os.path.join(app.root_path, 'static/img/favicon'),
         'favicon.ico',
         mimetype='image/vnd.microsoft.icon')
+
 
 @app.route('/static/<path:path>')
 def send_static(path):
@@ -109,13 +211,51 @@ def send_static(path):
 def send_generated(path):
     return send_from_directory('generated', path)
 
-@app.route('/home')
-def home():
-    return redirect(url_for('dashboard'))
 
+@app.route('/')
 @app.route('/index')
 def index():
+    '''
+    index page is empty dashboard with scrim that shows flash messages in center
+    and upon load redirects the user to /home
+    '''
+    flash('Welcome to Satori', 'info')
+    return render_template('index.html')
+
+
+@app.route('/loading-progress')
+def loadingProgress():
+    def update():
+        for x in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
+            time.sleep(1)
+            yield "data: " + x + "\n\n"
+
+    import time
+    return Response(update(), mimetype='text/event-stream')
+
+
+@app.route('/home')
+def home():
+    if IpfsDaemon == None:
+        flash('Starting local ipfs process', 'info')
+        return redirect(url_for('start_ipfs'))
+    if Wallet == None:
+        flash('Opening wallet', 'info')
+        return redirect(url_for('start_wallet'))
+    if nodeDetails == None:
+        flash('Checking in with satori server', 'info')
+        return redirect(url_for('start_checkin'))
+    if key == None:
+        flash('Syncing historic data', 'info')
+        return redirect(url_for('start_sync'))
+    if Connection == None:
+        flash('Establishing connection with network', 'info')
+        return redirect(url_for('start_pubsub'))
+    if Engine == None:
+        flash('Starting engine', 'info')
+        return redirect(url_for('start_engine'))
     return redirect(url_for('dashboard'))
+
 
 @app.route('/test')
 def test():
@@ -124,15 +264,19 @@ def test():
     print(request.MOBILE)
     return render_template('test.html')
 
+
 @app.route('/kwargs')
 def kwargs():
     ''' ...com/kwargs?0-name=widget_name0&0-value=widget_value0&0-type=widget_type0&1-name=widget_name1&1-value=widget_value1&1-#type=widget_type1 '''
     kwargs = {}
     for i in range(25):
         if request.args.get(f'{i}-name') and request.args.get(f'{i}-value'):
-            kwargs[request.args.get(f'{i}-name')] = request.args.get(f'{i}-value')
-            kwargs[request.args.get(f'{i}-name') + '-type'] = request.args.get(f'{i}-type')
+            kwargs[request.args.get(f'{i}-name')
+                   ] = request.args.get(f'{i}-value')
+            kwargs[request.args.get(f'{i}-name') +
+                   '-type'] = request.args.get(f'{i}-type')
     return jsonify(kwargs)
+
 
 @app.route('/ping', methods=['GET'])
 def ping():
@@ -166,19 +310,26 @@ def edit_configuration():
     def accept_submittion(edit_configuration):
         data = {}
         if edit_configuration.flaskPort.data not in ['', None, satori.config.flaskPort()]:
-            data = {**data, **{satori.config.verbose('flaskPort'): edit_configuration.flaskPort.data}}
+            data = {
+                **data, **{satori.config.verbose('flaskPort'): edit_configuration.flaskPort.data}}
         if edit_configuration.nodejsPort.data not in ['', None, satori.config.nodejsPort()]:
-            data = {**data, **{satori.config.verbose('nodejsPort'): edit_configuration.nodejsPort.data}}
+            data = {
+                **data, **{satori.config.verbose('nodejsPort'): edit_configuration.nodejsPort.data}}
         if edit_configuration.dataPath.data not in ['', None, satori.config.dataPath()]:
-            data = {**data, **{satori.config.verbose('dataPath'): edit_configuration.dataPath.data}}
+            data = {
+                **data, **{satori.config.verbose('dataPath'): edit_configuration.dataPath.data}}
         if edit_configuration.modelPath.data not in ['', None, satori.config.modelPath()]:
-            data = {**data, **{satori.config.verbose('modelPath'): edit_configuration.modelPath.data}}
+            data = {
+                **data, **{satori.config.verbose('modelPath'): edit_configuration.modelPath.data}}
         if edit_configuration.walletPath.data not in ['', None, satori.config.walletPath()]:
-            data = {**data, **{satori.config.verbose('walletPath'): edit_configuration.walletPath.data}}
+            data = {
+                **data, **{satori.config.verbose('walletPath'): edit_configuration.walletPath.data}}
         if edit_configuration.defaultSource.data not in ['', None, satori.config.defaultSource()]:
-            data = {**data, **{satori.config.verbose('defaultSource'): edit_configuration.defaultSource.data}}
+            data = {
+                **data, **{satori.config.verbose('defaultSource'): edit_configuration.defaultSource.data}}
         if edit_configuration.electrumxServers.data not in ['', None, satori.config.electrumxServers()]:
-            data = {**data, **{satori.config.verbose('electrumxServers'): [edit_configuration.electrumxServers.data]}}
+            data = {**data, **{satori.config.verbose('electrumxServers'): [
+                edit_configuration.electrumxServers.data]}}
         satori.config.modify(data=data)
         return redirect('/dashboard')
 
@@ -186,12 +337,12 @@ def edit_configuration():
     if request.method == 'POST':
         return accept_submittion(edit_configuration)
     return present_form(edit_configuration)
-    
+
 ###############################################################################
 ## Routes - dashboard #########################################################
 ###############################################################################
 
-@app.route('/')
+
 @app.route('/dashboard')
 def dashboard():
     ''' 
@@ -209,7 +360,8 @@ def dashboard():
         (access to all predictions and the truth)
     '''
     if Engine is None:
-        streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'3', 'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00', 'predictions': [2,3,1]}]
+        streamsOverview = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target': 'Close', 'subscribers': '3',
+                            'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00', 'predictions': [2, 3, 1]}]
     else:
         streamsOverview = [model.overview() for model in Engine.models]
     resp = {
@@ -221,43 +373,47 @@ def dashboard():
 
 
 class StreamsOverview():
-    
+
     def __init__(self, engine):
         self.engine = engine
-        self.overview = [{'source': '-', 'stream': '-', 'target':'-', 'subscribers':'-', 'accuracy': '-', 'prediction': '-', 'value': '-', 'values': [3,2,1], 'predictions': [3,2,1]}]
-        self.demo = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target':'Close', 'subscribers':'99', 'accuracy': [.5,.7,.8,.85,.87,.9,.91,.92,.93], 'prediction': 15.25, 'value': 15, 'values': [12,13,12.5,13.25,14,13.5,13.4,13.7,14.2,13.5,14.5,14.75,14.6,15.1], 'predictions': [3,2,1]}]
+        self.overview = [{'source': '-', 'stream': '-', 'target': '-', 'subscribers': '-',
+                          'accuracy': '-', 'prediction': '-', 'value': '-', 'values': [3, 2, 1], 'predictions': [3, 2, 1]}]
+        self.demo = [{'source': 'Streamr', 'stream': 'DATAUSD/binance/ticker', 'target': 'Close', 'subscribers': '99', 'accuracy': [.5, .7, .8, .85, .87, .9, .91, .92, .93],
+                      'prediction': 15.25, 'value': 15, 'values': [12, 13, 12.5, 13.25, 14, 13.5, 13.4, 13.7, 14.2, 13.5, 14.5, 14.75, 14.6, 15.1], 'predictions': [3, 2, 1]}]
         self.viewed = False
-    
+
     def setIt(self):
         self.overview = [model.overview() for model in self.engine.models]
         self.viewed = False
 
     def setViewed(self):
         self.viewed = True
-    
+
+
 @app.route('/model-updates')
 def modelUpdates():
     def update():
         streamsOverview = StreamsOverview(Engine)
-        listeners = [] 
-        #listeners.append(Engine.data.newData.subscribe(
-        #    lambda x: streamsOverview.setIt() if x is not None else None))    
-        if Engine is not None: 
+        listeners = []
+        # listeners.append(Engine.data.newData.subscribe(
+        #    lambda x: streamsOverview.setIt() if x is not None else None))
+        if Engine is not None:
             for model in Engine.models:
-                listeners.append(model.predictionUpdate.subscribe(lambda x: streamsOverview.setIt() if x is not None else None))
+                listeners.append(model.predictionUpdate.subscribe(
+                    lambda x: streamsOverview.setIt() if x is not None else None))
             while True:
                 if streamsOverview.viewed:
                     time.sleep(1)
-                else: 
+                else:
                     # parse it out here?
                     yield "data: " + str(streamsOverview.overview).replace("'", '"') + "\n\n"
                     streamsOverview.setViewed()
         else:
             yield "data: " + str(streamsOverview.demo).replace("'", '"') + "\n\n"
-            
-                    
+
     import time
     return Response(update(), mimetype='text/event-stream')
+
 
 @app.route('/wallet')
 def wallet():
@@ -269,18 +425,19 @@ def wallet():
     buf = io.BytesIO()
     img.save(buf)
     buf.seek(0)
-    #return send_file(buf, mimetype='image/jpeg')
+    # return send_file(buf, mimetype='image/jpeg')
     img = b64encode(buf.getvalue()).decode('ascii')
     img_tag = f'<img src="data:image/jpg;base64,{img}" class="img-fluid"/>'
     resp = {
-        'title':'Wallet',
+        'title': 'Wallet',
         'image': img_tag,
         'wallet': Wallet}
-    return render_template('wallet.html', **resp) 
+    return render_template('wallet.html', **resp)
 
 ###############################################################################
 ## Routes - subscription ######################################################
 ###############################################################################
+
 
 @app.route('/subscription/update', methods=['POST'])
 def update():
@@ -323,13 +480,14 @@ def update():
     print('POSTJSON...')
     x = Observation(request.json)
     Engine.data.newData.on_next(x)
-    
+
     return request.json
 
 ###############################################################################
 ## Routes - history ###########################################################
 # we may be able to make these requests
 ###############################################################################
+
 
 @app.route('/history/request')
 def publsih():
@@ -350,20 +508,20 @@ def publsihMeta():
 ## Entry ######################################################################
 ###############################################################################
 
+
 if __name__ == '__main__':
     if full:
         spoofStreamer()
 
     #serve(app, host='0.0.0.0', port=satori.config.get()['port'])
-    if not debug: 
+    if not debug:
         webbrowser.open('http://127.0.0.1:24685', new=0, autoraise=True)
-    app.run(host='0.0.0.0', port=satori.config.flaskPort(), threaded=True, debug=debug)
+    app.run(host='0.0.0.0', port=satori.config.flaskPort(),
+            threaded=True, debug=debug)
     #app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True)
     # https://stackoverflow.com/questions/11150343/slow-requests-on-local-flask-server
     # did not help
-    
+
 # http://localhost:24685/
 # sudo nohup /app/anaconda3/bin/python app.py > /dev/null 2>&1 &
-# > python satori\web\app.py    
-
-
+# > python satori\web\app.py

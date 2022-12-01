@@ -394,6 +394,21 @@ h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
   z-index: 1000;
 }
 
+.overlayWhite {
+  position: absolute; 
+  bottom: 0; 
+  background: rgba(255, 255, 255, 0.5); /* White see-through */
+  color: #533549; 
+  width: 100%;
+  transition: .5s ease;
+  opacity:1;
+  font-size: 20px;
+  padding: 20px;
+  text-align: center;
+  height: 100%;
+  z-index: 1000;
+}
+
 .yellow-hover:hover {
   background: linear-gradient(90deg, rgb(246, 176, 66, .5) 0%, rgb(249, 237, 78, .5) 100%);
 }
@@ -405,4 +420,14 @@ td:last-child {
 }
 .mt-3 {
   margin-top: 2rem !important;
+}
+
+.container-for-center {
+  position: relative;
+}
+
+.vertical-center {
+  margin: 0;
+  /*position: absolute;*/
+  top: 42%;
 }
