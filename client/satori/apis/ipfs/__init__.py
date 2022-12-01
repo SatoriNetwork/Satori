@@ -17,4 +17,5 @@ when a client send a cid to the server, the server will tell the client that the
     the stream does not have a stream_id and 
     the cid does not match the most popular or the cid it's replacing does not match the most popular.
 '''
-from . import cli
+from .cli import IpfsCli
+ipfsCli = IpfsCli()

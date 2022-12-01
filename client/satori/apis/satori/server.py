@@ -4,12 +4,12 @@ it returns a key you use to make a websocket connection with the pubsub server.
 '''
 import json
 import requests
-from satori import Wallet
+'from satori import Wallet'
 
 
 class SatoriServerClient(object):
     def __init__(
-            self, wallet: Wallet, url: str = 'http://localhost:5002/',
+            self, wallet: 'Wallet', url: str = 'http://localhost:5002/',
             *args, **kwargs):
         super(SatoriServerClient, self).__init__(*args, **kwargs)
         self.wallet = wallet

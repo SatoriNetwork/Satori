@@ -10,12 +10,12 @@ import satori.engine.model.metrics as metrics
 from satori.wallet import Wallet
 from satori.apis import disk
 from satori.apis import memory
-from satori.apis.ipfs import cli as ipfs
+from satori.apis.ipfs import ipfsCli
 from satori.apis.satori.server import SatoriServerClient
 
 
 def startIPFS():
-    thread = threading.Thread(target=ipfs.start, daemon=True)
+    thread = threading.Thread(target=ipfsCli.start, daemon=True)
     thread.start()
     return thread
 

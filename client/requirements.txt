@@ -1,3 +1,6 @@
+## non python requirements
+# ipfs version 0.14.0 - 0.17.0
+
 setuptools==56.0.0
 IPython==7.23.0
 matplotlib==3.4.1

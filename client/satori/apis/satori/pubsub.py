@@ -6,7 +6,7 @@ import threading
 class SatoriPubsubConn(object):
     def __init__(
             self, uid: str, payload: dict, url: str = 'ws://localhost:3000',
-            router: function = None, listening: bool = True, *args, **kwargs):
+            router: 'function' = None, listening: bool = True, *args, **kwargs):
         super(SatoriPubsubConn, self).__init__(*args, **kwargs)
         self.uid = uid
         self.url = url
