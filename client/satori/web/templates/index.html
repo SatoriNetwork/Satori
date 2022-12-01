@@ -3,14 +3,12 @@
   {% with messages = get_flashed_messages() %}
   {% if messages %}
     <ul class="container-for-center vertical-center" style="padding-left: 0px;">
-      {% for message in messages %}
-        <li class="card">
-          <h4 class="mb-0" style="margin-bottom: 15px !important; margin-top: 15px; color: #000000; cursor: pointer;">{{message}}</h4>
-        </li>
-      {% endfor %}
       <li class="card">
-        <h4 id='updating_loading' class="mb-0" style="margin-bottom: 15px !important; margin-top: 15px; color: #000000; cursor: pointer;"></h4>
-      </li>
+          {% for message in messages %}
+          <h2 class="mb-0" style="margin-bottom: 15px !important; margin-top: 15px; color: #000000; cursor: pointer;">{{message}}</h2>
+          {% endfor %}
+          <h4 id='updating_loading' class="mb-0" style="margin-bottom: 15px !important; margin-top: 15px; color: #000000; cursor: pointer;"></h4>
+        </li>
     </ul>
   {% endif %}
 {% endwith %}
@@ -394,9 +392,8 @@
   loading_update.onmessage = function (e) {
     if (e.data == "close") {
       loading_update.close();
+      window.location.replace("{{url_for('dashboard')}}");
     } else {
-      const streamOverview = JSON.parse(e.data);
-      
       loading_output.innerHTML = e.data;
     }
   }

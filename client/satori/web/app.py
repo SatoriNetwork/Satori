@@ -67,6 +67,7 @@ Connection = None
 Engine = None
 Wallet = None
 nodeDetails = None
+key = None
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
@@ -225,10 +226,57 @@ def index():
 
 @app.route('/loading-progress')
 def loadingProgress():
+
+    def spoofIpfsDaemon():
+        global IpfsDaemon
+        time.sleep(3)
+        IpfsDaemon = 'something'
+
+    def spoofWallet():
+        global Wallet
+        time.sleep(3)
+        Wallet = 'something'
+
+    def spoofnodeDetails():
+        global nodeDetails
+        time.sleep(3)
+        nodeDetails = 'something'
+
+    def spoofkey():
+        global key
+        time.sleep(3)
+        key = 'something'
+
+    def spoofConnection():
+        global Connection
+        time.sleep(3)
+        Connection = 'something'
+
+    def spoofEngine():
+        global Engine
+        time.sleep(3)
+        Engine = 'something'
+
     def update():
-        for x in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
-            time.sleep(1)
-            yield "data: " + x + "\n\n"
+        global IpfsDaemon
+        global Wallet
+        global nodeDetails
+        global key
+        global Connection
+        global Engine
+        for singleton, msg, function in [
+            (IpfsDaemon, 'starting local ipfs process', spoofIpfsDaemon),
+            (Wallet, 'opening wallet', spoofWallet),
+            (nodeDetails, 'checking in with satori server', spoofnodeDetails),
+            (key, 'syncing historic data', spoofkey),
+            (Connection, 'establishing connection with network', spoofConnection),
+            (Engine, 'starting engine', spoofEngine),
+            (None, 'close', lambda: None),
+        ]:
+            if singleton == None:
+                function()
+                yield f'data:{msg}\n\n'
+                print('doing something')
 
     import time
     return Response(update(), mimetype='text/event-stream')
@@ -236,6 +284,12 @@ def loadingProgress():
 
 @app.route('/home')
 def home():
+    global IpfsDaemon
+    global Wallet
+    global nodeDetails
+    global key
+    global Connection
+    global Engine
     if IpfsDaemon == None:
         flash('Starting local ipfs process', 'info')
         return redirect(url_for('start_ipfs'))
