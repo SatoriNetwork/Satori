@@ -76,7 +76,8 @@ class SatoriServerClient(object):
         print(r.status_code, r.text)
         j = r.json()
         # use subscriptions to initialize engine
-        print('key', j.get('key'))
+        print('publications.key', j.get('publications.key'))
+        print('subscriptions.key', j.get('subscriptions.key'))
         # use subscriptions to initialize engine
         print('subscriptions', j.get('subscriptions'))
         # use publications to initialize engine
@@ -88,8 +89,12 @@ class SatoriServerClient(object):
         # use client version to know when to update the client
         print('client version', j.get('versions', {}).get('client'))
         from satoriserver.utils import Crypt
-        print('key', Crypt().decrypt(
-            toDecrypt=j.get('key'),
+        print('subscriptions.key', Crypt().decrypt(
+            toDecrypt=j.get('subscriptions.key'),
+            key='thiskeyisfromenv',
+            clean=True))
+        print('publications.key', Crypt().decrypt(
+            toDecrypt=j.get('publications.key'),
             key='thiskeyisfromenv',
             clean=True))
         return r.json()

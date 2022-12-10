@@ -1,13 +1,20 @@
+# this isn't quite right. this connection object needs to subscribe and publish.
+# right now it just listens indefinitely. since the self.ws.recv() is blocking,
+# we may need to establish two connections, one for subscribing and one for
+# publishing. That would be the simplest solution, puts a burden on the server
+# but that's ok for now.
+
+
 import json
 from satoriserver.utils import Crypt
 import threading
 
 
-class SatoriPubsubConn(object):
+class SatoriPubConn(object):
     def __init__(
             self, uid: str, payload: dict, url: str = 'ws://localhost:3000',
             router: 'function' = None, listening: bool = True, *args, **kwargs):
-        super(SatoriPubsubConn, self).__init__(*args, **kwargs)
+        super(SatoriPubConn, self).__init__(*args, **kwargs)
         self.uid = uid
         self.url = url
         self.router = router

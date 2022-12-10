@@ -67,7 +67,8 @@ Connection = None
 Engine = None
 Wallet = None
 nodeDetails = None
-key = None
+publisherKey = None
+subscriberKey = None
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
@@ -101,7 +102,8 @@ def startup_checkin():
 
 
 def startup_sync():
-    global key
+    global publisherKey
+    global subscriberKey
     global nodeDetails
     global Wallet
     ipfsHashes = satori.start.downloadIpfs(nodeDetails)
@@ -109,23 +111,26 @@ def startup_sync():
     if nodeDetails.get('ipfsHashes') != ipfsHashes:
         # download again... loop until hashes match
         return redirect(url_for('start_sync'))
-    key = nodeDetails.get('key')
+    subscriberKey = nodeDetails.get('subscriber.key')
+    publisherKey = nodeDetails.get('publisher.key')
 
 
 def startup_pubsub():
-    global key
+    global publisherKey
+    global subscriberKey
     global Connection
-    if key:
+    if subscriberKey and publisherKey:
         Connection = satori.start.establishConnection(key)
     else:
         raise Exception('no key provided by satori server')
 
 
 def startup_engine():
-    global key
+    global publisherKey
+    global subscriberKey
     global Connection
     global Engine
-    if key:
+    if subscriberKey and publisherKey:
         Engine = satori.start.getEngine(Connection)
         Engine.run()
     else:
