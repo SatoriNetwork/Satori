@@ -4,7 +4,8 @@ from itertools import product
 from functools import partial
 import pandas as pd
 import satori
-from satori.apis.satori.pubsub import SatoriPubsubConn
+from satori.apis.satori.pub import SatoriPubConn
+from satori.apis.satori.sub import SatoriSubConn
 from satori.engine.structs import SourceStreamTargets
 import satori.engine.model.metrics as metrics
 from satori.apis.wallet import Wallet
@@ -21,7 +22,7 @@ def startIpfs():
 
 
 def startWallet():
-    return wallet.Wallet()()
+    return Wallet()()
 
 
 def checkinWithSatoriServer(wallet: Wallet):

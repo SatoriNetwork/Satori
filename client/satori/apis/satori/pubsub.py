@@ -1,20 +1,17 @@
-# this isn't quite right. this connection object needs to subscribe and publish.
-# right now it just listens indefinitely. since the self.ws.recv() is blocking,
-# we may need to establish two connections, one for subscribing and one for
-# publishing. That would be the simplest solution, puts a burden on the server
-# but that's ok for now.
-
+# this pubsub has a separate thread for listening, so all we need to do is kill
+# and restart that thread when we want to change the function that handles the
+# incoming messages (router).
 
 import json
 from satoriserver.utils import Crypt
 import threading
 
 
-class SatoriPubConn(object):
+class SatoriSubConn(object):
     def __init__(
             self, uid: str, payload: dict, url: str = 'ws://localhost:3000',
             router: 'function' = None, listening: bool = True, *args, **kwargs):
-        super(SatoriPubConn, self).__init__(*args, **kwargs)
+        super(SatoriSubConn, self).__init__(*args, **kwargs)
         self.uid = uid
         self.url = url
         self.router = router
@@ -25,6 +22,12 @@ class SatoriPubConn(object):
         self.ear.start()
         self.payload = payload
         self.checkin()
+
+    def listen(self):
+        while True:
+            response = self.ws.recv()
+            print(response)
+            self.router(response)
 
     def connect(self):
         import websocket
