@@ -86,12 +86,16 @@ class IpfsCli(object):
     def pinAndAddDirectoryByCLI(self, abspath: str, name: str):
         return self.run(f'files cp /ipfs/$(ipfs add -r -Q {abspath}) /{name}')
 
-    def init(self, ):
+    def init(self):
         return self.run(f'init')
 
-    def daemon(self, ):
+    def daemon(self):
         ''' run this in a separate thread '''
         return self.run(f'daemon')
+
+    def get(self, hash: str, abspath: str = None):
+        ''' gets a file from ipfs and saves it to the given path '''
+        return self.run(f'get {hash}{f" --output={abspath}" if abspath is None else ""}')
 
     ## interface ##################################################################
 

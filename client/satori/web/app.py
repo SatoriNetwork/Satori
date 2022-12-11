@@ -178,7 +178,7 @@ def start_engine():
 
 
 def returnNone():
-    r = flask.Response()
+    r = Response()
     #r.set_cookie("My important cookie", value=some_cool_value)
     return r, 204
 

@@ -15,24 +15,6 @@ from satori.apis.ipfs import ipfsCli
 from satori.apis.satori.server import SatoriServerClient
 
 
-def startIpfs():
-    thread = threading.Thread(target=ipfsCli.start, daemon=True)
-    thread.start()
-    return thread
-
-
-def startWallet():
-    return Wallet()()
-
-
-def checkinWithSatoriServer(wallet: Wallet):
-    return SatoriServerClient(wallet).checkin()
-
-
-def downloadIpfs(ipfsDetails: dict):
-    ''' downloads ipfs data, returns ipfs hashes '''
-
-
 def establishConnection(key: str):
     ''' establishes a connection to the satori server, returns connection object '''
 
@@ -52,8 +34,7 @@ def establishConnection(key: str):
 # accept optional data necessary to generate models data and learner
 
 
-def getEngine(connection):
-    # todo: use connection if no config present to set yourself up correctly (connnection will provide streams to subscribe to)
+def getEngine():
     '''
     called by the flask app to start the Engine.
     returns None or Engine.
