@@ -6,7 +6,7 @@ import pandas as pd
 import satori
 from satori.apis.satori.pub import SatoriPubConn
 from satori.apis.satori.sub import SatoriSubConn
-from satori.engine.structs import SourceStreamTargets
+from satori.engine.structs import StreamId
 import satori.engine.model.metrics as metrics
 from satori.apis.wallet import Wallet
 from satori.apis import disk
@@ -118,7 +118,7 @@ def getEngine():
                 sourceId='streamrSpoof',
                 streamId='simpleEURCleanedHL',
                 targetId='High',
-                targets=[SourceStreamTargets(
+                targets=[StreamId(
                     source='streamrSpoof',
                     stream='simpleEURCleanedHL',
                     targets=['High', 'Low'])],
@@ -139,7 +139,7 @@ def getEngine():
                 sourceId='streamrSpoof',
                 streamId='simpleEURCleanedHL',
                 targetId='Low',
-                targets=[SourceStreamTargets(
+                targets=[StreamId(
                     source='streamrSpoof',
                     stream='simpleEURCleanedHL',
                     targets=['Low', 'High'])],
@@ -160,11 +160,11 @@ def getEngine():
                 streamId='simpleEURCleanedC',
                 targetId='Close',
                 targets=[
-                    SourceStreamTargets(
+                    StreamId(
                         source='streamrSpoof',
                         stream='simpleEURCleanedC',
                         targets=['Close']),
-                    SourceStreamTargets(
+                    StreamId(
                         source='streamrSpoof',
                         stream='simpleEURCleanedHL',
                         targets=['High', 'Low'])],

@@ -1,121 +1,106 @@
 import json
-import pandas as pd 
+import pandas as pd
 import datetime as dt
 from satori import config
+from functools import partial
 
-class SourceStreamTargets:
-    
+
+class StreamId:
+    ''' unique identifier for a stream '''
+
     def __init__(
         self,
-        stream:str,
-        targets:list[str]=None,
-        source:str=None,
+        stream: str,
+        source: str = 'Satori',
+        target: str = None,
+        publisher: str = None,
     ):
+        self.publisher = publisher
         self.stream = stream
-        self.targets = targets or [stream] 
+        self.target = target
         self.source = source or config.defaultSource()
 
     def id(self):
-        ''' id has one target '''
-        return (self.source, self.stream, self.targets[0])
+        return (self.publisher, self.source, self.stream, self.target)
+
+    def __repr__(self):
+        return {
+            'publisher': self.publisher,
+            'source': self.source,
+            'stream': self.stream,
+            'target': self.target}
+
+    def __str__(self):
+        return f'{self.publisher}:{self.source}:{self.stream}:{self.target}'
 
     def key(self):
         return self.id()
-    
-    def streamKey(self):
-        return (self.source, self.stream)
-    
-    def get(self):
-        ''' easy to combine '''
-        return (self.source, self.stream, self.targets)
 
-    def asTuples(self):
-        ''' easy to combine '''
-        return [(self.source, self.stream, target) for target in self.targets]
 
-    def asMap(self):
-        ''' hard to combine '''
-        return {self.source: {self.stream: self.targets}}
-
-    def asDict(self):
-        ''' hard to combine '''
-        return {(self.source, self.stream): self.targets}
-    
-    @staticmethod
-    def combine(sourceStreamTargetss:list['SourceStreamTargets']):
-        ''' {('x', 'y', 'z1'), ('a', 'b', 'c'), ('x', 'y', 'z2')} '''
-        return {(source, stream, targets) for sst in sourceStreamTargetss for source, stream, targets in sst.asTuples()}
-
-    @staticmethod
-    def condense(sourceStreamTargetss:list['SourceStreamTargets']):
-        '''
-        SourceStreamTargets.condense(targets)
-        [('x', 'y', ['z1', 'z2']), ('a', 'b', ['c'])]
-        '''
-        existing = {}
-        ret = []
-        for sst in sourceStreamTargetss:
-            if (sst.source, sst.stream) in existing.keys():
-                existing[(sst.source, sst.stream)].extend(sst.targets)
-                existing[(sst.source, sst.stream)].extend(sst.targets)
-            else:
-                existing = {**existing, **sst.asDict()}
-        for key, value in existing.items():
-            ret.append((key[0], key[1], list(set(value))))
-        return ret
-    
 class SourceStreamMap(dict):
-    
-    def __init__(self, content=None, source:str=None, stream:str=None):
-        super(SourceStreamMap,self).__init__([
+
+    def __init__(self, content=None, source: str = None, stream: str = None):
+        super(SourceStreamMap, self).__init__([
             ((source, stream), content)] if source is not None and stream is not None else [])
-    
+
     def add(self, source, stream, value=None):
         return self.__setitem__((source, stream), value)
-    
-class SourceStreamTargetMap(dict):
-    def __init__(self, targetValues:dict[str, str]=None, source:str=None, stream:str=None):
-        super(SourceStreamTargetMap,self).__init__([
-            ((source, stream, k), v) for k, v in (targetValues or {}).items()])
-    def add(self, source, stream, target, value=None):
-        return self.__setitem__((source, stream, target), value)
-    def isFilled(self, source:str=None, stream:str=None, key:tuple[str, str]=None):
-        if key is not None:
-            condition = lambda x: x[1] == key[1] and x[0] == key[0]
-        if source is not None and stream is not None:
-            condition = lambda x: x[1] == stream and x[0] == source    
-        return all([self[k] is not None for k in self if condition(k)])
-    def erase(self, source:str=None, stream:str=None, key:tuple[str, str]=None):
-        for k in self:
-            if key is not None:
-                if k[1] == key[1] and k[0] == key[0]:
-                    self[k] = None
-            elif source is not None and stream is not None:
-                if k[1] == stream and k[0] == source:
-                    self[k] = None
-    def getAllAsMap(self, source:str=None, stream:str=None, key:tuple[str, str]=None):
-        if key is not None:
-            condition = lambda x: x[1] == key[1] and x[0] == key[0]
-        if source is not None and stream is not None:
-            condition = lambda x: x[1] == stream and x[0] == source    
-        return {k: self[k] for k in self if condition(k)}
-    def getAll(self, source:str=None, stream:str=None, key:tuple[str, str]=None):
-        if key is not None:
-            condition = lambda x: x[1] == key[1] and x[0] == key[0]
-        if source is not None and stream is not None:
-            condition = lambda x: x[1] == stream and x[0] == source    
-        return [(k, self[k]) for k in self if condition(k)]
+
+
+class StreamIdMap():
+    def __init__(self, publisher: str = None, source: str = None, stream: str = None, target: str = None, value=None):
+        self.d = {(publisher, source, stream, target): value}
+
+    def add(self, publisher, source, stream, target, value=None):
+        self.d[(publisher, source, stream, target)] = value
+
+    @staticmethod
+    def _condition(x: list[str], publisher: str = None, source: str = None, stream: str = None, target: str = None, default: bool = False):
+        return all([
+            i is None or i == x[z]
+            for i, z in zip([publisher, source, stream, target], range(4))])
+
+    def erase(self, publisher: str = None, source: str = None, stream: str = None, target: str = None):
+        condition = partial(
+            StreamIdMap._condition,
+            publisher=publisher, source=source, stream=stream, target=target)
+        erased = []
+        for k in self.d.keys():
+            if condition(k):
+                erased.append(k)
+        for k in erased:
+            del self.d[k]
+        return erased
+
+    def getAll(self, publisher: str = None, source: str = None, stream: str = None, target: str = None):
+        condition = partial(
+            StreamIdMap._condition,
+            publisher=publisher, source=source, stream=stream, target=target)
+        return {k: v for k, v in self.d.items() if condition(k)}
+
+    def isFilled(self, publisher: str = None, source: str = None, stream: str = None, target: str = None):
+        condition = partial(
+            StreamIdMap._condition,
+            publisher=publisher, source=source, stream=stream, target=target)
+        matches = [
+            self.d.get(k) is not None for k in self.d.keys() if condition(k)]
+        return len(matches) > 0 and all(matches)
+
+    def getAllAsList(self, publisher: str = None, source: str = None, stream: str = None, target: str = None):
+        matches = self.getAll(publisher, source, stream, target)
+        return [(k, v) for k, v in matches.items()]
+
 
 class HyperParameter:
-    
+
     def __init__(
         self,
-        name:str='n_estimators',
+        name: str = 'n_estimators',
         value=3,
         limit=1,
         minimum=1,
         maximum=10,
-        kind:'type'=int
+        kind: 'type' = int
     ):
         self.name = name
         self.value = value
@@ -125,8 +110,9 @@ class HyperParameter:
         self.max = maximum
         self.kind = kind
 
+
 class Observation:
-    
+
     def __init__(self, data):
         self.data = data
         self.parse(data)
@@ -151,12 +137,14 @@ class Observation:
         self.content = j['content']
         if isinstance(self.content, dict):
             self.df = pd.DataFrame(
-                {(self.sourceId, self.streamId, target): values for target, values in list(self.content.items()) + [('StreamObservationId', self.observationId)]},
-                #columns=pd.MultiIndex.from_tuples([(self.sourceId, self.streamId, self.)]),
+                {(self.sourceId, self.streamId, target): values for target, values in list(
+                    self.content.items()) + [('StreamObservationId', self.observationId)]},
+                # columns=pd.MultiIndex.from_tuples([(self.sourceId, self.streamId, self.)]),
                 index=[self.observedTime])
         elif not isinstance(self.content, dict):
             self.df = pd.DataFrame(
-                {(self.sourceId, self.streamId, self.streamId): [self.content] + [('StreamObservationId', self.observationId)]}, 
+                {(self.sourceId, self.streamId, self.streamId): [
+                    self.content] + [('StreamObservationId', self.observationId)]},
                 index=[self.observedTime])
 
     def key(self):

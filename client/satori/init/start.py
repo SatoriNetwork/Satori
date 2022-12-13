@@ -6,7 +6,7 @@ import pandas as pd
 import satori
 from satori.apis.satori.pub import SatoriPubConn
 from satori.apis.satori.sub import SatoriSubConn
-from satori.engine.structs import SourceStreamTargets
+from satori.engine.structs import StreamId
 import satori.engine.model.metrics as metrics
 from satori.apis.wallet import Wallet
 from satori.apis import disk
@@ -61,7 +61,7 @@ class StartupDag(object):
                 ipfsCli.get(
                     hash=ipfs
                     # 'parse "target" column into observation id: w.pubkey:s.source:s.name:s.target'
-                    abspath=SourceStreamTargets(
+                    abspath=StreamId(
                         stream=pin.get('target').split(':')[2],
                         targets=[pin.get('target').split(':')[3]],
                         source='|'.join(

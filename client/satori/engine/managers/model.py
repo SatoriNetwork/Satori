@@ -16,7 +16,7 @@ from reactivex.subject import BehaviorSubject
 from sklearn.exceptions import NotFittedError
 
 from satori import config
-from satori.engine.structs import HyperParameter, SourceStreamTargets
+from satori.engine.structs import HyperParameter, StreamId
 from satori.engine.model.pilot import PilotModel
 from satori.engine.model.stable import StableModel
 from satori.engine.interfaces.model import ModelDataDiskApi
@@ -38,7 +38,7 @@ class ModelManager:
         sourceId:str='',
         streamId:str='',
         targetId:str='',
-        targets:list[SourceStreamTargets]=None,
+        targets:list[StreamId]=None,
         split:'int|float'=.2,
         override:bool=False,
     ):
@@ -66,8 +66,8 @@ class ModelManager:
         self.targetId = targetId
         self.modelPath = modelPath or config.root('..', 'models', self.sourceId, self.streamId, self.targetId + '.joblib')
         #self.sources = {'source': {'stream':['targets']}}
-        self.targets:list[SourceStreamTargets] = targets
-        self.id = SourceStreamTargets(source=sourceId, stream=streamId, targets=[targetId])
+        self.targets:list[StreamId] = targets
+        self.id = StreamId(source=sourceId, stream=streamId, targets=[targetId])
         self.setupFlags()
         self.get()
         # how could we use dependency injection here? 
@@ -146,7 +146,7 @@ class ModelManager:
             threshold amount of data.
             '''
             self.data = self.data if self.data is not None else pd.DataFrame(
-                {x: [] for x in SourceStreamTargets.combine(self.targets)})
+                {x: [] for x in StreamId.combine(self.targets)})
     
         self.data = self.disk.gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
         handleEmpty()
@@ -288,7 +288,7 @@ class ModelManager:
             ## something like this?
             #self.features.append(x)
             # 
-            #self.targets.append(SourceStreamTargets(x))  or something
+            #self.targets.append(StreamId(x))  or something
             #self.syncManifest()  then sync manifest when you change targets.
             #maybe remove targets that aren't being used as any features.. somewhere?
             
