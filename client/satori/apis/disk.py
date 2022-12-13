@@ -291,19 +291,12 @@ class Disk(DataDiskApi, ModelDataDiskApi):
     def gather(
         self,
         targetColumn: 'str|tuple[str]',
-        targetsByStreamBySource: dict[str, dict[str, list[str]]] = None,
-        targetsByStream: dict[str, list[str]] = None,
-        targets: list[str] = None,
-        sourceStreamTargets: list = None,
-        sourceStreamTargetss: list[StreamId] = None,
+        streamIds: list[StreamId] = None,
         source: str = None,
         stream: str = None,
     ):
         ''' Layer 2. 
         retrieves the targets and merges them.
-        as a prime example of premature optimization I made 
-        this function callable in a myriad of various ways...
-        I don't remember why.
         '''
         def dropIf(df: pd.DataFrame, column: tuple):
             if df is not None:
@@ -314,39 +307,11 @@ class Disk(DataDiskApi, ModelDataDiskApi):
 
         source = source or self.source
         stream = stream or self.stream
-        if sourceStreamTargetss is not None:
+        if streamIds is not None:
             return self.memory.merge(filterNone([
-                dropIf(self.read(source, stream, columns=targets),
+                dropIf(self.read(publisher, source, stream, columns=targets),
                        (source, stream, 'StreamObservationId'))
-                for source, stream, targets in StreamId.condense(sourceStreamTargetss)]),
-                targetColumn=targetColumn)
-        if sourceStreamTargets is not None:
-            return self.memory.merge(filterNone([
-                dropIf(self.read(source, stream, columns=targets),
-                       (source, stream, 'StreamObservationId'))
-                for source, stream, targets in sourceStreamTargets]),
-                targetColumn=targetColumn)
-        if targets is not None:
-            return self.memory.merge(
-                dropIf(
-                    self.read(
-                        source or self.source,
-                        stream or self.stream,
-                        columns=targets),
-                    (source, stream, 'StreamObservationId')),
-                targetColumn=targetColumn)
-        if targetsByStream is not None:
-            return self.memory.merge(filterNone([
-                dropIf(self.read(source or self.source, stream,
-                       columns=targets), (source, stream, 'StreamObservationId'))
-                for stream, targets in targetsByStream.items()]),
-                targetColumn=targetColumn)
-        if targetsByStreamBySource is not None:
-            return self.memory.merge(filterNone([
-                dropIf(self.read(source, stream, columns=targets),
-                       (source, stream, 'StreamObservationId'))
-                for source, values in targetsByStreamBySource.items()
-                for stream, targets in values]),
+                for publisher, source, stream, targets in StreamId.condense(streamIds)]),
                 targetColumn=targetColumn)
         return dropIf(self.read(source, stream), (source, stream, 'StreamObservationId'))
 

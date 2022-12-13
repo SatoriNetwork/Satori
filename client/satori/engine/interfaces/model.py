@@ -31,7 +31,7 @@ class ModelDataDiskApi():
         targetsByStream: dict[str, list[str]] = None,
         targets: list[str] = None,
         sourceStreamTargets: list = None,
-        sourceStreamTargetss: list[StreamId] = None,
+        streamIds: list[StreamId] = None,
         source: str = None,
         stream: str = None,
     ):

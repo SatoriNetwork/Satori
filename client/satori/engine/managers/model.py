@@ -22,25 +22,26 @@ from satori.engine.model.stable import StableModel
 from satori.engine.interfaces.model import ModelDataDiskApi
 from satori.engine.interfaces.model import ModelMemoryApi
 
+
 class ModelManager:
 
     def __init__(
         self,
-        disk:ModelDataDiskApi=None,
-        memory:ModelMemoryApi=None,
-        modelPath:str=None,
-        hyperParameters:'list(HyperParameter)'=None,
-        metrics:dict=None,
-        features:dict=None,
-        chosenFeatures:'list(str)'=None,
-        pinnedFeatures:'list(str)'=None,
-        exploreFeatures:bool=True,
-        sourceId:str='',
-        streamId:str='',
-        targetId:str='',
-        targets:list[StreamId]=None,
-        split:'int|float'=.2,
-        override:bool=False,
+        disk: ModelDataDiskApi = None,
+        memory: ModelMemoryApi = None,
+        modelPath: str = None,
+        hyperParameters: 'list(HyperParameter)' = None,
+        metrics: dict = None,
+        features: dict = None,
+        chosenFeatures: 'list(str)' = None,
+        pinnedFeatures: 'list(str)' = None,
+        exploreFeatures: bool = True,
+        sourceId: str = '',
+        streamId: str = '',
+        targetId: str = '',
+        targets: list[StreamId] = None,
+        split: 'int|float' = .2,
+        override: bool = False,
     ):
         '''
         modelPath: the path of the model
@@ -64,13 +65,15 @@ class ModelManager:
         self.sourceId = sourceId
         self.streamId = streamId
         self.targetId = targetId
-        self.modelPath = modelPath or config.root('..', 'models', self.sourceId, self.streamId, self.targetId + '.joblib')
+        self.modelPath = modelPath or config.root(
+            '..', 'models', self.sourceId, self.streamId, self.targetId + '.joblib')
         #self.sources = {'source': {'stream':['targets']}}
-        self.targets:list[StreamId] = targets
-        self.id = StreamId(source=sourceId, stream=streamId, targets=[targetId])
+        self.targets: list[StreamId] = targets
+        self.id = StreamId(source=sourceId, stream=streamId,
+                           targets=[targetId])
         self.setupFlags()
         self.get()
-        # how could we use dependency injection here? 
+        # how could we use dependency injection here?
         self.stable = StableModel(
             manager=self,
             hyperParameters=hyperParameters or [],
@@ -78,14 +81,14 @@ class ModelManager:
             features=features or {},
             chosenFeatures=chosenFeatures or [],
             pinnedFeatures=pinnedFeatures or [],
-            split=split) 
+            split=split)
         if not override:
             self.load()
-        # how could we use dependency injection here? 
+        # how could we use dependency injection here?
         self.pilot = PilotModel(
             manager=self,
             stable=self.stable,
-            exploreFeatures=exploreFeatures) 
+            exploreFeatures=exploreFeatures)
         self.syncManifest()
 
     @property
@@ -99,26 +102,26 @@ class ModelManager:
     def overview(self):
         return {
             'source': self.sourceId,
-            'stream': self.streamId, 
-            'target': self.targetId, 
+            'stream': self.streamId,
+            'target': self.targetId,
             'value': self.stable.current.values[0][0] if hasattr(self.stable, 'current') else '',
             'prediction': self.stable.prediction if hasattr(self.stable, 'prediction') else '',
             'values': self.data.dropna().loc[:, (self.sourceId, self.streamId, self.targetId)].values.tolist()[-20:],
-            'predictions': [.9,.8,1,.6,.9,.5,.6,.8,1.1],
-            # this isn't the accuracy we really care about (historic accuracy), 
+            'predictions': [.9, .8, 1, .6, .9, .5, .6, .8, 1.1],
+            # this isn't the accuracy we really care about (historic accuracy),
             # it's accuracy of this current model on historic data.
-            'accuracy': f'{str(self.stableScore*100)[0:5]} %' if hasattr(self, 'stableScore') else '', 
-            'subscribers':'none'}
+            'accuracy': f'{str(self.stableScore*100)[0:5]} %' if hasattr(self, 'stableScore') else '',
+            'subscribers': 'none'}
 
     def syncManifest(self):
         manifest = config.manifest()
         manifest[self.key()] = {
-            'targets': [x.asTuples() for x in self.targets], 
+            'targets': [x.asTuples() for x in self.targets],
             'purged': manifest.get(self.key(), {}).get('purged', [])}
         config.put('manifest', data=manifest)
 
     ### FLAGS ################################################################################
-    
+
     def setupFlags(self):
         self.modelUpdated = BehaviorSubject(None)
         self.targetUpdated = BehaviorSubject(None)
@@ -126,17 +129,17 @@ class ModelManager:
         self.predictionUpdate = BehaviorSubject(None)
         self.predictionEdgeUpdate = BehaviorSubject(None)
         self.newAvailableInput = BehaviorSubject(None)
-    
+
     ### GET DATA ####################################################################
-    
-    #@staticmethod
-    #def addFeatureLevel(df:pd.DataFrame):
+
+    # @staticmethod
+    # def addFeatureLevel(df:pd.DataFrame):
     #    ''' adds a feature level to the multiindex columns'''
     #    return pd.MultiIndex.from_tuples([c + ('Raw',)  for c in df.columns])
 
     def get(self):
         ''' gets the raw data from disk '''
-            
+
         def handleEmpty():
             '''
             todo: what should we do if no data available yet? 
@@ -147,15 +150,17 @@ class ModelManager:
             '''
             self.data = self.data if self.data is not None else pd.DataFrame(
                 {x: [] for x in StreamId.combine(self.targets)})
-    
-        self.data = self.disk.gather(sourceStreamTargetss=self.targets, targetColumn=self.id.id)
+
+        self.data = self.disk.gather(
+            streamIds=self.targets,
+            targetColumn=self.id.id)
         handleEmpty()
 
     ### TARGET ####################################################################
 
     def key(self):
         return self.id.id()
-    
+
     def streamKey(self):
         return self.id.id()
 
@@ -175,18 +180,21 @@ class ModelManager:
 
     def evaluateCandidate(self):
         ''' notice, model consists of the hyperParameter values and the chosenFeatures '''
-        self.stableScore = self.stable.xgb.score(self.stable.testX, self.stable.testY)
-        self.pilotScore = self.pilot.xgb.score(self.pilot.testX, self.pilot.testY)
+        self.stableScore = self.stable.xgb.score(
+            self.stable.testX, self.stable.testY)
+        self.pilotScore = self.pilot.xgb.score(
+            self.pilot.testX, self.pilot.testY)
         # not sure what this score is... r2 f1? not mae I think
         if self.stableScore < self.pilotScore:
             for param in self.stable.hyperParameters:
-                param.value = param.test # is this right? it looks right but I don't think the stable model ever updates from the pilot
+                # is this right? it looks right but I don't think the stable model ever updates from the pilot
+                param.value = param.test
             self.stable.chosenFeatures = self.pilot.testFeatures
             self.stable.featureSet = self.pilot.testFeatureSet
             self.save()
             return True
         return False
-    
+
     ### SAVE ###########################################################################
 
     def save(self):
@@ -196,15 +204,16 @@ class ModelManager:
             self.modelPath,
             self.stable.hyperParameters,
             self.stable.chosenFeatures)
-        
-    def load(self): # -> bool:
+
+    def load(self):  # -> bool:
         ''' loads the model - happens on init so we automatically load our progress '''
         xgb = self.disk.loadModel(self.modelPath)
         if xgb == False:
             return False
         if (
             all([scf in self.stable.features.keys() for scf in xgb.savedChosenFeatures]) and
-            True # all([shp in self.stable.hyperParameters for shp in xgb.savedHyperParameters])
+            # all([shp in self.stable.hyperParameters for shp in xgb.savedHyperParameters])
+            True
         ):
             self.stable.xgb = xgb
             self.stable.hyperParameters = xgb.savedHyperParameters
@@ -212,46 +221,51 @@ class ModelManager:
         return True
 
     ### LIFECYCLE ######################################################################
-    
+
     def runPredictor(self):
         def makePrediction(isTarget=False):
             if isTarget and self.stable.build():
                 self.stable.producePrediction()
-                show(f'prediction - {self.streamId} {self.targetId}:', self.stable.prediction)
+                show(
+                    f'prediction - {self.streamId} {self.targetId}:', self.stable.prediction)
                 self.predictionUpdate.on_next(self)
-            ## this is a feature to be added - a second publish stream which requires a
-            ## different dataset - one where the latest update is taken into account.
-            #    if self.edge: 
+            # this is a feature to be added - a second publish stream which requires a
+            # different dataset - one where the latest update is taken into account.
+            #    if self.edge:
             #        self.predictionEdgeUpdate.on_next(self)
-            #elif self.edge:
+            # elif self.edge:
             #    self.stable.build()
             #    self.predictionEdge = self.producePrediction()
             #    self.predictionEdgeUpdate.on_next(self)
-        
+
         def makePredictionFromNewModel():
-            show(f'model updated - {self.streamId} {self.targetId}:', f'{self.stableScore}, {self.pilotScore}')
+            show(f'model updated - {self.streamId} {self.targetId}:',
+                 f'{self.stableScore}, {self.pilotScore}')
             makePrediction()
-        
+
         def makePredictionFromNewInputs(incremental):
             self.data = self.memory.appendInsert(
-                df=self.data, 
+                df=self.data,
                 incremental=incremental)
             makePrediction()
-            
+
         def makePredictionFromNewTarget(incremental):
             for col in incremental.columns:
                 if col not in self.data.columns:
                     incremental = incremental.drop(col, axis=1)
             #incremental.columns = ModelManager.addFeatureLevel(df=incremental)
             self.data = self.memory.appendInsert(
-                df=self.data, 
+                df=self.data,
                 incremental=incremental)
             makePrediction(isTarget=True)
-                
-        self.modelUpdated.subscribe(lambda x: makePredictionFromNewModel() if x is not None else None)
-        self.inputsUpdated.subscribe(lambda x: makePredictionFromNewInputs(x) if x is not None else None)
-        self.targetUpdated.subscribe(lambda x: makePredictionFromNewTarget(x) if x is not None else None)
-        
+
+        self.modelUpdated.subscribe(
+            lambda x: makePredictionFromNewModel() if x is not None else None)
+        self.inputsUpdated.subscribe(
+            lambda x: makePredictionFromNewInputs(x) if x is not None else None)
+        self.targetUpdated.subscribe(
+            lambda x: makePredictionFromNewTarget(x) if x is not None else None)
+
     def runExplorer(self):
         if hasattr(self.stable, 'target') and hasattr(self.stable, 'xgbStable'):
             try:
@@ -265,40 +279,40 @@ class ModelManager:
                 '''
                 #print('not fitted', e)
                 pass
-            #except AttributeError as e:
-            #    ''' 
+            # except AttributeError as e:
+            #    '''
             #    this happens at the beginning of running when we have not set
             #    self.xgbStable yet.
-            #    
+            #
             #    '''
             #    #print('Attribute', e)
             #    pass
-            ##except Exception as e:
+            # except Exception as e:
             ##    print('UNEXPECTED', e)
         else:
             time.sleep(1)
-    
+
     def syncAvailableInputs(self):
-        
+
         def sync(x):
             '''
             add the new datastreams and histories to the top 
             of the list of things to explore and evaluate 
             '''
-            ## something like this?
-            #self.features.append(x)
-            # 
+            # something like this?
+            # self.features.append(x)
+            #
             #self.targets.append(StreamId(x))  or something
-            #self.syncManifest()  then sync manifest when you change targets.
-            #maybe remove targets that aren't being used as any features.. somewhere?
-            
-        self.newAvailableInput.subscribe(lambda x: sync(x) if x is not None else None)
+            # self.syncManifest()  then sync manifest when you change targets.
+            # maybe remove targets that aren't being used as any features.. somewhere?
+
+        self.newAvailableInput.subscribe(
+            lambda x: sync(x) if x is not None else None)
 
 
-## testing
+# testing
 def show(name, value):
     if isinstance(value, pd.DataFrame):
         print(f'\n{name}\n', value.tail(2))
     else:
         print(f'\n{name}\n', value)
-        

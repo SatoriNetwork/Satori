@@ -10,35 +10,55 @@ class StreamId:
 
     def __init__(
         self,
-        stream: str,
-        source: str = 'Satori',
+        stream: str = None,
+        source: str = None,
         target: str = None,
-        publisher: str = None,
+        author: str = None,
     ):
-        self.publisher = publisher
+        self.author = author
         self.stream = stream
         self.target = target
-        self.source = source or config.defaultSource()
+        self.source = source  # or config.defaultSource()
 
     def id(self):
-        return (self.publisher, self.source, self.stream, self.target)
+        return (self.author, self.source, self.stream, self.target)
 
     def __repr__(self):
-        return {
-            'publisher': self.publisher,
+        return str({
+            'author': self.author,
             'source': self.source,
             'stream': self.stream,
-            'target': self.target}
+            'target': self.target})
 
     def __str__(self):
-        return f'{self.publisher}:{self.source}:{self.stream}:{self.target}'
+        return str(self.__repr__())
 
     def key(self):
         return self.id()
 
+    def new(
+        self,
+        author: str = None,
+        source: str = None,
+        stream: str = None,
+        target: str = None,
+        clearAuthor: bool = False,
+        clearSource: bool = False,
+        clearStream: bool = False,
+        clearTarget: bool = False,
+    ):
+        return StreamId(
+            author=None if clearAuthor else (author or self.author),
+            source=None if clearSource else (source or self.source),
+            stream=None if clearStream else (stream or self.stream),
+            target=None if clearTarget else (target or self.target))
+    # @staticmethod
+    # def order(streamIds: list[StreamId]):
+    #    ''' orders list such that streams '''
+    #    return {(source, stream, targets) for sst in sourceStreamTargetss for source, stream, targets in sst.asTuples()}
+
 
 class SourceStreamMap(dict):
-
     def __init__(self, content=None, source: str = None, stream: str = None):
         super(SourceStreamMap, self).__init__([
             ((source, stream), content)] if source is not None and stream is not None else [])
@@ -48,22 +68,35 @@ class SourceStreamMap(dict):
 
 
 class StreamIdMap():
-    def __init__(self, publisher: str = None, source: str = None, stream: str = None, target: str = None, value=None):
-        self.d = {(publisher, source, stream, target): value}
+    def __init__(self, streamId: StreamId = None, value=None):
+        self.d = {streamId: value}
 
-    def add(self, publisher, source, stream, target, value=None):
-        self.d[(publisher, source, stream, target)] = value
+    def __repr__(self):
+        return str(self.d)
+
+    def __str__(self):
+        return str(self.__repr__())
+
+    def add(self, streamId: StreamId, value=None):
+        self.d[streamId] = value
+
+    def addAll(self, streamIds: list[StreamId], values: list[StreamId]):
+        for streamId, value in zip(streamIds, values):
+            self.add(streamId, value)
 
     @staticmethod
-    def _condition(x: list[str], publisher: str = None, source: str = None, stream: str = None, target: str = None, default: bool = False):
+    def _condition(key: StreamId, streamId: StreamId, default: bool = True):
         return all([
-            i is None or i == x[z]
-            for i, z in zip([publisher, source, stream, target], range(4))])
+            x == k or (x is None and default)
+            for x, k in zip(
+                [streamId.author, streamId.source,
+                    streamId.stream, streamId.target],
+                [key.author, key.source, key.stream, key.target])])
 
-    def erase(self, publisher: str = None, source: str = None, stream: str = None, target: str = None):
+    def erase(self, streamId: StreamId, greedy: bool = True):
         condition = partial(
             StreamIdMap._condition,
-            publisher=publisher, source=source, stream=stream, target=target)
+            streamId=streamId, default=greedy)
         erased = []
         for k in self.d.keys():
             if condition(k):
@@ -72,22 +105,24 @@ class StreamIdMap():
             del self.d[k]
         return erased
 
-    def getAll(self, publisher: str = None, source: str = None, stream: str = None, target: str = None):
+    def getAll(self, streamId: StreamId = None, greedy: bool = True):
+        if streamId is None:
+            return self.d
         condition = partial(
             StreamIdMap._condition,
-            publisher=publisher, source=source, stream=stream, target=target)
+            streamId=streamId, default=greedy)
         return {k: v for k, v in self.d.items() if condition(k)}
 
-    def isFilled(self, publisher: str = None, source: str = None, stream: str = None, target: str = None):
+    def isFilled(self, streamId: StreamId, greedy: bool = True):
         condition = partial(
             StreamIdMap._condition,
-            publisher=publisher, source=source, stream=stream, target=target)
+            streamId=streamId, default=greedy)
         matches = [
             self.d.get(k) is not None for k in self.d.keys() if condition(k)]
         return len(matches) > 0 and all(matches)
 
-    def getAllAsList(self, publisher: str = None, source: str = None, stream: str = None, target: str = None):
-        matches = self.getAll(publisher, source, stream, target)
+    def getAllAsList(self, streamId: StreamId = None, greedy: bool = True):
+        matches = self.getAll(streamId, greedy=greedy)
         return [(k, v) for k, v in matches.items()]
 
 
