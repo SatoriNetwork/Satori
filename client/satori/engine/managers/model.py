@@ -27,6 +27,7 @@ class ModelManager:
 
     def __init__(
         self,
+        variable: StreamId,
         disk: ModelDataDiskApi = None,
         memory: ModelMemoryApi = None,
         modelPath: str = None,
@@ -36,23 +37,22 @@ class ModelManager:
         chosenFeatures: 'list(str)' = None,
         pinnedFeatures: 'list(str)' = None,
         exploreFeatures: bool = True,
-        sourceId: str = '',
-        streamId: str = '',
-        targetId: str = '',
         targets: list[StreamId] = None,
         split: 'int|float' = .2,
         override: bool = False,
     ):
         '''
+        variable: the response variable - that which we are trying to predict. 
+                Is a StreamId object which must be entirely specified.
+        disk: the disk interface
+        memory: the memory interface
         modelPath: the path of the model
         hyperParameters: a list of HyperParameter objects
-        metrics: a dictionary of functions that each produce
-                    a feature (from 1 dynamic column)
-                    example: year over year, rolling average
-        features: a dictionary of functions that each take in
-                    multiple columns of the raw data and ouput
-                    a feature (cols known ahead of time)
-                    example: high minus low, x if y > 1 else 2**z
+        metrics: a dictionary of functions that each produce a feature 
+                (from 1 dynamic column) example: year over year, rolling average
+        features: a dictionary of functions that each take in multiple columns
+                of the raw data and ouput a feature (cols known ahead of time)
+                example: high minus low, x if y > 1 else 2**z
         chosenFeatures: list of feature names to start with
         pinnedFeatures: list of feature names to keep in model
         exploreFeatures: change features or not
@@ -60,20 +60,19 @@ class ModelManager:
         split: train test split percentage or count
         override: override the existing model saved to disk if there is one
         '''
+        if not variable.potentiallyFilled():
+            raise ValueError('variable must be fully specified')
+        self.v = variable  # shorthand
+        self.variable = self.v
+        self.key = self.v.id()
+        self.id = self.v.id()
         self.disk = disk
         self.memory = memory
-        self.sourceId = sourceId
-        self.streamId = streamId
-        self.targetId = targetId
         self.modelPath = modelPath or config.root(
-            '..', 'models', self.sourceId, self.streamId, self.targetId + '.joblib')
-        #self.sources = {'source': {'stream':['targets']}}
+            '..', 'models', variable.source, variable.author, variable.stream, variable.target + '.joblib')
         self.targets: list[StreamId] = targets
-        self.id = StreamId(source=sourceId, stream=streamId,
-                           targets=[targetId])
         self.setupFlags()
         self.get()
-        # how could we use dependency injection here?
         self.stable = StableModel(
             manager=self,
             hyperParameters=hyperParameters or [],
@@ -84,7 +83,6 @@ class ModelManager:
             split=split)
         if not override:
             self.load()
-        # how could we use dependency injection here?
         self.pilot = PilotModel(
             manager=self,
             stable=self.stable,
@@ -101,12 +99,13 @@ class ModelManager:
 
     def overview(self):
         return {
-            'source': self.sourceId,
-            'stream': self.streamId,
-            'target': self.targetId,
+            'source': self.v.source,
+            'author': self.v.author,
+            'stream': self.v.stream,
+            'target': self.v.target,
             'value': self.stable.current.values[0][0] if hasattr(self.stable, 'current') else '',
             'prediction': self.stable.prediction if hasattr(self.stable, 'prediction') else '',
-            'values': self.data.dropna().loc[:, (self.sourceId, self.streamId, self.targetId)].values.tolist()[-20:],
+            'values': self.data.dropna().loc[:, (self.v.source, self.v.author, self.v.stream, self.v.target)].values.tolist()[-20:],
             'predictions': [.9, .8, 1, .6, .9, .5, .6, .8, 1.1],
             # this isn't the accuracy we really care about (historic accuracy),
             # it's accuracy of this current model on historic data.
@@ -114,6 +113,7 @@ class ModelManager:
             'subscribers': 'none'}
 
     def syncManifest(self):
+        # todo: fix this to work with the data from the server
         manifest = config.manifest()
         manifest[self.key()] = {
             'targets': [x.asTuples() for x in self.targets],
@@ -152,17 +152,9 @@ class ModelManager:
                 {x: [] for x in StreamId.combine(self.targets)})
 
         self.data = self.disk.gather(
-            streamIds=self.targets,
+            streams=self.targets,
             targetColumn=self.id.id)
         handleEmpty()
-
-    ### TARGET ####################################################################
-
-    def key(self):
-        return self.id.id()
-
-    def streamKey(self):
-        return self.id.id()
 
     ### FEATURE DATA ####################################################################
 
@@ -227,7 +219,7 @@ class ModelManager:
             if isTarget and self.stable.build():
                 self.stable.producePrediction()
                 show(
-                    f'prediction - {self.streamId} {self.targetId}:', self.stable.prediction)
+                    f'prediction - {self.v.stream} {self.v.target}:', self.stable.prediction)
                 self.predictionUpdate.on_next(self)
             # this is a feature to be added - a second publish stream which requires a
             # different dataset - one where the latest update is taken into account.
@@ -239,7 +231,7 @@ class ModelManager:
             #    self.predictionEdgeUpdate.on_next(self)
 
         def makePredictionFromNewModel():
-            show(f'model updated - {self.streamId} {self.targetId}:',
+            show(f'model updated - {self.v.stream} {self.v.target}:',
                  f'{self.stableScore}, {self.pilotScore}')
             makePrediction()
 

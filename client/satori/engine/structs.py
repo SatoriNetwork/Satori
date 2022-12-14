@@ -10,36 +10,47 @@ class StreamId:
 
     def __init__(
         self,
-        stream: str = None,
         source: str = None,
-        target: str = None,
         author: str = None,
+        stream: str = None,
+        target: str = None,
     ):
+        self.source = source  # or config.defaultSource()
         self.author = author
         self.stream = stream
         self.target = target
-        self.source = source  # or config.defaultSource()
 
     def id(self):
-        return (self.author, self.source, self.stream, self.target)
+        return (self.source, self.author, self.stream, self.target)
 
     def __repr__(self):
         return str({
-            'author': self.author,
             'source': self.source,
+            'author': self.author,
             'stream': self.stream,
             'target': self.target})
 
     def __str__(self):
         return str(self.__repr__())
 
+    def filled(self):
+        ''' all fields are filled '''
+        return self.source is not None and self.author is not None and self.stream is not None and self.target is not None
+
+    def potentiallyFilled(self):
+        '''
+        some streams may not have a target or author. but they all come from a 
+        source and have a stream id
+        '''
+        return self.source is not None and self.stream is not None
+
     def key(self):
         return self.id()
 
     def new(
         self,
-        author: str = None,
         source: str = None,
+        author: str = None,
         stream: str = None,
         target: str = None,
         clearAuthor: bool = False,
@@ -48,23 +59,14 @@ class StreamId:
         clearTarget: bool = False,
     ):
         return StreamId(
-            author=None if clearAuthor else (author or self.author),
             source=None if clearSource else (source or self.source),
+            author=None if clearAuthor else (author or self.author),
             stream=None if clearStream else (stream or self.stream),
             target=None if clearTarget else (target or self.target))
     # @staticmethod
     # def order(streamIds: list[StreamId]):
     #    ''' orders list such that streams '''
     #    return {(source, stream, targets) for sst in sourceStreamTargetss for source, stream, targets in sst.asTuples()}
-
-
-class SourceStreamMap(dict):
-    def __init__(self, content=None, source: str = None, stream: str = None):
-        super(SourceStreamMap, self).__init__([
-            ((source, stream), content)] if source is not None and stream is not None else [])
-
-    def add(self, source, stream, value=None):
-        return self.__setitem__((source, stream), value)
 
 
 class StreamIdMap():
@@ -84,26 +86,32 @@ class StreamIdMap():
         for streamId, value in zip(streamIds, values):
             self.add(streamId, value)
 
+    def keys(self):
+        return self.d.keys()
+
+    def streams(self):
+        return {k.new(clearTarget=True) for k in self.keys()}
+
     @staticmethod
     def _condition(key: StreamId, streamId: StreamId, default: bool = True):
         return all([
             x == k or (x is None and default)
             for x, k in zip(
-                [streamId.author, streamId.source,
+                [streamId.source, streamId.author,
                     streamId.stream, streamId.target],
-                [key.author, key.source, key.stream, key.target])])
+                [key.source, key.author, key.stream, key.target])])
 
-    def erase(self, streamId: StreamId, greedy: bool = True):
+    def remove(self, streamId: StreamId, greedy: bool = True):
         condition = partial(
             StreamIdMap._condition,
             streamId=streamId, default=greedy)
-        erased = []
+        removed = []
         for k in self.d.keys():
             if condition(k):
-                erased.append(k)
-        for k in erased:
+                removed.append(k)
+        for k in removed:
             del self.d[k]
-        return erased
+        return removed
 
     def getAll(self, streamId: StreamId = None, greedy: bool = True):
         if streamId is None:
@@ -155,6 +163,7 @@ class Observation:
     def parse(self, data):
         ''' {
                 'source-id:"streamrSpoof",'
+                'author-id:"pubKey",'
                 'stream-id:"simpleEURCleaned",'
                 'observation-id': 3675, 
                 'observed-time': "2022-02-16 02:52:45.794120", 
@@ -165,22 +174,36 @@ class Observation:
             note: if observed-time is missing, define it here.
         '''
         j = json.loads(data)
-        self.sourceId = j['source-id']
-        self.streamId = j['stream-id']
+        self.source = j.get('source-id', None)
+        self.author = j.get('author-id', None)
+        self.stream = j.get('stream-id', None)
         self.observedTime = j.get('observed-time', str(dt.datetime.utcnow()))
-        self.observationId = j['observation-id']
-        self.content = j['content']
+        self.observationId = j.get('observation-id', None)
+        self.content = j.get('content', {})
+        self.target = None
+        self.value = None
         if isinstance(self.content, dict):
+            if len(self.content.keys()) == 1:
+                self.target = self.content.keys()[0]
+                self.value = self.content.get(self.target)
             self.df = pd.DataFrame(
-                {(self.sourceId, self.streamId, target): values for target, values in list(
-                    self.content.items()) + [('StreamObservationId', self.observationId)]},
-                # columns=pd.MultiIndex.from_tuples([(self.sourceId, self.streamId, self.)]),
+                {(self.source, self.author, self.stream, target): values for target, values in list(
+                    self.content.items()) + (
+                        [('StreamObservationId', self.observationId)]
+                        if self.observationId is not None else [])},
                 index=[self.observedTime])
         elif not isinstance(self.content, dict):
+            self.value = self.content
             self.df = pd.DataFrame(
-                {(self.sourceId, self.streamId, self.streamId): [
-                    self.content] + [('StreamObservationId', self.observationId)]},
+                {(self.source, self.author, self.stream, self.stream): [
+                    self.content] + (
+                        [('StreamObservationId', self.observationId)]
+                        if self.observationId is not None else [])},
                 index=[self.observedTime])
 
     def key(self):
-        return (self.sourceId, self.streamId)
+        return StreamId(
+            source=self.source,
+            author=self.author,
+            stream=self.stream,
+            target=self.target)

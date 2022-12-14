@@ -40,17 +40,16 @@ import datetime as dt
 from reactivex.subject import BehaviorSubject
 from satori import config
 from satori.engine.interfaces.data import DataDiskApi
+from satori.engine.managers.model import ModelManager
 from satori.engine.structs import Observation, StreamIdMap, SourceStreamMap
 
 
 class DataManager:
 
     def __init__(self, disk: DataDiskApi = None):
-        # dictionary of source, streams, and their latest incremental
-        # must be initialized with keys otherwise we'll post partial predictions
-        self.targets = SourceStreamMap()
+        # dictionary of source, streams, author, and their latest incremental
+        self.targets = StreamIdMap()
         # dictionary of source, stream, targets and their latest predictions
-        # must be initialized with keys otherwise we'll post partial predictions
         self.predictions = StreamIdMap()
         self.listeners = []
         self.newData = BehaviorSubject(None)
@@ -88,10 +87,10 @@ class DataManager:
     ### most of the fuctions above this point are made obsolete by the new design ###
     #################################################################################
 
-    def runSubscriber(self, models: list):
+    def runSubscriber(self, models: list[ModelManager]):
         ''' triggered from the flask app '''
 
-        def handleNewData(models, observation: Observation):
+        def handleNewData(models: list[ModelManager], observation: Observation):
             ''' append to existing datastream, save to disk, notify models '''
 
             def remember():
@@ -102,7 +101,11 @@ class DataManager:
                 if observation.key() not in self.targets.keys():
                     self.targets[observation.key()] = None
                 x = self.targets[observation.key()]
-                if x is not None and x.observationId == observation.observationId:
+                if (
+                    x is not None and x.observationId is not None and
+                    observation.observationId is not None and
+                    x.observationId == observation.observationId
+                ):
                     return False
                 self.targets[observation.key()] = observation
                 return True
@@ -110,12 +113,16 @@ class DataManager:
             def saveIncremental():
                 ''' save these observations to the right parquet file on disk '''
                 self.disk.setAttributes(
-                    source=observation.sourceId, stream=observation.streamId).append(observation.df.copy())
+                    source=observation.source,
+                    author=observation.author,
+                    stream=observation.stream).append(observation.df.copy())
 
             def compress():
                 ''' compress if the number of incrementals is high '''
                 self.disk.setAttributes(
-                    source=observation.sourceId, stream=observation.streamId)
+                    source=observation.source,
+                    author=observation.author,
+                    stream=observation.stream)
                 if len(self.disk.incrementals()) > 100:
                     try:
                         self.disk.compress()
@@ -125,17 +132,21 @@ class DataManager:
             def tellModels():
                 ''' tell the modesl that listen to this stream and these targets '''
                 for model in models:
-                    if (model.sourceId == observation.sourceId and
-                            model.streamId == observation.streamId and
-                            model.targetId in observation.content.keys()
-                        ):
+                    if (
+                        model.v.source == observation.source and
+                        model.v.author == observation.author and
+                        model.v.stream == observation.stream and
+                        (
+                            model.v.target == observation.target or
+                            model.v.target in observation.content.keys())
+                    ):
                         model.targetUpdated.on_next(observation.df)
                     # elif any([key in observation.df.columns for key in model.feature.keys()]):
                     # model.inputsUpdated.on_next(True)
                     # reference model.targets:
                     # if (
-                    #    model.targets.sourceId == observation.sourceId and
-                    #    model.targets.streamId == observation.streamId
+                    #    model.targets.sourceId == observation.source and
+                    #    model.targets.streamId == observation.stream
                     # ):
                     #    sendUpdates = []
                     #    for modelTarget in model.targets.targets:
@@ -144,7 +155,7 @@ class DataManager:
                     #                sendUpdates.append(obsTarget)
                     #    model.inputsUpdated.on_next(
                     #        observation.df.loc[:, [
-                    #            (observation.sourceId, observation.streamId, update)
+                    #            (observation.source, observation.stream, update)
                     #            for update in sendUpdates]])
 
             if remember():
@@ -161,20 +172,20 @@ class DataManager:
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
 
             def remember():
-                if model.key() not in self.predictions.keys():
-                    self.predictions[model.key()] = None
-                self.predictions[model.key()] = model.prediction
+                if model.key not in self.predictions.keys():
+                    self.predictions[model.key] = None
+                self.predictions[model.key] = model.prediction
                 return True
 
             def post():
                 ''' here we save prediction to disk, but that'll change once we can post it somewhere '''
-                if self.predictions.isFilled(key=model.key()):
-                    for k, v in self.predictions.getAll(key=model.key()):
+                if self.predictions.isFilled(key=model.key):
+                    for k, v in self.predictions.getAll(key=model.key):
                         path = config.root(
                             '..', 'predictions', k[0], k[1], k[2] + '.txt')
                         self.disk.savePrediction(
                             path=path, prediction=f'{str(dt.datetime.now())} | {k} | {v}\n')
-                    self.predictions.erase(key=model.key())
+                    self.predictions.remove(key=model.key)
 
             remember()
             post()

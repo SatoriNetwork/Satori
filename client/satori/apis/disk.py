@@ -85,27 +85,36 @@ class ModelApi(ModelDiskApi):
 class Disk(DataDiskApi, ModelDataDiskApi):
     ''' single point of contact for interacting with disk '''
 
-    def __init__(self,
-                 df: pd.DataFrame = None,
-                 source: str = None,
-                 stream: str = None,
-                 location: str = None,
-                 ext: str = 'parquet',
-                 ):
+    def __init__(
+        self,
+        df: pd.DataFrame = None,
+        author: str = None,
+        source: str = None,
+        stream: str = None,
+        location: str = None,
+        ext: str = 'parquet',
+    ):
         self.memory = memory.Memory
-        self.setAttributes(df=df, source=source,
-                           stream=stream, location=location, ext=ext)
+        self.setAttributes(
+            df=df,
+            author=author,
+            source=source,
+            stream=stream,
+            location=location,
+            ext=ext)
 
     def setAttributes(
         self,
         df: pd.DataFrame = None,
         source: str = None,
+        author: str = None,
         stream: str = None,
         location: str = None,
         ext: str = 'parquet',
     ):
         self.df = df if df is not None else pd.DataFrame()
         self.source = source
+        self.author = author
         self.stream = stream
         self.location = location
         self.ext = ext
@@ -139,7 +148,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
     def getModelSize(modelPath: str = None):
         return ModelApi.getModelSize(modelPath)
 
-    def path(self, source: str = None, stream: str = None, permanent: bool = False):
+    def path(self, source: str = None, author: str = None, stream: str = None, permanent: bool = False):
         ''' Layer 0 get the path of a file '''
         source = source or self.source or config.defaultSource()
         stream = stream or self.stream
