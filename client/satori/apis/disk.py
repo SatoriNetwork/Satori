@@ -88,35 +88,27 @@ class Disk(DataDiskApi, ModelDataDiskApi):
     def __init__(
         self,
         df: pd.DataFrame = None,
-        author: str = None,
-        source: str = None,
-        stream: str = None,
-        location: str = None,
+        id: StreamId = None,
+        loc: str = None,
         ext: str = 'parquet',
     ):
         self.memory = memory.Memory
         self.setAttributes(
             df=df,
-            author=author,
-            source=source,
-            stream=stream,
-            location=location,
+            id=id,
+            loc=loc,
             ext=ext)
 
     def setAttributes(
         self,
         df: pd.DataFrame = None,
-        source: str = None,
-        author: str = None,
-        stream: str = None,
-        location: str = None,
+        id: StreamId = None,
+        loc: str = None,
         ext: str = 'parquet',
     ):
         self.df = df if df is not None else pd.DataFrame()
-        self.source = source
-        self.author = author
-        self.stream = stream
-        self.location = location
+        self.id = id
+        self.loc = loc
         self.ext = ext
         return self
 
@@ -148,36 +140,39 @@ class Disk(DataDiskApi, ModelDataDiskApi):
     def getModelSize(modelPath: str = None):
         return ModelApi.getModelSize(modelPath)
 
-    def path(self, source: str = None, author: str = None, stream: str = None, permanent: bool = False):
+    def setId(self, id: StreamId = None, source: str = None, author: str = None, stream: str = None):
+        self.id = id or StreamId(source=source, author=author, stream=stream)
+
+    def path(self, permanent: bool = False):
         ''' Layer 0 get the path of a file '''
-        source = source or self.source or config.defaultSource()
-        stream = stream or self.stream
         return safetify(os.path.join(
-            self.location or config.dataPath(),
+            self.loc or config.dataPath(),
             # 'incremental', # we need a name for not permanent because what if a stream source is called permanent...
             'permanent' if permanent else 'incremental',
-            source,
-            f'{stream}.{self.ext}'))
+            self.id.source or config.defaultSource(),
+            f'{self.id.stream}.{self.ext}'))
 
-    def exists(self, source: str = None, stream: str = None, permanent: bool = False,):
+    def exists(self, permanent: bool = False,):
         ''' Layer 0 return True if file exists at path, else False '''
-        return os.path.exists(self.path(source, stream, permanent))
+        return os.path.exists(self.path(permanent))
 
-    def dropSourceStream(self, df: pd.DataFrame):
+    def reduceMulti(self, df: pd.DataFrame):
         ''' Layer 0 '''
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.droplevel()  # source
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.droplevel()  # author
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.droplevel()  # stream
         return df
 
     def toTable(self, df: pd.DataFrame = None):
         ''' Layer 0 '''
-        return pa.Table.from_pandas(self.dropSourceStream(df if df is not None else self.df))
+        return pa.Table.from_pandas(self.reduceMulti(df if df is not None else self.df))
 
-    def incrementals(self, source: str = None, stream: str = None):
+    def incrementals(self):
         ''' Layer 0 '''
-        return os.listdir(self.path(source, stream))
+        return os.listdir(self.path())
 
     def append(self, df: pd.DataFrame = None):
         ''' Layer 1
@@ -196,7 +191,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         '''
         pq.write_table(self.toTable(df), self.path(permanent=True))
 
-    def compress(self, source: str = None, stream: str = None):
+    def compress(self):
         ''' Layer 1
         assumes columns are always the same...
         this function is used on rare occasion to compress the on disk 
@@ -208,42 +203,40 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         to save it to long term storage. We can still query long term
         storage the same way.
         '''
-        source = source or self.source
-        stream = stream or self.stream
-        df = self.readBoth(source, stream)
+        df = self.readBoth()
         if df is not None:
-            self.remove(source, stream, True)
+            self.remove(True)
             self.write(df)
-            self.remove(source, stream, False)
+            self.remove(False)
 
-    def remove(self, source: str = None, stream: str = None, permanent: bool = None):
+    def remove(self, permanent: bool = None):
         ''' Layer 1 when we don't use a stream anymore we'll remove it '''
-        source = source or self.source
-        stream = stream or self.stream
         if permanent is None:
-            self.remove(source, stream, True)
-            self.remove(source, stream, False)
+            self.remove(True)
+            self.remove(False)
         elif permanent:
-            if self.exists(source, stream, permanent):
-                os.remove(self.path(source, stream, permanent))
+            if self.exists(permanent):
+                os.remove(self.path(permanent))
         else:
-            shutil.rmtree(self.path(source, stream), ignore_errors=True)
+            shutil.rmtree(self.path(), ignore_errors=True)
 
-    def readBoth(self, source: str, stream: str, **kwargs):
-        ''' Layer 1 '''
+    def readBoth(self, **kwargs):
+        ''' Layer 1 
+        read both the permanent and incremental tables into memory
+        merge them into one dataframe
+        '''
         return self.merge(
-            self.read(source, stream, permanent=False, **kwargs),
-            self.read(source, stream, permanent=True, **kwargs),
-            source, stream)
+            self.read(permanent=False, **kwargs),
+            self.read(permanent=True, **kwargs))
 
-    def merge(self, df: pd.DataFrame, long: pd.DataFrame, source: str, stream: str):
+    def merge(self, df: pd.DataFrame, long: pd.DataFrame, ):
         ''' Layer 1 
         meant to merge long term (permanent) written tables 
         with short term (incremental) appended datasets
         for one stream
         '''
         def dropDuplicates(df: pd.DataFrame):
-            return df.drop_duplicates(subset=(source, stream, 'StreamObservationId'), keep='last').sort_index()
+            return df.drop_duplicates(subset=(self.id.source, self.id.author, self.id.stream, 'StreamObservationId'), keep='last').sort_index()
 
         if df is None and long is None:
             return None
@@ -259,7 +252,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         df = df.drop('TempIndex', axis=1, level=0)
         return dropDuplicates(df)
 
-    def read(self, source: str = None, stream: str = None, permanent: bool = None, **kwargs):
+    def read(self, permanent: bool = None, **kwargs):
         ''' Layer 1
         reads a parquet file with filtering, use columns=[targets].
         adds on the stream as first level in multiindex column on dataframe.
@@ -275,14 +268,15 @@ class Disk(DataDiskApi, ModelDataDiskApi):
                     kwargs['columns'].append('__index_level_0__')
             return kwargs
 
-        source = source or self.source or self.df.columns.levels[0]
-        stream = stream or self.stream or self.df.columns.levels[1]
+        source = self.id.source or self.df.columns.levels[0]
+        stream = self.id.stream or self.df.columns.levels[1]
         if permanent is None:
-            return self.readBoth(source, stream, **kwargs)
-        if not self.exists(source, stream, permanent):
+            return self.readBoth(**kwargs)
+        if not self.exists(permanent):
             return None
-        rdf = pq.read_table(self.path(source, stream, permanent),
-                            **conform(**kwargs)).to_pandas()
+        rdf = pq.read_table(
+            self.path(permanent),
+            **conform(**kwargs)).to_pandas()
         if '__index_level_0__' in rdf.columns:
             rdf.index = rdf.loc[:, '__index_level_0__']
             rdf.index.name = None
@@ -301,8 +295,6 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         self,
         targetColumn: 'str|tuple[str]',
         streamIds: list[StreamId] = None,
-        source: str = None,
-        stream: str = None,
     ):
         ''' Layer 2. 
         retrieves the targets and merges them.
@@ -314,15 +306,25 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         def filterNone(items: list):
             return [x for x in items if x is not None]
 
-        source = source or self.source
-        stream = stream or self.stream
+        # if streamIds is not None:
+        #    return self.memory.merge(filterNone([
+        #        dropIf(self.read(publisher, self.id.source, self.id.stream, columns=targets),
+        #               (self.id.source, self.id.stream, 'StreamObservationId'))
+        #        for publisher, self.id.source, self.id.stream, targets in StreamId.condense(streamIds)]),
+        #        targetColumn=targetColumn)
+        # return dropIf(self.read(self.id.source, self.id.stream), (self.id.source, self.id.stream, 'StreamObservationId'))
+
         if streamIds is not None:
-            return self.memory.merge(filterNone([
-                dropIf(self.read(publisher, source, stream, columns=targets),
-                       (source, stream, 'StreamObservationId'))
-                for publisher, source, stream, targets in StreamId.condense(streamIds)]),
+            items = []
+            for publisher, source, author, stream, targets in StreamId.condense(streamIds):
+                self.setId(source=source, author=author, stream=stream)
+                items.append(dropIf(
+                    df=self.read(publisher, columns=targets),
+                    column=(self.id.source, self.id.author, self.id.stream, 'StreamObservationId')))
+            return self.memory.merge(
+                dfs=filterNone(items),
                 targetColumn=targetColumn)
-        return dropIf(self.read(source, stream), (source, stream, 'StreamObservationId'))
+        return dropIf(self.read(), (self.id.source, self.id.author, self.id.stream, 'StreamObservationId'))
 
 
 '''
