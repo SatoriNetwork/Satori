@@ -118,7 +118,10 @@ class DataManager:
                     stream=observation.stream).append(observation.df.copy())
 
             def compress():
-                ''' compress if the number of incrementals is high '''
+                ''' 
+                compress if the number of incrementals is high
+                could make this responsive to /get/stream/cadence if we wanted.
+                '''
                 self.disk.setAttributes(
                     source=observation.source,
                     author=observation.author,

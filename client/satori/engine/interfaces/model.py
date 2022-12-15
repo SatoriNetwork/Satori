@@ -17,6 +17,10 @@ class ModelMemoryApi():
 
 class ModelDataDiskApi():
     @staticmethod
+    def defaultModelPath(streamId: StreamId):
+        ''' returns the path to the model '''
+
+    @staticmethod
     def saveModel(model, modelPath: str = None, hyperParameters: list = None, chosenFeatures: list = None):
         ''' saves model using ModelDiskApi'''
 

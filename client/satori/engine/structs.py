@@ -23,6 +23,9 @@ class StreamId:
     def id(self):
         return (self.source, self.author, self.stream, self.target)
 
+    def idString(self):  # todo: make this .id and the .key a tuple
+        return (self.source or '') + (self.author or '') + (self.stream or '') + (self.target or '')
+
     def __repr__(self):
         return str({
             'source': self.source,

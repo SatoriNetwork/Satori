@@ -55,17 +55,33 @@ class StartupDag(object):
         self.publisherKey = self.nodeDetails.get('publisher.key')
 
     def sync(self):
+        '''
+        download pins (by ipfs address) received from satori server.
+        start with the ipfs that the oracle/stream author/publisher has pinned.
+        if unable to download, ask the server for all the pins of that stream.
+        the other pins will be reported by the subscribers of the stream.
+        download them at random.
+
+        context: before we begin this process we will subscribe to the pubsub
+        server which will provide us with new observations while we're
+        downloading the history. those will be held in reserve until this
+        process completes successfully, then they will be processed and saved to
+        disk as incrementals one at a time, like normal, so that at the 100
+        count we combine just like normal. that way, if we got the history from
+        a subscriber our ipfs should match theirs.
+        '''
         for pin in self.nodeDetails.get('pins'):
             ipfs = pin.get('ipfs')
+            idsElements = pin.get('target_stream').split('::')
             if ipfs:
                 ipfsCli.get(
-                    hash=ipfs
-                    # 'parse "target" column into observation id: w.pubkey:s.source:s.name:s.target'
-                    abspath=StreamId(
-                        stream=pin.get('target').split(':')[2],
-                        targets=[pin.get('target').split(':')[3]],
-                        source='|'.join(
-                            pin.get('target').split(':')[0:2])))
+                    hash=ipfs,
+                    abspath=disk.Disk(
+                        id=StreamId(
+                            source=idsElements[0],
+                            author=idsElements[1],
+                            stream=idsElements[2],
+                            target=idsElements[3])).path())
 
     def pubsub(self):
         if self.key:

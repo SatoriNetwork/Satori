@@ -68,8 +68,7 @@ class ModelManager:
         self.id = self.v.id()
         self.disk = disk
         self.memory = memory
-        self.modelPath = modelPath or config.root(
-            '..', 'models', variable.source, variable.author, variable.stream, variable.target + '.joblib')
+        self.modelPath = modelPath or self.disk.defaultModelPath(self.v)
         self.targets: list[StreamId] = targets
         self.setupFlags()
         self.get()

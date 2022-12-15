@@ -11,6 +11,7 @@ import os
 import joblib
 import pyarrow as pa
 from satori.apis import memory
+from satori.apis.hash import generatePathId
 from satori.engine.interfaces.data import DataDiskApi
 from satori.engine.interfaces.model import ModelDataDiskApi, ModelDiskApi
 from satori.engine.interfaces.wallet import WalletDiskApi
@@ -40,6 +41,13 @@ class WalletApi(WalletDiskApi):
 
 
 class ModelApi(ModelDiskApi):
+
+    @staticmethod
+    def defaultModelPath(streamId: StreamId):
+        return config.root(
+            '..', 'models',
+            streamId.source, streamId.author, streamId.stream,
+            streamId.target + '.joblib')
 
     @staticmethod
     def save(model, modelPath: str = None, hyperParameters: list = None, chosenFeatures: list = None):
@@ -118,6 +126,10 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         return safetify(path)
 
     @staticmethod
+    def defaultModelPath(streamId: StreamId):
+        ModelApi.defaultModelPath(streamId)
+
+    @staticmethod
     def saveModel(model, modelPath: str = None, hyperParameters: list = None, chosenFeatures: list = None):
         ModelApi.save(
             model,
@@ -148,11 +160,13 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         ''' Layer 0 get the path of a file '''
         return safetify(os.path.join(
             self.loc or config.dataPath(),
-            # 'incremental', # we need a name for not permanent because what if a stream source is called permanent...
+            # here we can make a path id that holds both the permanent and incremental data.
+            generatePathId(self.id),
             'permanent' if permanent else 'incremental',
-            self.id.source or config.defaultSource(),
-            self.id.author,
-            f'{self.id.stream}.{self.ext}'))
+            self.id.source or config.defaultSource(),  # this should be the dataframe only
+            self.id.author,  # this should be the dataframe only
+            f'{self.id.stream}.{self.ext}'  # this should be the dataframe only
+        ))
 
     def exists(self, permanent: bool = False,):
         ''' Layer 0 return True if file exists at path, else False '''
