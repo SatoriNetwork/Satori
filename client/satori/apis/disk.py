@@ -150,6 +150,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
             # 'incremental', # we need a name for not permanent because what if a stream source is called permanent...
             'permanent' if permanent else 'incremental',
             self.id.source or config.defaultSource(),
+            self.id.author,
             f'{self.id.stream}.{self.ext}'))
 
     def exists(self, permanent: bool = False,):
@@ -269,7 +270,8 @@ class Disk(DataDiskApi, ModelDataDiskApi):
             return kwargs
 
         source = self.id.source or self.df.columns.levels[0]
-        stream = self.id.stream or self.df.columns.levels[1]
+        author = self.id.author or self.df.columns.levels[1]
+        stream = self.id.stream or self.df.columns.levels[2]
         if permanent is None:
             return self.readBoth(**kwargs)
         if not self.exists(permanent):
@@ -282,7 +284,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
             rdf.index.name = None
             rdf = rdf.drop('__index_level_0__', axis=1)
         rdf.columns = pd.MultiIndex.from_product(
-            [[source], [stream], rdf.columns])
+            [[source], [author], [stream], rdf.columns])
         return rdf.sort_index()
 
     def savePrediction(self, path: str = None, prediction: str = None):
@@ -316,11 +318,11 @@ class Disk(DataDiskApi, ModelDataDiskApi):
 
         if streamIds is not None:
             items = []
-            for publisher, source, author, stream, targets in StreamId.condense(streamIds):
+            for source, author, stream, targets in StreamId.condense(streamIds):
                 self.setId(source=source, author=author, stream=stream)
                 items.append(dropIf(
-                    df=self.read(publisher, columns=targets),
-                    column=(self.id.source, self.id.author, self.id.stream, 'StreamObservationId')))
+                    df=self.read(columns=targets),
+                    column=(source, author, stream, 'StreamObservationId')))
             return self.memory.merge(
                 dfs=filterNone(items),
                 targetColumn=targetColumn)
