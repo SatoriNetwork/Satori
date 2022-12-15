@@ -1,4 +1,5 @@
 import pandas as pd
+from satori.engine.structs import StreamId
 
 
 class DataDiskApi():
@@ -6,14 +7,14 @@ class DataDiskApi():
     def setAttributes(
         self,
         df: pd.DataFrame = None,
-        source: str = None,
-        stream: str = None,
-        location: str = None,
-        ext: str = 'parquet'
+        id: StreamId = None,
+        loc: str = None,
+        ext: str = 'parquet',
+        **kwargs,
     ):
         ''' setter for any and all attributes, like __init__ returns self '''
 
-    def incrementals(self, source: str = None, stream: str = None):
+    def incrementals(self):
         ''' Layer 0 '''
 
     def append(self, df: pd.DataFrame = None):
@@ -24,7 +25,7 @@ class DataDiskApi():
         streamId is the name of file.
         '''
 
-    def compress(self, source: str = None, stream: str = None):
+    def compress(self):
         ''' Layer 1
         assumes columns are always the same...
         this function is used on rare occasion to compress the on disk 

@@ -99,15 +99,15 @@ class DataManager:
                 if it's new returns true so process can continue, if a repeat, return false
                 '''
                 if observation.key() not in self.targets.keys():
-                    self.targets[observation.key()] = None
-                x = self.targets[observation.key()]
+                    self.targets.add(observation.key(), None)
+                x = self.targets.get(observation.key())
                 if (
                     x is not None and x.observationId is not None and
                     observation.observationId is not None and
                     x.observationId == observation.observationId
                 ):
                     return False
-                self.targets[observation.key()] = observation
+                self.targets.add(observation.key(), observation)
                 return True
 
             def saveIncremental():
@@ -172,9 +172,7 @@ class DataManager:
             ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
 
             def remember():
-                if model.key not in self.predictions.keys():
-                    self.predictions[model.key] = None
-                self.predictions[model.key] = model.prediction
+                self.predictions.add(model.key, model.prediction)
                 return True
 
             def post():

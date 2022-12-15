@@ -91,13 +91,10 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         id: StreamId = None,
         loc: str = None,
         ext: str = 'parquet',
+        **kwargs,
     ):
         self.memory = memory.Memory
-        self.setAttributes(
-            df=df,
-            id=id,
-            loc=loc,
-            ext=ext)
+        self.setAttributes(df=df, id=id, loc=loc, ext=ext, **kwargs)
 
     def setAttributes(
         self,
@@ -105,9 +102,13 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         id: StreamId = None,
         loc: str = None,
         ext: str = 'parquet',
+        **kwargs,
     ):
         self.df = df if df is not None else pd.DataFrame()
-        self.id = id
+        self.id = id or StreamId(
+            source=kwargs.get('source'),
+            author=kwargs.get('author'),
+            stream=kwargs.get('stream'))
         self.loc = loc
         self.ext = ext
         return self

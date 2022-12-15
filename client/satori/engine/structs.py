@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 import datetime as dt
-from satori import config
+#from satori import config
 from functools import partial
 
 
@@ -112,6 +112,16 @@ class StreamIdMap():
         for k in removed:
             del self.d[k]
         return removed
+
+    def get(self, streamId: StreamId = None, default=None, greedy: bool = False):
+        if streamId is None:
+            return self.d
+        condition = partial(
+            StreamIdMap._condition,
+            streamId=streamId, default=greedy)
+        matches = [
+            self.d.get(k) for k in self.d.keys() if condition(k)]
+        return matches[0] if len(matches) > 0 else default
 
     def getAll(self, streamId: StreamId = None, greedy: bool = True):
         if streamId is None:

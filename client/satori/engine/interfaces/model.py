@@ -27,13 +27,7 @@ class ModelDataDiskApi():
     def gather(
         self,
         targetColumn: 'str|tuple[str]',
-        targetsByStreamBySource: dict[str, dict[str, list[str]]] = None,
-        targetsByStream: dict[str, list[str]] = None,
-        targets: list[str] = None,
-        sourceStreamTargets: list = None,
         streamIds: list[StreamId] = None,
-        source: str = None,
-        stream: str = None,
     ):
         ''' Layer 2. 
         retrieves the targets and merges them.
