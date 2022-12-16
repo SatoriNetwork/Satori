@@ -21,7 +21,6 @@ class StartupDag(object):
     def __init__(self, *args):
         super(StartupDag, self).__init__(*args)
         self.full = True
-
         self.ipfsDaemon
         self.wallet
         self.nodeDetails
@@ -30,14 +29,15 @@ class StartupDag(object):
         self.publisherKey
         self.connection
         self.engine
+        self.synced = []
 
     def start(self):
         if self.full:
             self.startIpfs()
             self.openWallet()
             self.checkin()
-            self.sync()
             self.pubsub()
+            self.sync()
             self.engine()
 
     def startIpfs(self):
@@ -53,6 +53,18 @@ class StartupDag(object):
         self.key = self.nodeDetails.get('key')
         self.subscriberKey = self.nodeDetails.get('subscriber.key')
         self.publisherKey = self.nodeDetails.get('publisher.key')
+
+    def pubsub(self):
+        ''' establish a pubsub connection. '''
+        if self.key:
+            self.connection = satori.init.establishConnection(
+                pubkey=self.wallet.publicKey, key=self.key, startupDag=self)
+        # will removing the separate connection pattern.
+        # elif self.subscriberKey and self.publisherKey:
+        #    self.pubConn = satori.init.establishConnection(self.pubConn)
+        #    self.subConn = satori.init.establishConnection(self.subConn)
+        else:
+            raise Exception('no key provided by satori server')
 
     def sync(self):
         '''
@@ -70,27 +82,26 @@ class StartupDag(object):
         count we combine just like normal. that way, if we got the history from
         a subscriber our ipfs should match theirs.
         '''
+
+        # we should make the download run in parellel so using async functions
+        # here. but in the meantime, we'll do them sequentially.
         for pin in self.nodeDetails.get('pins'):
             ipfs = pin.get('ipfs')
-            idsElements = pin.get('target_stream').split('::')
+            topic = pin.get('target_stream').split('::')
             if ipfs:
                 ipfsCli.get(
                     hash=ipfs,
                     abspath=disk.Disk(
                         id=StreamId(
-                            source=idsElements[0],
-                            author=idsElements[1],
-                            stream=idsElements[2],
-                            target=idsElements[3])).path())
-
-    def pubsub(self):
-        if self.key:
-            self.connection = satori.init.establishConnection(self.key)
-        elif self.subscriberKey and self.publisherKey:
-            self.pubConn = satori.init.establishConnection(self.pubConn)
-            self.subConn = satori.init.establishConnection(self.subConn)
-        else:
-            raise Exception('no key provided by satori server')
+                            source=topic[0],
+                            author=topic[1],
+                            stream=topic[2],
+                            target=topic[3])).path())
+                # this topic should match the pubsub topic
+                # because when we get a message from the pubsub server
+                # it will have a topic key that we must look for to see if that
+                # datastream is done syncing.
+                self.synced = [topic]
 
     def buildEngine(self):
         if self.key:
