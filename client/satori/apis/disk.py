@@ -161,9 +161,9 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         folder and avoid worrying about path length limits. also, we can use the
         entire folder as the ipfs hash for the datastream.
         path lengths should about 170 characters long typically. for examples:
-        C:\Users\user\AppData\Local\Satori\data\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=\incrementals\6c0a15fcfa1c4535ab1da046cc1b5dc8.parquet
-        C:\Users\user\AppData\Local\Satori\data\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=\aggregate.parquet
-        C:\Users\user\AppData\Local\Satori\models\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=.joblib
+        C:\\Users\\user\\AppData\\Local\\Satori\\data\\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=\\incrementals\\6c0a15fcfa1c4535ab1da046cc1b5dc8.parquet
+        C:\\Users\\user\\AppData\\Local\\Satori\\data\\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=\\aggregate.parquet
+        C:\\Users\\user\\AppData\\Local\\Satori\\models\\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=.joblib
         '''
         return safetify(os.path.join(
             self.loc or config.dataPath(),
@@ -337,9 +337,9 @@ class Disk(DataDiskApi, ModelDataDiskApi):
             items = []
             for streamId in streamIds:
                 self.setId(id=streamId)
-                    #source=streamId.source,
-					#author=streamId.author,
-     				#stream=streamId.stream)
+                # source=streamId.source,
+                # author=streamId.author,
+                # stream=streamId.stream)
                 items.append(dropIf(
                     df=self.read(columns=streamId.target),
                     column=(streamId.source, streamId.author, streamId.stream, 'StreamObservationId')))

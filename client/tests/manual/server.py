@@ -14,8 +14,8 @@ class fixtures():
     def streams():
         return {
             0: {},
-            1: {'source': 'test', 'name': 'stream1', 'target': 'target'},
-            2: {'source': 'test'},
+            1: {'source': 'source', 'author': '1', 'name': 'stream1', 'target': 'target'},
+            2: {'source': 'source', 'author': '1', 'name': 'stream1 pred', 'target': 'target'},
         }
 
     @staticmethod
@@ -24,14 +24,10 @@ class fixtures():
             0: {},
             1: {
                 'publisher': {'pubkey': '12a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'},
-                'stream': {
-                    'source': 'source',
-                    'name': 'name pred',
-                    'target': 'target'},
-                'reason': {
-                    'source': 'source',
-                    'name': 'name pred pred',
-                    'target': 'target'},
+                # subscribe to this stream...
+                'stream': fixtures.streams()[1],
+                # because I need it to predict this stream...
+                'reason': fixtures.streams()[2],
             },
         }
 
@@ -49,12 +45,12 @@ def register_wallet():
     #{'ram_total_gb': 32, 'ram_available_percent': 49.16639057975354, 'cpu': 8, 'disk_total': 475, 'disk_free': 66, 'bandwidth': 'unknown'}
 
 
-def register_stream():
+def register_stream(x: int):
     ''' publish raw data'''
     r = requests.post(
         'http://localhost:5002/register/stream',
         headers=w.authPayload(asDict=True),
-        json=json.dumps(fixtures.streams()[1]))
+        json=json.dumps(fixtures.streams()[x]))
     print(r.status_code, r.text)
 
 

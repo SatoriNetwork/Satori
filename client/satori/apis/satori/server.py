@@ -4,7 +4,7 @@ it returns a key you use to make a websocket connection with the pubsub server.
 '''
 import json
 import requests
-from satori import Wallet
+from satori.apis.wallet import Wallet
 
 
 class SatoriServerClient(object):
