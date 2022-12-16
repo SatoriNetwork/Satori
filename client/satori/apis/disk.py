@@ -11,7 +11,7 @@ import os
 import joblib
 import pyarrow as pa
 from satori.apis import memory
-from satori.apis.hash import generatePathId
+from satori.apis import hash
 from satori.engine.interfaces.data import DataDiskApi
 from satori.engine.interfaces.model import ModelDataDiskApi, ModelDiskApi
 from satori.engine.interfaces.wallet import WalletDiskApi
@@ -44,10 +44,8 @@ class ModelApi(ModelDiskApi):
 
     @staticmethod
     def defaultModelPath(streamId: StreamId):
-        return config.root(
-            '..', 'models',
-            streamId.source, streamId.author, streamId.stream,
-            streamId.target + '.joblib')
+        return safetify(config.root(
+            '..', 'models', hash.generatePathId(streamId=streamId) + '.joblib'))
 
     @staticmethod
     def save(model, modelPath: str = None, hyperParameters: list = None, chosenFeatures: list = None):
@@ -156,21 +154,25 @@ class Disk(DataDiskApi, ModelDataDiskApi):
     def setId(self, id: StreamId = None, source: str = None, author: str = None, stream: str = None):
         self.id = id or StreamId(source=source, author=author, stream=stream)
 
-    def path(self, permanent: bool = False):
-        ''' Layer 0 get the path of a file '''
+    def path(self, aggregate: bool = False):
+        ''' Layer 0
+        get the path of a file
+        we generate a hash as the id for the datastream so we can store it in a
+        folder and avoid worrying about path length limits. also, we can use the
+        entire folder as the ipfs hash for the datastream.
+        path lengths should about 170 characters long typically. for examples:
+        C:\Users\user\AppData\Local\Satori\data\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=\incrementals\6c0a15fcfa1c4535ab1da046cc1b5dc8.parquet
+        C:\Users\user\AppData\Local\Satori\data\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=\aggregate.parquet
+        C:\Users\user\AppData\Local\Satori\models\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=.joblib
+        '''
         return safetify(os.path.join(
             self.loc or config.dataPath(),
-            # here we can make a path id that holds both the permanent and incremental data.
-            generatePathId(self.id),
-            'permanent' if permanent else 'incremental',
-            self.id.source or config.defaultSource(),  # this should be the dataframe only
-            self.id.author,  # this should be the dataframe only
-            f'{self.id.stream}.{self.ext}'  # this should be the dataframe only
-        ))
+            hash.generatePathId(streamId=self.id),
+            f'aggregate.{self.ext}' if aggregate else 'incrementals'))
 
-    def exists(self, permanent: bool = False,):
+    def exists(self, aggregate: bool = False,):
         ''' Layer 0 return True if file exists at path, else False '''
-        return os.path.exists(self.path(permanent))
+        return os.path.exists(self.path(aggregate))
 
     def reduceMulti(self, df: pd.DataFrame):
         ''' Layer 0 '''
@@ -205,7 +207,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         must remove multiindex column first.
         streamId is the name of file.
         '''
-        pq.write_table(self.toTable(df), self.path(permanent=True))
+        pq.write_table(self.toTable(df), self.path(aggregate=True))
 
     def compress(self):
         ''' Layer 1
@@ -225,29 +227,29 @@ class Disk(DataDiskApi, ModelDataDiskApi):
             self.write(df)
             self.remove(False)
 
-    def remove(self, permanent: bool = None):
+    def remove(self, aggregate: bool = None):
         ''' Layer 1 when we don't use a stream anymore we'll remove it '''
-        if permanent is None:
+        if aggregate is None:
             self.remove(True)
             self.remove(False)
-        elif permanent:
-            if self.exists(permanent):
-                os.remove(self.path(permanent))
+        elif aggregate:
+            if self.exists(aggregate):
+                os.remove(self.path(aggregate))
         else:
             shutil.rmtree(self.path(), ignore_errors=True)
 
     def readBoth(self, **kwargs):
         ''' Layer 1 
-        read both the permanent and incremental tables into memory
+        read both the aggregate and incremental tables into memory
         merge them into one dataframe
         '''
         return self.merge(
-            self.read(permanent=False, **kwargs),
-            self.read(permanent=True, **kwargs))
+            self.read(aggregate=False, **kwargs),
+            self.read(aggregate=True, **kwargs))
 
     def merge(self, df: pd.DataFrame, long: pd.DataFrame, ):
         ''' Layer 1 
-        meant to merge long term (permanent) written tables 
+        meant to merge long term (aggregate) written tables 
         with short term (incremental) appended datasets
         for one stream
         '''
@@ -268,12 +270,12 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         df = df.drop('TempIndex', axis=1, level=0)
         return dropDuplicates(df)
 
-    def read(self, permanent: bool = None, **kwargs):
+    def read(self, aggregate: bool = None, **kwargs):
         ''' Layer 1
         reads a parquet file with filtering, use columns=[targets].
         adds on the stream as first level in multiindex column on dataframe.
         Since we compress incremental observations into long term storage we
-        really have 2 datasets per stream to look up, thus we specify permanent
+        really have 2 datasets per stream to look up, thus we specify aggregate
         as None in order to pull from both datasets and merge automatically.
         '''
         def conform(**kwargs):
@@ -287,12 +289,12 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         source = self.id.source or self.df.columns.levels[0]
         author = self.id.author or self.df.columns.levels[1]
         stream = self.id.stream or self.df.columns.levels[2]
-        if permanent is None:
+        if aggregate is None:
             return self.readBoth(**kwargs)
-        if not self.exists(permanent):
+        if not self.exists(aggregate):
             return None
         rdf = pq.read_table(
-            self.path(permanent),
+            self.path(aggregate),
             **conform(**kwargs)).to_pandas()
         if '__index_level_0__' in rdf.columns:
             rdf.index = rdf.loc[:, '__index_level_0__']
