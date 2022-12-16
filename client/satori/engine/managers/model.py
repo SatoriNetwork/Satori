@@ -148,7 +148,7 @@ class ModelManager:
             threshold amount of data.
             '''
             self.data = self.data if self.data is not None else pd.DataFrame(
-                {x: [] for x in StreamId.combine(self.targets)})
+                {x.key(): [] for x in set(self.targets)})
 
         self.data = self.disk.gather(
             streams=self.targets,

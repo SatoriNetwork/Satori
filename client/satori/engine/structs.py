@@ -66,10 +66,6 @@ class StreamId:
             author=None if clearAuthor else (author or self.author),
             stream=None if clearStream else (stream or self.stream),
             target=None if clearTarget else (target or self.target))
-    # @staticmethod
-    # def order(streamIds: list[StreamId]):
-    #    ''' orders list such that streams '''
-    #    return {(source, stream, targets) for sst in sourceStreamTargetss for source, stream, targets in sst.asTuples()}
 
 
 class StreamIdMap():

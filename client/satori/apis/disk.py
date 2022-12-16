@@ -335,11 +335,14 @@ class Disk(DataDiskApi, ModelDataDiskApi):
 
         if streamIds is not None:
             items = []
-            for source, author, stream, targets in StreamId.condense(streamIds):
-                self.setId(source=source, author=author, stream=stream)
+            for streamId in streamIds:
+                self.setId(id=streamId)
+                    #source=streamId.source,
+					#author=streamId.author,
+     				#stream=streamId.stream)
                 items.append(dropIf(
-                    df=self.read(columns=targets),
-                    column=(source, author, stream, 'StreamObservationId')))
+                    df=self.read(columns=streamId.target),
+                    column=(streamId.source, streamId.author, streamId.stream, 'StreamObservationId')))
             return self.memory.merge(
                 dfs=filterNone(items),
                 targetColumn=targetColumn)
