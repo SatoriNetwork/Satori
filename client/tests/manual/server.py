@@ -12,10 +12,10 @@ class fixtures():
     def streams():
         return {
             0: {},
-            1: {'source': 'source', 'author': '2', 'name': 'stream1', 'target': 'target'},
-            2: {'source': 'source', 'author': '1', 'name': 'stream1 pred', 'target': 'target'},
-            3: {'source': 'source', 'author': '3', 'name': 'stream3', 'target': 'target'},
-            4: {'source': 'source', 'author': '4', 'name': 'stream4', 'target': 'target'},
+            1: {'source': 'SATORI', 'author': '2', 'stream': 'stream1', 'target': 'target'},
+            2: {'source': 'SATORI', 'author': '1', 'stream': 'stream1_p', 'target': 'target'},
+            3: {'source': 'SATORI', 'author': '3', 'stream': 'stream3', 'target': 'target'},
+            4: {'source': 'SATORI', 'author': '4', 'stream': 'stream4', 'target': 'target'},
         }
 
     @staticmethod
@@ -59,8 +59,11 @@ register_stream(1)
 register_stream(2)
 register_stream(3)
 register_stream(4)
-# now manually fix streams 3 and 4 in the database to point to wallet 3 and 4
-# now manually set the sanctioned to > 0 for streams 1, and 3
+# now manually fix stream 1 in the database to point to wallet 2
+# now manually fix stream 3 in the database to point to wallet 3
+# now manually fix stream 4 in the database to point to wallet  4
+# now manually set the sanctioned to > 0 for streams 1, 3, and 4
+# now manually set the predicting for stream 2 to 1
 
 
 def register_subscription(x: int):
@@ -95,13 +98,55 @@ def get_streams(x: int):
     print(r.status_code, r.text)
 
 
+get_streams(1)
+get_streams(2)
+get_streams(3)
+get_streams(4)
+
+
 def my_streams():
     ''' subscribe to primary data stream and and publish prediction '''
     r = requests.post(
         'http://localhost:5002/my/streams',
         headers=w.authPayload(asDict=True),
-        json='{}')
+        json='{}')  # if you want a subset of your streams...
     print(r.status_code, r.text)
+
+
+my_streams()
+
+
+def my_publications():
+    ''' subscribe to primary data stream and and publish prediction '''
+    r = requests.post(
+        'http://localhost:5002/my/publications',
+        headers=w.authPayload(asDict=True))
+    print(r.status_code, r.text)
+
+
+my_publications()
+
+
+def my_subscriptions():
+    ''' subscribe to primary data stream and and publish prediction '''
+    r = requests.post(
+        'http://localhost:5002/my/subscriptions',
+        headers=w.authPayload(asDict=True))
+    print(r.status_code, r.text)
+
+
+my_subscriptions()
+
+
+def my_subscriptions_pins():
+    ''' subscribe to primary data stream and and publish prediction '''
+    r = requests.post(
+        'http://localhost:5002/my/subscriptions/pins',
+        headers=w.authPayload(asDict=True))
+    print(r.status_code, r.text)
+
+
+my_subscriptions_pins()
 
 
 def checkin():
@@ -112,23 +157,25 @@ def checkin():
     print(r.status_code, r.text)
     j = r.json()
     # use subscriptions to initialize engine
-    print('key', j.get('key'))
+    print('\nkey', j.get('key'))
     # use subscriptions to initialize engine
-    print('subscriptions', j.get('subscriptions'))
+    print('\nsubscriptions', j.get('subscriptions'))
     # use publications to initialize engine
-    print('publications', j.get('publications'))
+    print('\npublications', j.get('publications'))
     # use pins to initialize engine and update any missing data
-    print('pins', j.get('pins'))
+    print('\npins', j.get('pins'))
     # use server version to use the correct api
-    print('server version', j.get('versions', {}).get('server'))
+    print('\nserver version', j.get('versions', {}).get('server'))
     # use client version to know when to update the client
-    print('client version', j.get('versions', {}).get('client'))
+    print('\nclient version', j.get('versions', {}).get('client'))
     from satoriserver.utils import Crypt
-    print('key', Crypt().decrypt(
+    print('\nkey', Crypt().decrypt(
         toDecrypt=j.get('key'),
         key='thiskeyisfromenv',
         clean=True))
 
+
+checkin()
 
 if __name__ == '__main__':
     # register_wallet()
