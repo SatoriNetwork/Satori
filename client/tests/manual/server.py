@@ -6,16 +6,16 @@ import requests
 from satori import Wallet
 w = Wallet()()
 
-# TODO make a set of fixtures for testing
-
 
 class fixtures():
     @staticmethod
     def streams():
         return {
             0: {},
-            1: {'source': 'source', 'author': '1', 'name': 'stream1', 'target': 'target'},
+            1: {'source': 'source', 'author': '2', 'name': 'stream1', 'target': 'target'},
             2: {'source': 'source', 'author': '1', 'name': 'stream1 pred', 'target': 'target'},
+            3: {'source': 'source', 'author': '3', 'name': 'stream3', 'target': 'target'},
+            4: {'source': 'source', 'author': '4', 'name': 'stream4', 'target': 'target'},
         }
 
     @staticmethod
@@ -23,10 +23,10 @@ class fixtures():
         return {
             0: {},
             1: {
-                'publisher': {'pubkey': '12a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'},
+                'publisher': {'pubkey': '22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'},
                 # subscribe to this stream...
                 'stream': fixtures.streams()[1],
-                # because I need it to predict this stream...
+                # because I need it to produce this prediction stream...
                 'reason': fixtures.streams()[2],
             },
         }
@@ -38,11 +38,12 @@ def register_wallet():
         headers=w.authPayload(asDict=True),
         json=w.registerPayload())
     print(r.status_code, r.text)
-    #from satori.apis import system
-    # w.authPayload()
-    #'{"message": "2022-10-20 20:14:02.322147", "pubkey": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "address": "RPBG9hf93Uge2SgZt4K1mRNyJeTTcKe8kt", "signature": "IHi9HH21rED8hZsTio6Q488qi/cSZ5DRgWSN9rsqTSGcJiXk3v1qECXVYB2ptcTk5dGThqpCmqJCXP2/gR4ubL8="}'
-    # system.devicePayload()
-    #{'ram_total_gb': 32, 'ram_available_percent': 49.16639057975354, 'cpu': 8, 'disk_total': 475, 'disk_free': 66, 'bandwidth': 'unknown'}
+
+
+register_wallet()
+# now, go make a new wallet in the database manually starting with 22...
+# now, go make a new wallet in the database manually starting with 32...
+# now, go make a new wallet in the database manually starting with 42...
 
 
 def register_stream(x: int):
@@ -54,6 +55,14 @@ def register_stream(x: int):
     print(r.status_code, r.text)
 
 
+register_stream(1)
+register_stream(2)
+register_stream(3)
+register_stream(4)
+# now manually fix streams 3 and 4 in the database to point to wallet 3 and 4
+# now manually set the sanctioned to > 0 for streams 1, and 3
+
+
 def register_subscription(x: int):
     ''' subscribe to stream '''
     r = requests.post(
@@ -63,12 +72,18 @@ def register_subscription(x: int):
     print(r.status_code, r.text)
 
 
+register_subscription(1)
+
+
 def request_primary():
     ''' subscribe to primary data stream and and publish prediction '''
     r = requests.get(
         'http://localhost:5002/request/primary',
         headers=w.authPayload(asDict=True))
     print(r.status_code, r.text)
+
+
+request_primary()
 
 
 def get_streams(x: int):
