@@ -23,22 +23,25 @@ class StartupDag(object):
         self.full = True
         self.ipfsDaemon
         self.wallet
-        self.nodeDetails
+        self.details
         self.key
         self.subscriberKey
         self.publisherKey
         self.connection
         self.engine
         self.synced = []
+        self.publications = []
+        self.subscriptions = []
 
     def start(self):
+        ''' start the satori engine. '''
         if self.full:
             self.startIpfs()
             self.openWallet()
             self.checkin()
+            self.buildEngine()
             self.pubsub()
             self.sync()
-            self.engine()
 
     def startIpfs(self):
         thread = threading.Thread(target=ipfsCli.start, daemon=True)
@@ -49,10 +52,20 @@ class StartupDag(object):
         self.wallet = Wallet()()
 
     def checkin(self):
-        self.nodeDetails = SatoriServerClient(self.wallet).checkin()
-        self.key = self.nodeDetails.get('key')
-        self.subscriberKey = self.nodeDetails.get('subscriber.key')
-        self.publisherKey = self.nodeDetails.get('publisher.key')
+        self.details = SatoriServerClient(self.wallet).checkin()
+        self.key = self.details.get('key')
+        self.subscriberKey = self.details.get('subscriber.key')
+        self.publisherKey = self.details.get('publisher.key')
+        self.publications = [
+            StreamId.fromMap(map=x) for x in self.details.get('publications')]
+        self.subscriptions = [
+            StreamId.fromMap(map=x) for x in self.details.get('subscriptions')]
+
+    def buildEngine(self):
+        self.engine = satori.init.getEngine(
+            subscriptions=self.subscriptions,
+            publications=self.publications)
+        self.engine.run()
 
     def pubsub(self):
         ''' establish a pubsub connection. '''
@@ -85,7 +98,7 @@ class StartupDag(object):
 
         # we should make the download run in parellel so using async functions
         # here. but in the meantime, we'll do them sequentially.
-        for pin in self.nodeDetails.get('pins'):
+        for pin in self.details.get('pins'):
             ipfs = pin.get('ipfs')
             topic = pin.get('target_stream').split('::')
             if ipfs:
@@ -102,13 +115,3 @@ class StartupDag(object):
                 # it will have a topic key that we must look for to see if that
                 # datastream is done syncing.
                 self.synced = [topic]
-
-    def buildEngine(self):
-        if self.key:
-            self.engine = satori.init.getEngine(self.connection)
-            self.engine.run()
-        elif self.subscriberKey and self.publisherKey:
-            self.engine = satori.init.getEngine(self.connection)
-            self.engine.run()
-        else:
-            raise Exception('no key provided by satori server')

@@ -5,8 +5,8 @@ from functools import partial
 import pandas as pd
 import satori
 from satori.apis.satori.pubsub import SatoriPubSubConn
-# from satori.apis.satori.pub import SatoriPubConn
-# from satori.apis.satori.sub import SatoriSubConn
+#from satori.apis.satori.pub import SatoriPubConn
+#from satori.apis.satori.sub import SatoriSubConn
 from satori.engine.structs import StreamId
 import satori.engine.model.metrics as metrics
 from satori.apis.wallet import Wallet
@@ -57,7 +57,7 @@ def establishConnection(pubkey: str, key: str, startupDag: StartupDag):
 # accept optional data necessary to generate models data and learner
 
 
-def getEngine(subscriptions: list[StreamId], publications: list[StreamId]):
+def getEngine(subscriptions: dict, publications: dict):
     '''
     called by the flask app to start the Engine.
     returns None or Engine.
@@ -70,14 +70,10 @@ def getEngine(subscriptions: list[StreamId], publications: list[StreamId]):
         ''' generates DataManager from data on disk '''
         return satori.DataManager(disk=disk.Disk())
 
-    def generateModelManager():
+    def generateModelManagerForSpoof():
         ''' generate a set of Model(s) for Engine '''
 
-        def generateCombinedFeature(
-            df: pd.DataFrame = None,
-            columns: list[tuple] = None,
-            prefix='Diff'
-        ):
+        def generateCombinedFeature(df: pd.DataFrame = None, columns: list[tuple] = None, prefix='Diff'):
             '''
             example of making a feature out of data you know ahead of time.
             most of the time you don't know what kinds of data you'll get...
@@ -138,47 +134,74 @@ def getEngine(subscriptions: list[StreamId], publications: list[StreamId]):
                             ('streamrSpoof', 'simpleEURCleanedHL', 'Low')])
             },
             'override': False}
-        # return {
-        #    satori.ModelManager(
-        #        variable: publication,
-        #        output: prediction_stream,
-        # disk=disk.Disk(),
-        #        memory=memory.Memory,
-        #        hyperParameters: 'list(HyperParameter)'=None,
-        #		metrics: dict=None,
-        #		features: dict=None,
-        #		chosenFeatures: 'list(str)'=None,
-        #		pinnedFeatures: 'list(str)'=None,
-        #		exploreFeatures: bool=True,
-        #		targets: list[StreamId]=None,
-        #		split: 'int|float'=.2,
-        #		override: bool=False,
-#
-#
-#
-#
-#
-        #        targets=[
-        #            StreamId(
-        # source='streamrSpoof',
-        # stream='simpleEURCleanedHL',
-        # targets=['High', 'Low'])
-        #    		for subscription in subscriptions
-        #      		if subscription.get('reason') == publicaiton.get('source')],
-        #        pinnedFeatures=[
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow')],
-        #        chosenFeatures=[
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'DailyHigh21'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh14std'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
-        #        **kwargs),
-        #    for publication in publications
-#
-#       }
+        return {
+            satori.ModelManager(
+                disk=disk.Disk(),
+                memory=memory.Memory,
+                sourceId='streamrSpoof',
+                streamId='simpleEURCleanedHL',
+                targetId='High',
+                targets=[StreamId(
+                    source='streamrSpoof',
+                    stream='simpleEURCleanedHL',
+                    targets=['High', 'Low'])],
+                pinnedFeatures=[
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow')],
+                chosenFeatures=[
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyHigh21'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh14std'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
+                **kwargs),
+            satori.ModelManager(
+                disk=disk.Disk(),
+                memory=memory.Memory,
+                sourceId='streamrSpoof',
+                streamId='simpleEURCleanedHL',
+                targetId='Low',
+                targets=[StreamId(
+                    source='streamrSpoof',
+                    stream='simpleEURCleanedHL',
+                    targets=['Low', 'High'])],
+                pinnedFeatures=[('streamrSpoof', 'simpleEURCleanedHL', 'Low')],
+                chosenFeatures=[
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyLow21'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow14std'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
+                **kwargs),
+            satori.ModelManager(
+                disk=disk.Disk(),
+                memory=memory.Memory,
+                sourceId='streamrSpoof',
+                streamId='simpleEURCleanedC',
+                targetId='Close',
+                targets=[
+                    StreamId(
+                        source='streamrSpoof',
+                        stream='simpleEURCleanedC',
+                        targets=['Close']),
+                    StreamId(
+                        source='streamrSpoof',
+                        stream='simpleEURCleanedHL',
+                        targets=['High', 'Low'])],
+                chosenFeatures=[
+                    ('streamrSpoof', 'simpleEURCleanedC', 'Close'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
+                    ('streamrSpoof', 'simpleEURCleanedHL', 'DailyCLose7')],
+                **kwargs)
+        }
+
+    subscriptions
+    publications
 
     return satori.Engine(
         view=satori.View(),

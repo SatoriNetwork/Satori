@@ -20,6 +20,15 @@ class StreamId:
         self.stream = stream
         self.target = target
 
+    def topic(self, asJson: bool = True):
+        '''
+        the topic (id) for this stream. 
+        this is how the pubsub system identifies the stream.
+        '''
+        if asJson:
+            return json.dumps(self.keyedId(asJson=False))
+        return {'source': self.source, 'author': self.author, 'stream': self.stream, 'target': self.target}
+
     def id(self):
         return (self.source, self.author, self.stream, self.target)
 
@@ -66,6 +75,14 @@ class StreamId:
             author=None if clearAuthor else (author or self.author),
             stream=None if clearStream else (stream or self.stream),
             target=None if clearTarget else (target or self.target))
+
+    @staticmethod
+    def fromMap(map: dict = None):
+        return StreamId(
+            source=(map or {}).get('source'),
+            author=(map or {}).get('author'),
+            stream=(map or {}).get('stream'),
+            target=(map or {}).get('target'))
 
 
 class StreamIdMap():
