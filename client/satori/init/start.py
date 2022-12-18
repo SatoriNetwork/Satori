@@ -62,6 +62,16 @@ class StartupDag(object):
             StreamId.fromMap(map=x) for x in self.details.get('subscriptions')]
 
     def buildEngine(self):
+        ''' start the engine, it will run w/ what it has til ipfs is synced '''
+        ''' 
+        NEXT STEP: get the engine to look at two locations for it's data. save
+        incrementals to the empty folder, or if they're both empty, to the 
+        second one. the download function will do the same, saving to the empty
+        folder or to the first one if they're both empty. When it is done it 
+        will take all the incrementals and add them to the ipfs dataset, then
+        delete the incrementals and tell the pubsub system to save incrementals
+        to the designated folder, then it will tell the engine to reload.
+        '''
         self.engine = satori.init.getEngine(
             subscriptions=self.subscriptions,
             publications=self.publications)

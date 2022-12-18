@@ -136,12 +136,12 @@ class DataManager:
                 ''' tell the modesl that listen to this stream and these targets '''
                 for model in models:
                     if (
-                        model.v.source == observation.source and
-                        model.v.author == observation.author and
-                        model.v.stream == observation.stream and
+                        model.variable.source == observation.source and
+                        model.variable.author == observation.author and
+                        model.variable.stream == observation.stream and
                         (
-                            model.v.target == observation.target or
-                            model.v.target in observation.content.keys())
+                            model.variable.target == observation.target or
+                            model.variable.target in observation.content.keys())
                     ):
                         model.targetUpdated.on_next(observation.df)
                     # elif any([key in observation.df.columns for key in model.feature.keys()]):

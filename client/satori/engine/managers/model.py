@@ -28,6 +28,8 @@ class ModelManager:
     def __init__(
         self,
         variable: StreamId,
+        output: StreamId,
+        targets: list[StreamId] = None,
         disk: ModelDataDiskApi = None,
         memory: ModelMemoryApi = None,
         modelPath: str = None,
@@ -37,7 +39,6 @@ class ModelManager:
         chosenFeatures: 'list(str)' = None,
         pinnedFeatures: 'list(str)' = None,
         exploreFeatures: bool = True,
-        targets: list[StreamId] = None,
         split: 'int|float' = .2,
         override: bool = False,
     ):
@@ -62,10 +63,10 @@ class ModelManager:
         '''
         if not variable.potentiallyFilled():
             raise ValueError('variable must be fully specified')
-        self.v = variable  # shorthand
-        self.variable = self.v
-        self.key = self.v.id()
-        self.id = self.v.id()
+        self.variable = variable
+        self.output = output
+        self.key = self.variable.id()
+        self.id = self.variable.id()
         self.disk = disk
         self.memory = memory
         self.modelPath = modelPath or self.disk.defaultModelPath(self.v)
@@ -98,13 +99,13 @@ class ModelManager:
 
     def overview(self):
         return {
-            'source': self.v.source,
-            'author': self.v.author,
-            'stream': self.v.stream,
-            'target': self.v.target,
+            'source': self.variable.source,
+            'author': self.variable.author,
+            'stream': self.variable.stream,
+            'target': self.variable.target,
             'value': self.stable.current.values[0][0] if hasattr(self.stable, 'current') else '',
             'prediction': self.stable.prediction if hasattr(self.stable, 'prediction') else '',
-            'values': self.data.dropna().loc[:, (self.v.source, self.v.author, self.v.stream, self.v.target)].values.tolist()[-20:],
+            'values': self.data.dropna().loc[:, (self.variable.source, self.variable.author, self.variable.stream, self.variable.target)].values.tolist()[-20:],
             'predictions': [.9, .8, 1, .6, .9, .5, .6, .8, 1.1],
             # this isn't the accuracy we really care about (historic accuracy),
             # it's accuracy of this current model on historic data.
@@ -218,7 +219,7 @@ class ModelManager:
             if isTarget and self.stable.build():
                 self.stable.producePrediction()
                 show(
-                    f'prediction - {self.v.stream} {self.v.target}:', self.stable.prediction)
+                    f'prediction - {self.variable.stream} {self.variable.target}:', self.stable.prediction)
                 self.predictionUpdate.on_next(self)
             # this is a feature to be added - a second publish stream which requires a
             # different dataset - one where the latest update is taken into account.
@@ -230,7 +231,7 @@ class ModelManager:
             #    self.predictionEdgeUpdate.on_next(self)
 
         def makePredictionFromNewModel():
-            show(f'model updated - {self.v.stream} {self.v.target}:',
+            show(f'model updated - {self.variable.stream} {self.variable.target}:',
                  f'{self.stableScore}, {self.pilotScore}')
             makePrediction()
 

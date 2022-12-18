@@ -7,7 +7,9 @@ import satori
 from satori.apis.satori.pubsub import SatoriPubSubConn
 # from satori.apis.satori.pub import SatoriPubConn
 # from satori.apis.satori.sub import SatoriSubConn
-from satori.engine.structs import StreamId
+from satori.engine.structs import StreamId, HyperParameter
+from satori.engine import ModelManager
+from satori.engine.view import View
 import satori.engine.model.metrics as metrics
 from satori.apis.wallet import Wallet
 from satori.apis import disk
@@ -96,21 +98,21 @@ def getEngine(subscriptions: list[StreamId], publications: list[StreamId]):
         # these will be sensible defaults based upon the patterns in the data
         kwargs = {
             'hyperParameters': [
-                satori.HyperParameter(
+                HyperParameter(
                     name='n_estimators',
                     value=300,
                     kind=int,
                     limit=100,
                     minimum=200,
                     maximum=5000),
-                satori.HyperParameter(
+                HyperParameter(
                     name='learning_rate',
                     value=0.3,
                     kind=float,
                     limit=.05,
                     minimum=.01,
                     maximum=.1),
-                satori.HyperParameter(
+                HyperParameter(
                     name='max_depth',
                     value=6,
                     kind=int,
@@ -128,60 +130,37 @@ def getEngine(subscriptions: list[StreamId], publications: list[StreamId]):
                 # rolling period transformation percentage change, max of the last 50 or 70 days, etc...
                 **{f'Rolling{tx[0:3]}{i}': partial(metrics.rollingPercentChangeMetric, window=i, transformation=tx)
                     for tx, i in product('sum() max() min() mean() median() std()'.split(), list(range(22, 90, 7)))}
-            },
-            'features': {
-                ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'):
-                    partial(
-                        generateCombinedFeature,
-                        columns=[
-                            ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
-                            ('streamrSpoof', 'simpleEURCleanedHL', 'Low')])
-            },
-            'override': False}
-        # return {
-        #    satori.ModelManager(
-        #        variable: publication,
-        #        output: prediction_stream,
-        # disk=disk.Disk(),
-        #        memory=memory.Memory,
-        #        hyperParameters: 'list(HyperParameter)'=None,
-        #		metrics: dict=None,
-        #		features: dict=None,
-        #		chosenFeatures: 'list(str)'=None,
-        #		pinnedFeatures: 'list(str)'=None,
-        #		exploreFeatures: bool=True,
-        #		targets: list[StreamId]=None,
-        #		split: 'int|float'=.2,
-        #		override: bool=False,
-#
-#
-#
-#
-#
-        #        targets=[
-        #            StreamId(
-        # source='streamrSpoof',
-        # stream='simpleEURCleanedHL',
-        # targets=['High', 'Low'])
-        #    		for subscription in subscriptions
-        #      		if subscription.get('reason') == publicaiton.get('source')],
-        #        pinnedFeatures=[
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow')],
-        #        chosenFeatures=[
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'High'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'Low'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'DiffHighLow'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'DailyHigh21'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'RollingLow50min'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh14std'),
-        #            ('streamrSpoof', 'simpleEURCleanedHL', 'RollingHigh50max')],
-        #        **kwargs),
-        #    for publication in publications
-#
-#       }
+            }}
+        return {
+            ModelManager(
+                variable=StreamId(
+                    source=publication.get('predicting_source'),
+                    author=publication.get('predicting_author'),
+                    stream=publication.get('predicting_stream'),
+                    target=publication.get('predicting_target')),
+                output=publication,
+                targets=[
+                    StreamId(
+                        source=subscription.source,
+                        author=subscription.author,
+                        stream=subscription.stream,
+                        targets=subscription.target)
+                    # will be unique by publication, no need to enforce
+                    for subscription in subscriptions
+                    if (
+                        subscription.get('reason_source') == publication.get('source') and
+                        subscription.get('reason_author') == publication.get('author') and
+                        subscription.get('reason_stream') == publication.get('stream') and
+                        subscription.get(
+                            'reason_target') == publication.get('target')
+                    )],
+                disk=disk.Disk(),
+                memory=memory.Memory,
+                **kwargs)
+            for publication in publications
+        }
 
     return satori.Engine(
-        view=satori.View(),
         data=generateDataManager(),
         models=generateModelManager()
     )
