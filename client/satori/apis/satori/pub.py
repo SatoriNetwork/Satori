@@ -6,7 +6,6 @@
 
 
 import json
-from satoriserver.utils import Crypt
 import threading
 
 
@@ -34,10 +33,12 @@ class SatoriPubConn(object):
         return ws
 
     def checkin(self):
-        self.ws.send('key:' +
-                     Crypt().encrypt(
-                         toEncrypt=json.dumps(self.payload),
-                         key='thiskeyisfromenv'))
+        self.ws.send('key:' + self.payload)
+        # from satoriserver.utils import Crypt
+        # self.ws.send('key:' +
+        #             Crypt().encrypt(
+        #                 toEncrypt=json.dumps(self.payload),
+        #                 key='thiskeyisfromenv'))
 
     def publish(self, topic, data):
         self.ws.send('publish:' + json.dumps({'topic': topic, 'data': data}))

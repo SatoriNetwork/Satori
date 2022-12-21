@@ -153,7 +153,7 @@ class ModelManager:
 
         self.data = self.disk.gather(
             streams=self.targets,
-            targetColumn=self.id.id)
+            targetColumn=self.id)
         handleEmpty()
 
     ### FEATURE DATA ####################################################################

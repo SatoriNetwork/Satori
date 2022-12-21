@@ -17,7 +17,6 @@ class fixtures():
             3: {'source': 'SATORI', 'author': '32a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream3', 'target': 'target'},
             4: {'source': 'SATORI', 'author': '42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream4', 'target': 'target'},
         }
-
     @staticmethod
     def subscriptions():
         return {
