@@ -12,24 +12,25 @@ class fixtures():
     def streams():
         return {
             0: {},
-            1: {'source': 'SATORI', 'author': '22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream1', 'target': 'target'},
-            2: {'source': 'SATORI', 'author': '02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream1_p', 'target': 'target'},
-            3: {'source': 'SATORI', 'author': '32a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream3', 'target': 'target'},
-            4: {'source': 'SATORI', 'author': '42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream4', 'target': 'target'},
+            1: {'source': 'SATORI', 'pubkey': '22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream1', 'target': 'target'},
+            2: {'source': 'SATORI', 'pubkey': '02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream1_p', 'target': 'target'},
+            3: {'source': 'SATORI', 'pubkey': '32a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream3', 'target': 'target'},
+            4: {'source': 'SATORI', 'pubkey': '42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream4', 'target': 'target'},
         }
+
     @staticmethod
     def subscriptions():
         return {
             0: {},
             1: {
-                'publisher': {'pubkey': '22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'},
+                'author': {'pubkey': '22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'},
                 # subscribe to this stream...
                 'stream': fixtures.streams()[1],
                 # because I need it to produce this prediction stream...
                 'reason': fixtures.streams()[2],
             },
             4: {
-                'publisher': {'pubkey': '42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'},
+                'author': {'pubkey': '42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'},
                 # subscribe to this stream...
                 'stream': fixtures.streams()[4],
                 # because I need it to produce this prediction stream...
@@ -125,7 +126,7 @@ my_streams()
 
 def my_publications():
     ''' subscribe to primary data stream and and publish prediction '''
-    r = requests.post(
+    r = requests.get(
         'http://localhost:5002/my/publications',
         headers=w.authPayload(asDict=True))
     print(r.status_code, r.text)
@@ -136,7 +137,7 @@ my_publications()
 
 def my_subscriptions():
     ''' subscribe to primary data stream and and publish prediction '''
-    r = requests.post(
+    r = requests.get(
         'http://localhost:5002/my/subscriptions',
         headers=w.authPayload(asDict=True))
     print(r.status_code, r.text)
@@ -147,7 +148,7 @@ my_subscriptions()
 
 def my_subscriptions_pins():
     ''' subscribe to primary data stream and and publish prediction '''
-    r = requests.post(
+    r = requests.get(
         'http://localhost:5002/my/subscriptions/pins',
         headers=w.authPayload(asDict=True))
     print(r.status_code, r.text)
@@ -213,13 +214,13 @@ if __name__ == '__main__':
 # key 75hwPignMgTlefjBM3fJZr2Z2L86ioM69frY45c01adDyr5K6GcM/U6KJ9epjRN9nlNMsD/NmTIE09gE+M66e7TdsVkIab02YwcQUStXXMeRPngOgics1tQhSL4UG9beXqHRQ9ifDDULeBspaitKT7TQR1cGShw3o+tTlsPWZ8BHTTc43qYFaMFFcXWgP/GND4931KG738VhGQYL1BraJSrgon0bvDI3WHwDsurUln7ZlvYhcRDHUreMV6oMO2/1UuynnAo8DVHe2n3dxBTrerlhlFTRBUcR7oU2KmhY7jPiUMgcl1Vty/n4592L2mE+GQmSty7NkijBLmyWmusv+E3lp341v3Vre1k7Kie+U3HeVNp96As1ZVOQx03kKgCo14KyIX3NaxDiYDP461wOPvFYtojO8c/AEVcm2p0BIgJ8urQ509D0tCO4IzZtnlOHKsS/2tf36iYc22R3nWt+zLVSBqVNC0CzzyWBla+4km90lFZ3kP1oreKE/vhpIErzvjqtWfeLlqW++5Ge9UkKZaGxEQSbSPkfRxnQZk9kmv68QpRkTgwZ8QChkYxpPZLrvDRF6FYvtJtRrQxe9DTDPGktu9SvVRGMV5kp66O+E6AoYKCTP+IW4BvEr7oqXaQZQMAA0qlC/mjVOwd+uGaf/bbM+6ULVqG2YtEjABe7wEezMWZ/Ksk7CsFF471MfhDVUAmoccmsbm5zog2w9w7yBO89/BbkcxUPEL+/hcSx2EQowhQRKwyYHk8Jlv7suX0YB4O0Zrec3jPVgNGQGLstXl2r1AvAEtCN9klwMTzWK0e4/FHvP+yFT26cSW719iaxUZ4ZlccLd9r9+WaSK2NuPYwuifep7C/MY2joy9VnWNDykLwwEVB+PGjdvPLyMJq/ldAjq2dx30rS43wFVDGfrRBeugRixwqVUkUJf5akfwBn2JhEkCETK8Z5QiAdH6ZmeefQK4ztb33ag/BD3KELEpTZjrcFQA3UD9KbWPdB9O5r8KWHfTkVAXxyfaC9kWiT
 #
 # subscriptions [
-#	{"id": 1, "source": "SATORI", "author": "22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream1", "target": "target", "predicting": null, "sanctioned": 1, "ts": "2022-12-17 16:46:32.539", "reason_source": "SATORI", "reason_author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "reason_stream": "stream1_p", "reason_target": "target", "reason_is_primary": 1},
-#	{"id": 3, "source": "SATORI", "author": "32a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream3", "target": "target", "predicting": null, "sanctioned": 1, "ts": "2022-12-17 16:46:36.692", "reason_source": "SATORI", "reason_author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "reason_stream": "stream3_p", "reason_target": "target", "reason_is_primary": 1},
-#	{"id": 4, "source": "SATORI", "author": "42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream4", "target": "target", "predicting": null, "sanctioned": null, "ts": "2022-12-17 16:46:38.765", "reason_source": "SATORI", "reason_author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "reason_stream": "stream1_p", "reason_target": "target", "reason_is_primary": 0},
+# {"id": 1, "source": "SATORI", "author": "22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream1", "target": "target", "predicting": null, "sanctioned": 1, "ts": "2022-12-17 16:46:32.539", "reason_source": "SATORI", "reason_author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "reason_stream": "stream1_p", "reason_target": "target", "reason_is_primary": 1},
+# {"id": 3, "source": "SATORI", "author": "32a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream3", "target": "target", "predicting": null, "sanctioned": 1, "ts": "2022-12-17 16:46:36.692", "reason_source": "SATORI", "reason_author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "reason_stream": "stream3_p", "reason_target": "target", "reason_is_primary": 1},
+# {"id": 4, "source": "SATORI", "author": "42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream4", "target": "target", "predicting": null, "sanctioned": null, "ts": "2022-12-17 16:46:38.765", "reason_source": "SATORI", "reason_author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "reason_stream": "stream1_p", "reason_target": "target", "reason_is_primary": 0},
 # 	{"id": 4, "source": "SATORI", "author": "42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream4", "target": "target", "predicting": null, "sanctioned": null, "ts": "2022-12-17 16:46:38.765", "reason_source": "SATORI", "reason_author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "reason_stream": "stream3_p", "reason_target": "target", "reason_is_primary": 0}]
 #
 # publications [
-#	{"id": 2, "source": "SATORI", "author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream1_p", "target": "target", "predicting": 1, "sanctioned": null, "ts": "2022-12-17 16:46:34.606", "predicting_source": "SATORI", "predicting_author": "22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "predicting_stream": "stream1", "predicting_target": "target"},
+# {"id": 2, "source": "SATORI", "author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream1_p", "target": "target", "predicting": 1, "sanctioned": null, "ts": "2022-12-17 16:46:34.606", "predicting_source": "SATORI", "predicting_author": "22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "predicting_stream": "stream1", "predicting_target": "target"},
 # 	{"id": 5, "source": "SATORI", "author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream3_p", "target": "target", "predicting": 3, "sanctioned": null, "ts": "2022-12-17 16:59:50.523", "predicting_source": "SATORI", "predicting_author": "32a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "predicting_stream": "stream3", "predicting_target": "target"}]
 #
 # publications None
@@ -232,9 +233,9 @@ if __name__ == '__main__':
 #
 # key {
 #    "publisher": [
-#		{"source": "SATORI", "author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream1_p", "target": "target"},
+# {"source": "SATORI", "author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream1_p", "target": "target"},
 # 		{"source": "SATORI", "author": "02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream3_p", "target": "target"}],
 #    "subscriptions": [
-#	   	{"source": "SATORI", "author": "22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream1", "target": "target"},
-#	   	{"source": "SATORI", "author": "32a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream3", "target": "target"},
+# {"source": "SATORI", "author": "22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream1", "target": "target"},
+# {"source": "SATORI", "author": "32a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream3", "target": "target"},
 # 		{"source": "SATORI", "author": "42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8", "stream": "stream4", "target": "target"}]}

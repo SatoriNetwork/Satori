@@ -10,8 +10,9 @@ from satori.apis.disk import WalletApi
 from satori.apis import system
 from satori import config
 
+
 class Wallet():
-    
+
     def __init__(self, temporary=False):
         self._entropy = None
         self._privateKeyObj = None
@@ -26,13 +27,18 @@ class Wallet():
         self.rvn = None
         self.balance = None
         self.transactionHistory = None
-        self.transactions = [] # TransactionStruct
+        self.transactions = []  # TransactionStruct
         self.temporary = temporary
-    
+
     def __call__(self):
-        self.init()
+        x = 0
+        while x < 5:
+            try:
+                self.init()
+            except TimeoutError:
+                x += 1
         return self
-    
+
     def __repr__(self):
         return f'''Wallet(
     publicKey: {self.publicKey}
@@ -44,15 +50,15 @@ class Wallet():
     stats: {self.stats}
     banner: {self.banner})'''
 
-    def authPayload(self, asDict=False): 
+    def authPayload(self, asDict=False):
         payload = connection.authPayload(self)
         if asDict:
             return payload
         return json.dumps(payload)
 
-    def registerPayload(self, asDict=False): 
+    def registerPayload(self, asDict=False):
         payload = {
-            **connection.authPayload(self), 
+            **connection.authPayload(self),
             **system.devicePayload(asDict=True)}
         if asDict:
             return payload
@@ -92,12 +98,12 @@ class Wallet():
                 'words': self.words,
                 'address': self.address,
                 'scripthash': self.scripthash,
-                },
+            },
             walletPath=config.walletPath('wallet.yaml'))
 
     def regenerate(self):
         self.generate()
-        
+
     def generate(self):
         self._entropy = self._entropy or self._generateEntropy()
         self._privateKeyObj = self._generatePrivateKey()
@@ -108,10 +114,9 @@ class Wallet():
         self.address = self.address or str(self._addressObj)
         self.scripthash = self.scripthash or self._generateScripthash()
 
-
     def _generateScripthash(self):
         # possible shortcut:
-        #self.scripthash = '76a914' + [s for s in self._addressObj.to_scriptPubKey().raw_iter()][2][1].hex() + '88ac'
+        # self.scripthash = '76a914' + [s for s in self._addressObj.to_scriptPubKey().raw_iter()][2][1].hex() + '88ac'
         from base58 import b58decode_check
         from binascii import hexlify
         from hashlib import sha256
@@ -121,13 +126,16 @@ class Wallet():
         BYTES_TO_PUSH = b'14'
         OP_EQUALVERIFY = b'88'
         OP_CHECKSIG = b'ac'
-        DATA_TO_PUSH = lambda address: hexlify(b58decode_check(address)[1:])
-        sig_script_raw = lambda address: b''.join((OP_DUP, OP_HASH160, BYTES_TO_PUSH, DATA_TO_PUSH(address), OP_EQUALVERIFY, OP_CHECKSIG))
-        scripthash = lambda address: sha256(codecs.decode(sig_script_raw(address), 'hex_codec')).digest()[::-1].hex()
-        return scripthash(self.address);
+        def DATA_TO_PUSH(address): return hexlify(b58decode_check(address)[1:])
+
+        def sig_script_raw(address): return b''.join(
+            (OP_DUP, OP_HASH160, BYTES_TO_PUSH, DATA_TO_PUSH(address), OP_EQUALVERIFY, OP_CHECKSIG))
+        def scripthash(address): return sha256(codecs.decode(
+            sig_script_raw(address), 'hex_codec')).digest()[::-1].hex()
+        return scripthash(self.address)
 
     def _generateEntropy(self):
-        #return m.to_entropy(m.generate())
+        # return m.to_entropy(m.generate())
         return os.urandom(32)
 
     def _generateWords(self):
@@ -142,40 +150,43 @@ class Wallet():
 
     def showStats(self):
         ''' returns a string of stats properly formatted '''
-        def invertDivisibility(divisibility:int):
-            return (16 + 1) % (divisibility + 8 + 1);
-        
+        def invertDivisibility(divisibility: int):
+            return (16 + 1) % (divisibility + 8 + 1)
+
         divisions = self.stats.get('divisions', 8)
-        circulatingSats = self.stats.get('sats_in_circulation', 100000000000000) / int('1' + ('0'*invertDivisibility(int(divisions))))
+        circulatingSats = self.stats.get(
+            'sats_in_circulation', 100000000000000) / int('1' + ('0'*invertDivisibility(int(divisions))))
         headTail = str(circulatingSats).split('.')
         if headTail[1] == '0' or headTail[1] == '00000000':
             circulatingSats = f"{int(headTail[0]):,}"
         else:
-            circulatingSats = f"{int(headTail[0]):,}" + '.' + f"{headTail[1][0:4]}" + '.' + f"{headTail[1][4:]}"
+            circulatingSats = f"{int(headTail[0]):,}" + '.' + \
+                f"{headTail[1][0:4]}" + '.' + f"{headTail[1][4:]}"
         return f'''
     Circulating Supply: {circulatingSats}
     Decimal Points: {divisions}
     Reissuable: {self.stats.get('reissuable', False)}
     Issuing Transactions: {self.stats.get('source', {}).get('tx_hash', 'a015f44b866565c832022cab0dec94ce0b8e568dbe7c88dce179f9616f7db7e3')}
     '''
-        
+
     def showBalance(self, rvn=False):
         ''' returns a string of balance properly formatted '''
-        def invertDivisibility(divisibility:int):
-            return (16 + 1) % (divisibility + 8 + 1);
-        
+        def invertDivisibility(divisibility: int):
+            return (16 + 1) % (divisibility + 8 + 1)
+
         if rvn:
             balance = self.rvn / int('1' + ('0'*8))
         else:
             if self.balance == 'unknown':
                 return self.balance
-            balance = self.balance / int('1' + ('0'*invertDivisibility(int(self.stats.get('divisions', 8)))))
+            balance = self.balance / \
+                int('1' + ('0'*invertDivisibility(int(self.stats.get('divisions', 8)))))
         headTail = str(balance).split('.')
         if headTail[1] == '0':
             return f"{int(headTail[0]):,}"
         else:
             return f"{int(headTail[0]):,}" + '.' + f"{headTail[1][0:4]}" + '.' + f"{headTail[1][4:]}"
-        
+
     def get(self, allWalletInfo=False):
         ''' gets data from the blockchain, saves to attributes '''
         x = Ravencoin(self.address, self.scripthash, config.electrumxServers())
@@ -186,9 +197,9 @@ class Wallet():
         self.rvn = x.rvn
         self.transactionHistory = x.transactionHistory
         self.transactions = x.transactions
-    
-    def sign(self, message:str):
+
+    def sign(self, message: str):
         return sign.signMessage(self._privateKeyObj, message)
-    
-    def verify(self, message:str, sig:bytes):
-        return satori_verify(address=self.address, message=message, signature=sig)    
+
+    def verify(self, message: str, sig: bytes):
+        return satori_verify(address=self.address, message=message, signature=sig)
