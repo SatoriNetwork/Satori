@@ -124,6 +124,18 @@ def my_streams():
 my_streams()
 
 
+def my_databasetest():
+    ''' subscribe to primary data stream and and publish prediction '''
+    r = requests.post(
+        'http://localhost:5002/my/database/test',
+        headers=w.authPayload(asDict=True),
+        json='{}')  # if you want a subset of your streams...
+    print(r.status_code, r.text)
+
+
+my_databasetest()
+
+
 def my_publications():
     ''' subscribe to primary data stream and and publish prediction '''
     r = requests.get(
