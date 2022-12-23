@@ -38,6 +38,26 @@ class fixtures():
             },
         }
 
+    @staticmethod
+    def pins():
+        return {
+            0: {},
+            1: {'author': {'pubkey': '22a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'}, 'stream': fixtures.streams()[1], 'ipns': 'ipns', 'ipfs': 'ipfs', 'disk': 1, 'count': 27},
+            2: {'author': {'pubkey': '02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'}, 'stream': fixtures.streams()[2], 'ipns': 'ipns', 'ipfs': 'ipfs', 'disk': 2, 'count': 27},
+            3: {'author': {'pubkey': '32a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'}, 'stream': fixtures.streams()[3], 'ipns': 'ipns', 'ipfs': 'ipfs', 'disk': 3, 'count': 27},
+            4: {'author': {'pubkey': '42a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8'}, 'stream': fixtures.streams()[4], 'ipns': 'ipns', 'ipfs': 'ipfs', 'disk': 4, 'count': 27},
+        }
+
+    @staticmethod
+    def observations():
+        return {
+            0: {},
+            1: {'stream': fixtures.streams()[1], 'value': 1, 'time': 'time1'},
+            2: {'stream': fixtures.streams()[2], 'value': 2, 'time': 'time2'},
+            3: {'stream': fixtures.streams()[3], 'value': 3, 'time': 'time3'},
+            4: {'stream': fixtures.streams()[4], 'value': 4, 'time': 'time4'},
+        }
+
 
 def register_wallet():
     r = requests.post(
@@ -84,6 +104,32 @@ def register_subscription(x: int):
 
 register_subscription(1)  # primary
 register_subscription(4)  # secondary
+
+
+def register_pins(x: int):
+    ''' subscribe to stream '''
+    r = requests.post(
+        'http://localhost:5002/register/pin',
+        headers=w.authPayload(asDict=True),
+        json=json.dumps(fixtures.pins()[x]))
+    print(r.status_code, r.text)
+
+
+register_pins(2)  # on publication
+register_pins(3)  # subscription
+
+
+def register_observations(x: int):
+    ''' subscribe to stream '''
+    r = requests.post(
+        'http://localhost:5002/register/observation',
+        headers=w.authPayload(asDict=True),
+        json=json.dumps(fixtures.observations()[x]))
+    print(r.status_code, r.text)
+
+
+register_observations(2)
+register_observations(3)
 
 
 def request_primary():
