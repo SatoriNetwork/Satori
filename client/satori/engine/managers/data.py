@@ -230,67 +230,25 @@ class DataManager:
         #    self.listeners.append(model.predictionEdgeUpdate.subscribe(lambda x: publishEdge(x) if x else None))
 
     def runScholar(self, models):
-        ''' download histories and tell model sync '''
+        '''
+        download histories (do not subscribe, these histories are experimental)
+        and tell exploratory model managers to use them as inputs in order to 
+        evaluat their usefulness. if they are useful, then we will officially 
+        use them which means pushing the exploratory model to stable, purging
+        the history, subscribing to them, downloading their updated history.
 
-        def syncManifest(purged: list = None, new: list = None):
-            '''
-            TODO:
-            unnecessary, all manifest logic should be removed as the satori 
-            server is and later the satori blockchain will be, the single source
-            of truth for who subscribes and publishes to what. this requires 
-            that we report for what reasons we subscribe to a stream - what 
-            stream it helps us publish. as of now we don't make a distinction
-            between exploratory status and stable status. that is known only
-            locally, by the models themselves.
-            '''
-            purged = purged or []
-            new = new or []
-            manifest = config.manifest()
-            toPurge = manifest.get('datasets to purge', [])
-            toPurge.extend(new)
-            for x in purged:
-                toPurge.remove(x)
-            manifest['datasets to purge'] = {
-                ds: dt.datetime.now() for ds in toPurge}
-            config.put('manifest', data=manifest)
+        this function is interconnected with a recommender system larger process
+        which uses information about who subscribes to what and predicts what,
+        (meaning a map of the network is internally built, or at least similar
+        nodes by their inputs and outputs are identified) in order to evaulate
+        new datastreams that it might find useful.
+
+        there's a lot to do here but for mvp we'll just randomly sample 
+        datastreams from whatever sources are available to us.
+        '''
 
         # look for new useful datastreams - something like this
         # self.download(self.bestOf(self.compileMap(models)))
         # self.availableInputs.append(newInput)
         # for model in models:
         #    model.newAvailableInput.on_next(newInput)
-        '''
-        ## basic algorithm:
-        while true
-            wait a bit (or get triggered when a model feels it's exhausted it's search space)
-            choose next model to target
-            PURGE look at all datasets we have downloaded, look at manifest, anything that is
-                old enough that isn't being used in the model manifests (could litterally use
-                model.targets) gets tossed out as in deleted from disk and purged datasets
-                gets added to a list by model so we don't download it again, unsubscribe first
-                then syncManifest(purged=[...])
-            RECOMMENDER SYSTEM: choose what kind of dataset you should ask for 
-                (model inputs vs the inputs of other datasets)
-                (dataset features, etc.)
-                (the general case recommender system will generate a map of datasets 
-                 and their inputs, find the dataset(s) that looks the most like mine
-                 by inputs and choose a (popular) input they listen to that I don't)
-            ask for the dataset, download and save to disk
-            subscribe for updates
-            tell model its available
-            add it to the list with timestamp for later purge using
-                syncManifest(new=[...])     
-        '''
-        '''
-        ## what the manifest should look like
-        config.yaml:
-        port: 24685
-        manifest:
-            models:
-                modelName: 
-                    pinned: [(sourceId, streamId, targetId), ...]
-                    accepted: [...]
-                    evaluating: [...]
-                    purged: [...]
-        
-        '''
