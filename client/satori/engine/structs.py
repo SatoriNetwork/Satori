@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 import datetime as dt
-#from satori import config
+# from satori import config
 from functools import partial
 
 

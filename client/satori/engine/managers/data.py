@@ -42,18 +42,20 @@ from satori import config
 from satori.engine.interfaces.data import DataDiskApi
 from satori.engine.managers.model import ModelManager
 from satori.engine.structs import Observation, StreamIdMap
+from satori.init.start import StartupDag
 
 
 class DataManager:
 
-    def __init__(self, disk: DataDiskApi = None):
-        # dictionary of source, streams, author, and their latest incremental
+    def __init__(self, disk: DataDiskApi = None, startupDag: StartupDag = None):
+        # {source, streams, author, target: latest incremental}
         self.targets = StreamIdMap()
-        # dictionary of source, stream, targets and their latest predictions
+        # {source, stream, author, target: latest predictions}
         self.predictions = StreamIdMap()
         self.listeners = []
         self.newData = BehaviorSubject(None)
         self.disk = disk
+        self.startup = startupDag
 
     def importance(self, inputs: dict = None):
         inputs = inputs or {}
@@ -88,7 +90,7 @@ class DataManager:
     #################################################################################
 
     def runSubscriber(self, models: list[ModelManager]):
-        ''' triggered from the flask app '''
+        ''' routes new data to the right models '''
 
         def handleNewData(models: list[ModelManager], observation: Observation):
             ''' append to existing datastream, save to disk, notify models '''
@@ -144,6 +146,9 @@ class DataManager:
                             model.variable.target in observation.content.keys())
                     ):
                         model.targetUpdated.on_next(observation.df)
+                    # TODO:
+                    # what about features? is that what this is for? (stable model)
+                    # also, what about exploratory features? (pilot model)
                     # elif any([key in observation.df.columns for key in model.feature.keys()]):
                     # model.inputsUpdated.on_next(True)
                     # reference model.targets:
@@ -168,37 +173,56 @@ class DataManager:
 
         self.listeners.append(self.newData.subscribe(
             lambda x: handleNewData(models, x) if x is not None else None))
-        #self.listeners.append(self.newData.subscribe(lambda x: print('triggered')))
+        # self.listeners.append(self.newData.subscribe(lambda x: print('triggered')))
 
     def runPublisher(self, models):
-        def publish(model):
-            ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
+        def publish(model: ModelManager):
+            ''' publish to the right source '''
 
             def remember():
+                ''' in memory cache of predictions for each model '''
                 self.predictions.add(model.key, model.prediction)
                 return True
 
             def post():
-                ''' here we save prediction to disk, but that'll change once we can post it somewhere '''
-                if self.predictions.isFilled(key=model.key):
-                    for k, v in self.predictions.getAll(key=model.key):
-                        path = config.root(
-                            '..', 'predictions', k[0], k[1], k[2] + '.txt')
-                        self.disk.savePrediction(
-                            path=path, prediction=f'{str(dt.datetime.now())} | {k} | {v}\n')
-                    self.predictions.remove(key=model.key)
+                '''
+                here we save prediction to disk, but that'll change once we
+                can post it somewhere.
+
+                TODO: for this model look up the source of the prediction stream
+                which could be streamr, or satori pubsub, or even something
+                else. then post this prediction to that source. If it is streamr
+                send it over to the nodeJS server. if it is satori pubsub, send
+                use the pubsub connection object in the StartupDag object 
+                (meaning, we might have to pass that connection object down to
+                this function in the first place.)
+                '''
+                def saveToDisk():
+                    if self.predictions.isFilled(key=model.key):
+                        # why is there a for loop here?
+                        # we should only have 1 target, and one prediction...
+                        # is this really old, from when we thought a model might
+                        # have multiple targets, to predict a whole stream?
+                        for k, v in self.predictions.getAll(key=model.key):
+                            path = config.root(
+                                '..', 'predictions', k[0], k[1], k[2] + '.txt')
+                            self.disk.savePrediction(
+                                path=path, prediction=f'{str(dt.datetime.now())} | {k} | {v}\n')
+                        self.predictions.remove(key=model.key)
+
+                def publishToSatori():
+                    if self.predictions.isFilled(key=model.key):
+                        self.startup.connection.publish(
+                            topic=model.key,
+                            data=self.predictions.get(key=model.key))
+
+                if model.variable.source == 'streamr':
+                    saveToDisk()
+                if model.variable.source == 'SATORI':
+                    publishToSatori()
 
             remember()
             post()
-
-        # non-implemented feature yet. as it turns out this requires the model to contain two datasets or
-        # one dataset that is cut on two different time frames (merge_asof for the above publish and
-        # anti-merge_as of for the edge stream), so it introduces a lot of complexity we're not willing
-        # to deal with right now.
-        # def publishEdge(model):
-        #    ''' probably a rest call to the NodeJS server so it can pass it to the streamr light client '''
-        #    with open(f'{model.id}.txt', 'w') as f:
-        #        f.write(f'{model.predictionEdge}, {str(dt.datetime.now())} {model.predictionEdge}')
 
         for model in models:
             self.listeners.append(model.predictionUpdate.subscribe(
@@ -209,6 +233,16 @@ class DataManager:
         ''' download histories and tell model sync '''
 
         def syncManifest(purged: list = None, new: list = None):
+            '''
+            TODO:
+            unnecessary, all manifest logic should be removed as the satori 
+            server is and later the satori blockchain will be, the single source
+            of truth for who subscribes and publishes to what. this requires 
+            that we report for what reasons we subscribe to a stream - what 
+            stream it helps us publish. as of now we don't make a distinction
+            between exploratory status and stable status. that is known only
+            locally, by the models themselves.
+            '''
             purged = purged or []
             new = new or []
             manifest = config.manifest()

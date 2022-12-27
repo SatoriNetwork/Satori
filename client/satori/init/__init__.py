@@ -59,18 +59,12 @@ def establishConnection(pubkey: str, key: str, startupDag: StartupDag):
 # accept optional data necessary to generate models data and learner
 
 
-def getEngine(subscriptions: list[StreamId], publications: list[StreamId]):
-    '''
-    called by the flask app to start the Engine.
-    returns None or Engine.
-
-    returns None if no memory of data or models is found (first run)
-    returns Engine if memory of data or models is found or provided.
-    '''
-
-    def generateDataManager():
-        ''' generates DataManager from data on disk '''
-        return satori.DataManager(disk=disk.Disk())
+def getEngine(
+    subscriptions: list[StreamId],
+    publications: list[StreamId],
+    starup: StartupDag,
+):
+    ''' called by the flask app to start the Engine. returns Engine. '''
 
     def generateModelManager():
         ''' generate a set of Model(s) for Engine '''
@@ -89,7 +83,6 @@ def getEngine(subscriptions: list[StreamId], publications: list[StreamId]):
 
             if df is None:
                 return name()
-
             columns = columns or []
             feature = df.loc[:, columns[0]] - df.loc[:, columns[1]]
             feature.name = name()
@@ -161,6 +154,5 @@ def getEngine(subscriptions: list[StreamId], publications: list[StreamId]):
         }
 
     return satori.Engine(
-        data=generateDataManager(),
-        models=generateModelManager()
-    )
+        data=satori.engine.DataManager(disk=disk.Disk(), startup=self),
+        models=generateModelManager())
