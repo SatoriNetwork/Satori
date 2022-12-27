@@ -7,7 +7,7 @@ import satori
 from satori.apis.satori.pubsub import SatoriPubSubConn
 # from satori.apis.satori.pub import SatoriPubConn
 # from satori.apis.satori.sub import SatoriSubConn
-from satori.engine.structs import StreamId, HyperParameter
+from satori.engine.structs import Observation, StreamId, HyperParameter
 from satori.engine import ModelManager
 from satori.engine.view import View
 import satori.engine.model.metrics as metrics
@@ -19,33 +19,12 @@ from satori.apis.satori.server import SatoriServerClient
 from satori.init.start import StartupDag
 
 
-def establishConnection(pubkey: str, key: str, startupDag: StartupDag):
+def establishConnection(pubkey: str, key: str, startup: StartupDag):
     ''' establishes a connection to the satori server, returns connection object '''
 
     def router(response: str):
-        '''
-        response needs to tell me what stream this is for, and what the value is
-        the default router should accept the message and hold it in memory until
-        the ipfs sync process is complete. Once it is complete it should send
-        each message in reserve to the system that saves it to disk and routes
-        it to the engine.
-        '''
-
-        def saveToDisk():
-            ''' save to disk '''
-            pass
-
-        def routeToEngine():
-            ''' route to engine '''
-            pass
-
-        # add to reserve.topic
-        # if response.topic in startupDag.synced:
-        #    for item in reserve.topic:
-        #        # send to system that saves it to disk
-        #        #saveToDisk()
-        #        # send it to engine
-        #        #routeToEngine()
+        ''' TODO: may need to conform response to the observation format first. '''
+        startup.engine.data.newData.on_next(Observation(response))
 
     return SatoriPubSubConn(
         uid=pubkey,
@@ -154,5 +133,5 @@ def getEngine(
         }
 
     return satori.Engine(
-        data=satori.engine.DataManager(disk=disk.Disk(), startup=self),
+        data=satori.engine.DataManager(disk=disk.Disk(), startup=starup),
         models=generateModelManager())

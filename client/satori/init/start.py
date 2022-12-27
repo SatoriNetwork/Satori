@@ -26,11 +26,8 @@ class StartupDag(object):
         self.wallet
         self.details
         self.key
-        self.subscriberKey
-        self.publisherKey
         self.connection: SatoriPubSubConn
         self.engine: satori.engine.Engine
-        self.synced = []
         self.publications: list[StreamId] = []
         self.subscriptions: list[StreamId] = []
 
@@ -75,10 +72,6 @@ class StartupDag(object):
         if self.key:
             self.connection = satori.init.establishConnection(
                 pubkey=self.wallet.publicKey, key=self.key, startupDag=self)
-        # will removing the separate connection pattern.
-        # elif self.subscriberKey and self.publisherKey:
-        #    self.pubConn = satori.init.establishConnection(self.pubConn)
-        #    self.subConn = satori.init.establishConnection(self.subConn)
         else:
             raise Exception('no key provided by satori server')
 
@@ -103,18 +96,12 @@ class StartupDag(object):
         # here. but in the meantime, we'll do them sequentially.
         for pin in self.details.get('pins'):
             ipfs = pin.get('ipfs')
-            topic = pin.get('target_stream').split('::')
+            topic = StreamId(
+                source=pin.get('stream_source'),
+                author=pin.get('stream_author'),
+                stream=pin.get('stream_stream'),
+                target=pin.get('stream_target'))
             if ipfs:
                 ipfsCli.get(
                     hash=ipfs,
-                    abspath=disk.Disk(
-                        id=StreamId(
-                            source=topic[0],
-                            author=topic[1],
-                            stream=topic[2],
-                            target=topic[3])).path())
-                # this topic should match the pubsub topic
-                # because when we get a message from the pubsub server
-                # it will have a topic key that we must look for to see if that
-                # datastream is done syncing.
-                self.synced = [topic]
+                    abspath=disk.Disk(id=topic).path())

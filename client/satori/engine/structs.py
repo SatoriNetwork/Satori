@@ -182,29 +182,37 @@ class HyperParameter:
 
 class Observation:
 
-    def __init__(self, data):
+    def __init__(self, data: dict):
         self.data = data
         self.parse(data)
 
     def parse(self, data):
         ''' {
-                'source-id:"streamrSpoof",'
-                'author-id:"pubKey",'
-                'stream-id:"simpleEURCleaned",'
-                'observation-id': 3675, 
-                'observed-time': "2022-02-16 02:52:45.794120", 
+                'source:"streamrSpoof",'
+                'author:"pubkey",'
+                'stream:"simpleEURCleaned",'
+                'observation': 3675, 
+                'time': "2022-02-16 02:52:45.794120", 
                 'content': {
                     'High': 0.81856, 
                     'Low': 0.81337, 
                     'Close': 0.81512}}
             note: if observed-time is missing, define it here.
         '''
-        j = json.loads(data)
-        self.source = j.get('source-id', None)
-        self.author = j.get('author-id', None)
-        self.stream = j.get('stream-id', None)
-        self.observedTime = j.get('observed-time', str(dt.datetime.utcnow()))
-        self.observationId = j.get('observation-id', None)
+        if isinstance(data, str):
+            j = json.loads(data)
+        elif isinstance(data, dict):
+            j = data
+        elif isinstance(data, tuple):
+            for k, v in data:
+                j[k] = v
+        else:
+            j = data
+        self.source = j.get('source', None)
+        self.author = j.get('author', None)
+        self.stream = j.get('stream', None)
+        self.observedTime = j.get('time', str(dt.datetime.utcnow()))
+        self.observationId = j.get('observation', None)
         self.content = j.get('content', {})
         self.target = None
         self.value = None
