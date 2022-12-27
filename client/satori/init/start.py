@@ -1,9 +1,11 @@
 # todo create config if no config present, use config if config present
+import time
 import threading
 from itertools import product
 from functools import partial
 import pandas as pd
 import satori
+from satori import config
 from satori.apis.satori.pub import SatoriPubConn
 from satori.apis.satori.pubsub import SatoriPubSubConn
 from satori.apis.satori.sub import SatoriSubConn
@@ -39,7 +41,7 @@ class StartupDag(object):
             self.checkin()
             self.buildEngine()
             self.pubsub()
-            self.sync()
+            self.downloadDatasets()
 
     def startIpfs(self):
         thread = threading.Thread(target=ipfsCli.start, daemon=True)
@@ -75,33 +77,30 @@ class StartupDag(object):
         else:
             raise Exception('no key provided by satori server')
 
-    def sync(self):
+    def downloadDatasets(self):
         '''
         download pins (by ipfs address) received from satori server.
         start with the ipfs that the oracle/stream author/publisher has pinned.
-        if unable to download, ask the server for all the pins of that stream.
-        the other pins will be reported by the subscribers of the stream.
-        download them at random.
-
-        context: before we begin this process we will subscribe to the pubsub
-        server which will provide us with new observations while we're
-        downloading the history. those will be held in reserve until this
-        process completes successfully, then they will be processed and saved to
-        disk as incrementals one at a time, like normal, so that at the 100
-        count we combine just like normal. that way, if we got the history from
-        a subscriber our ipfs should match theirs.
         '''
 
         # we should make the download run in parellel so using async functions
         # here. but in the meantime, we'll do them sequentially.
         for pin in self.details.get('pins'):
             ipfs = pin.get('ipfs')
-            topic = StreamId(
-                source=pin.get('stream_source'),
-                author=pin.get('stream_author'),
-                stream=pin.get('stream_stream'),
-                target=pin.get('stream_target'))
+            data = disk.Disk(
+                id=StreamId(
+                    source=pin.get('stream_source'),
+                    author=pin.get('stream_author'),
+                    stream=pin.get('stream_stream'),
+                    target=pin.get('stream_target')))
+
             if ipfs:
+                # TODO:
+                # if this fails ask the server for all the pins of this stream.
+                # the other pins will be reported by the subscribers. download
+                # them at random.
+                now = time.time()
                 ipfsCli.get(
                     hash=ipfs,
-                    abspath=disk.Disk(id=topic).path())
+                    abspath=data.path(temp=True))
+                data.mergeTemp(time=now)

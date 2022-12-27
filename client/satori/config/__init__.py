@@ -10,24 +10,34 @@ get = partial(get, root=root)
 put = partial(put, root=root)
 env = partial(env, get=get, root=root)
 
-def verbose(name: str):
-    if name == 'flaskPort': return 'user interface port'
-    if name == 'nodejsPort': return 'streamr light client port'
-    if name == 'dataPath': return 'absolute data path'
-    if name == 'modelPath': return 'absolute model path'
-    if name == 'walletPath': return 'absolute wallet path'
-    if name == 'defaultSource': return 'default data streams source'
-    if name == 'electrumxServers': return 'electrumx servers'
 
-def manifest(): 
+def verbose(name: str):
+    if name == 'flaskPort':
+        return 'user interface port'
+    if name == 'nodejsPort':
+        return 'streamr light client port'
+    if name == 'dataPath':
+        return 'absolute data path'
+    if name == 'modelPath':
+        return 'absolute model path'
+    if name == 'walletPath':
+        return 'absolute wallet path'
+    if name == 'defaultSource':
+        return 'default data streams source'
+    if name == 'electrumxServers':
+        return 'electrumx servers'
+
+
+def manifest():
     return get('manifest') or {}
 
-def modify(data: dict): 
+
+def modify(data: dict):
     ''' modifies the config yaml without erasing comments (unlike put) '''
-    
+
     def extractKey(line: str):
         return line.replace('#', '').strip().split(':')[0]
-    
+
     replacement = []
     for line in read():
         key = extractKey(line)
@@ -37,11 +47,21 @@ def modify(data: dict):
             replacement.append(line)
     write(lines=replacement)
 
-def flaskPort(): 
+
+def flaskPort():
     return get().get(verbose('flaskPort'), '24685')
 
-def nodejsPort(): 
+
+def nodejsPort():
     return get().get(verbose('nodejsPort'), '24686')
+
+
+def tempPath(filename=None):
+    ''' temporary path for downloading files '''
+    if filename:
+        return os.path.join(path(of='temp'), filename)
+    return path(of='data')
+
 
 def dataPath(filename=None):
     ''' data path takes presidence over relative data path if both exist '''
@@ -49,11 +69,13 @@ def dataPath(filename=None):
         return os.path.join(path(of='data'), filename)
     return path(of='data')
 
+
 def modelPath(filename=None):
     ''' model path takes presidence over relative model path if both exist '''
     if filename:
         return os.path.join(path(of='model'), filename)
     return path(of='model')
+
 
 def walletPath(filename=None):
     ''' wallet path takes presidence over relative model path if both exist '''
@@ -61,11 +83,14 @@ def walletPath(filename=None):
         return os.path.join(path(of='wallet'), filename)
     return path(of='wallet')
 
-def defaultSource(): 
+
+def defaultSource():
     return get().get(verbose('defaultSource'), 'streamr')
 
-def electrumxServers(): 
+
+def electrumxServers():
     return get().get(verbose('electrumxServers'), ['rvn4lyfe.com:50002', 'moontree.com:50002'])
+
 
 def path(of='data'):
     ''' used to get the data or model path '''

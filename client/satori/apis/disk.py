@@ -6,6 +6,7 @@
 import shutil
 import pyarrow.parquet as pq
 import pandas as pd
+import datetime as dt
 from satori import config
 import os
 import joblib
@@ -154,7 +155,7 @@ class Disk(DataDiskApi, ModelDataDiskApi):
     def setId(self, id: StreamId = None, source: str = None, author: str = None, stream: str = None):
         self.id = id or StreamId(source=source, author=author, stream=stream)
 
-    def path(self, aggregate: bool = False):
+    def path(self, aggregate: bool = False, temp: bool = False):
         ''' Layer 0
         get the path of a file
         we generate a hash as the id for the datastream so we can store it in a
@@ -166,13 +167,13 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         C:\\Users\\user\\AppData\\Local\\Satori\\models\\qZk-NkcGgWq6PiVxeFDCbJzQ2J0=.joblib
         '''
         return safetify(os.path.join(
-            self.loc or config.dataPath(),
+            self.loc or (config.tempPath() if temp else config.dataPath()),
             hash.generatePathId(streamId=self.id),
             f'aggregate.{self.ext}' if aggregate else 'incrementals'))
 
-    def exists(self, aggregate: bool = False,):
+    def exists(self, aggregate: bool = False, temp: bool = False):
         ''' Layer 0 return True if file exists at path, else False '''
-        return os.path.exists(self.path(aggregate))
+        return os.path.exists(self.path(aggregate, temp=temp))
 
     def reduceMulti(self, df: pd.DataFrame):
         ''' Layer 0 '''
@@ -209,10 +210,42 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         '''
         pq.write_table(self.toTable(df), self.path(aggregate=True))
 
+    def mergeTemp(self, time: float = 0):
+        ''' Layer 1
+        when finished downloading, merge existing data with this data and save
+        to data path. here's what that looks like: we can completely overwrite
+        the aggregated data if there is any. then we can remove any and all
+        incremental records that were created before we started the download
+        process. then we move the ipfs file to the data path, copying all the
+        incrementals into the incremental folder along side any existing ones.
+        '''
+        # remove old aggregated data
+        # time included to avoid deleting a new aggregate created whilest
+        # downloading the ipfs dataset, however... TODO this case should be
+        # handled because we'd want to merge the two aggregate datasets... but
+        # this is a rare case so we can ignore it for mvp.
+        self.remove(aggregate=True, time=time)
+        # remove old incrementals
+        self.remove(aggregate=False, time=time)
+        # move aggregated data
+        os.rename(
+            self.path(aggregate=True, temp=True),
+            self.path(aggregate=True, temp=False))
+        # copy incrementals to incremental location
+        targetPath = self.path(aggregate=False, temp=True)
+        for file in os.listdir(targetPath):
+            f = os.path.join(targetPath, file)
+            if os.path.isfile(f):
+                os.rename(
+                    f,
+                    os.path.join(self.path(aggregate=False, temp=False), file))
+        # cleanup temp folder
+        self.remove(temp=True)
+
     def compress(self):
         ''' Layer 1
         assumes columns are always the same...
-        this function is used on rare occasion to compress the on disk 
+        this function is used on rare occasion to compress the on disk
         incrementally saved data to long term storage. The compressed
         table takes up less room than the dataset because the dataset
         is partitioned into many files, allowing us to easily append
@@ -220,23 +253,44 @@ class Disk(DataDiskApi, ModelDataDiskApi):
         occasionally, like daily or weekly, run this compress function
         to save it to long term storage. We can still query long term
         storage the same way.
+
+        this function can take some amount of time since it has to read data 
+        from disk and merge it. while it is running we might get a new update,
+        which would then automatically be saved to disk in another thread, and
+        removed before writing the df. Oops. this is why we take the incremental
+        count before reading the data, and then check it again after the merge,
+        and if it has changed we just restart the whole process. nothing, 
+        therefore, should wait for this to complete.
         '''
+        incCount = len(self.incrementals())
         df = self.readBoth()
         if df is not None:
-            self.remove(True)
-            self.write(df)
-            self.remove(False)
+            if incCount == len(self.incrementals()):
+                self.remove()
+                self.write(df)
+            else:
+                self.compress()
 
-    def remove(self, aggregate: bool = None):
-        ''' Layer 1 when we don't use a stream anymore we'll remove it '''
+    def remove(self, aggregate: bool = None, temp: bool = False, time: float = None):
+        ''' Layer 1 
+        removes the aggregate or incremental tables from disk
+        '''
         if aggregate is None:
-            self.remove(True)
-            self.remove(False)
-        elif aggregate:
+            self.remove(True, temp=temp, time=time)
+            self.remove(False, temp=temp, time=time)
+        targetPath = self.path(aggregate, temp=temp)
+        if aggregate:
             if self.exists(aggregate):
-                os.remove(self.path(aggregate))
+                if time is None or (os.stat(targetPath).st_mtime < time and os.path.isfile(targetPath)):
+                    os.remove(targetPath)
         else:
-            shutil.rmtree(self.path(), ignore_errors=True)
+            if time is None:
+                shutil.rmtree(targetPath, ignore_errors=True)
+            else:
+                for f in os.listdir(targetPath):
+                    f = os.path.join(targetPath, f)
+                    if os.stat(f).st_mtime < time and os.path.isfile(f):
+                        os.remove(f)
 
     def readBoth(self, **kwargs):
         ''' Layer 1 

@@ -168,8 +168,8 @@ class DataManager:
 
             if remember():
                 saveIncremental()
-                compress()
                 tellModels()
+                compress()
 
         self.listeners.append(self.newData.subscribe(
             lambda x: handleNewData(models, x) if x is not None else None))
