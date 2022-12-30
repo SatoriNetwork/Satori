@@ -158,6 +158,14 @@ get_streams(3)
 get_streams(4)
 
 
+def search_streams():
+    r = requests.post('http://localhost:5002/search/1')
+    print(r.status_code, r.text)
+
+
+search_streams()
+
+
 def my_streams():
     ''' subscribe to primary data stream and and publish prediction '''
     r = requests.post(
