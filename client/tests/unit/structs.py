@@ -1,4 +1,4 @@
-from satori.engine.structs import StreamId, StreamIdMap
+from satori.concepts.structs import StreamId, StreamIdMap
 
 
 def testStreamIdMap():

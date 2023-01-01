@@ -67,12 +67,6 @@ def register_wallet():
     print(r.status_code, r.text)
 
 
-register_wallet()
-# now, go make a new wallet in the database manually starting with 22...
-# now, go make a new wallet in the database manually starting with 32...
-# now, go make a new wallet in the database manually starting with 42...
-
-
 def register_stream(x: int):
     ''' publish raw data'''
     r = requests.post(
@@ -80,17 +74,6 @@ def register_stream(x: int):
         headers=w.authPayload(asDict=True),
         json=json.dumps(fixtures.streams()[x]))
     print(r.status_code, r.text)
-
-
-register_stream(1)
-register_stream(2)
-register_stream(3)
-register_stream(4)
-# now manually fix stream 1 in the database to point to wallet 2
-# now manually fix stream 3 in the database to point to wallet 3
-# now manually fix stream 4 in the database to point to wallet 4
-# now manually set the sanctioned to > 0 for streams 1, and 3
-# now manually set the predicting for stream 2 to 1
 
 
 def register_subscription(x: int):
@@ -102,10 +85,6 @@ def register_subscription(x: int):
     print(r.status_code, r.text)
 
 
-register_subscription(1)  # primary
-register_subscription(4)  # secondary
-
-
 def register_pins(x: int):
     ''' subscribe to stream '''
     r = requests.post(
@@ -113,10 +92,6 @@ def register_pins(x: int):
         headers=w.authPayload(asDict=True),
         json=json.dumps(fixtures.pins()[x]))
     print(r.status_code, r.text)
-
-
-register_pins(2)  # on publication
-register_pins(3)  # subscription
 
 
 def register_observations(x: int):
@@ -128,19 +103,12 @@ def register_observations(x: int):
     print(r.status_code, r.text)
 
 
-register_observations(2)
-register_observations(3)
-
-
 def request_primary():
     ''' subscribe to primary data stream and and publish prediction '''
     r = requests.get(
         'http://localhost:5002/request/primary',
         headers=w.authPayload(asDict=True))
     print(r.status_code, r.text)
-
-
-request_primary()
 
 
 def get_streams(x: int):
@@ -152,18 +120,9 @@ def get_streams(x: int):
     print(r.status_code, r.text)
 
 
-get_streams(1)
-get_streams(2)
-get_streams(3)
-get_streams(4)
-
-
 def search_streams():
     r = requests.post('http://localhost:5002/search/1')
     print(r.status_code, r.text)
-
-
-search_streams()
 
 
 def my_streams():
@@ -175,9 +134,6 @@ def my_streams():
     print(r.status_code, r.text)
 
 
-my_streams()
-
-
 def my_databasetest():
     ''' subscribe to primary data stream and and publish prediction '''
     r = requests.post(
@@ -185,9 +141,6 @@ def my_databasetest():
         headers=w.authPayload(asDict=True),
         json='{}')  # if you want a subset of your streams...
     print(r.status_code, r.text)
-
-
-my_databasetest()
 
 
 def my_publications():
@@ -198,9 +151,6 @@ def my_publications():
     print(r.status_code, r.text)
 
 
-my_publications()
-
-
 def my_subscriptions():
     ''' subscribe to primary data stream and and publish prediction '''
     r = requests.get(
@@ -209,18 +159,12 @@ def my_subscriptions():
     print(r.status_code, r.text)
 
 
-my_subscriptions()
-
-
 def my_subscriptions_pins():
     ''' subscribe to primary data stream and and publish prediction '''
     r = requests.get(
         'http://localhost:5002/my/subscriptions/pins',
         headers=w.authPayload(asDict=True))
     print(r.status_code, r.text)
-
-
-my_subscriptions_pins()
 
 
 def checkin():
@@ -249,7 +193,37 @@ def checkin():
         clean=True))
 
 
-checkin()
+if __name__ != '__main__':
+    register_wallet()
+    # now, go make a new wallet in the database manually starting with 22...
+    # now, go make a new wallet in the database manually starting with 32...
+    # now, go make a new wallet in the database manually starting with 42...
+    register_stream(1)
+    register_stream(2)
+    register_stream(3)
+    register_stream(4)
+    # now manually fix stream 1 in the database to point to wallet 2
+    # now manually fix stream 3 in the database to point to wallet 3
+    # now manually fix stream 4 in the database to point to wallet 4
+    # now manually set the sanctioned to > 0 for streams 1, and 3
+    # now manually set the predicting for stream 2 to 1
+    register_subscription(1)  # primary
+    register_subscription(4)  # secondary
+    register_pins(2)  # on publication
+    register_pins(3)  # subscription
+    register_observations(2)
+    register_observations(3)
+    request_primary()
+    get_streams(1)
+    get_streams(2)
+    get_streams(3)
+    get_streams(4)
+    search_streams()
+    my_streams()
+    my_databasetest()
+    my_publications()
+    my_subscriptions()
+    my_subscriptions_pins()
 
 if __name__ == '__main__':
     # register_wallet()

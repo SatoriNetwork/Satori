@@ -6,9 +6,9 @@ from ravencoin.wallet import P2PKHRavencoinAddress, CRavencoinSecret
 from satoriwallet.apis.ravencoin import Ravencoin
 from satoriwallet.lib import sign, verify as satori_verify
 from satoriwallet.lib import connection
-from satori.apis.disk import WalletApi
-from satori.apis import system
 from satori import config
+from satori.apis import system
+from satori.apis.disk import WalletApi
 
 
 class Wallet():
@@ -36,6 +36,7 @@ class Wallet():
             try:
                 self.init()
             except TimeoutError:
+                print('init wallet connection attempts', x)
                 x += 1
         return self
 

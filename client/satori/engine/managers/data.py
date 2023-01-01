@@ -39,9 +39,9 @@ Basic Reponsibilities of the DataManager:
 import datetime as dt
 from reactivex.subject import BehaviorSubject
 from satori import config
-from satori.engine.interfaces.data import DataDiskApi
+from satori.apis.interfaces.data import DataDiskApi
 from satori.engine.managers.model import ModelManager
-from satori.engine.structs import Observation, StreamIdMap
+from satori.concepts.structs import Observation, StreamIdMap
 from satori.init.start import StartupDag
 
 

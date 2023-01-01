@@ -1,6 +1,5 @@
 import pandas as pd
-
-from satori.engine.structs import StreamId
+from satori.concepts.structs import StreamId
 
 
 class ModelMemoryApi():

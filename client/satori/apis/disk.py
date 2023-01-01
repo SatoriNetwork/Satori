@@ -3,20 +3,19 @@
 
 ''' an api for reading and writing to disk '''
 
-import shutil
-import pyarrow.parquet as pq
-import pandas as pd
-import datetime as dt
-from satori import config
 import os
+import shutil
 import joblib
+import pandas as pd
 import pyarrow as pa
+import pyarrow.parquet as pq
+from satori import config
+from satori.concepts.structs import StreamId
 from satori.apis import memory
 from satori.apis import hash
-from satori.engine.interfaces.data import DataDiskApi
-from satori.engine.interfaces.model import ModelDataDiskApi, ModelDiskApi
-from satori.engine.interfaces.wallet import WalletDiskApi
-from satori.engine.structs import StreamId
+from satori.apis.interfaces.data import DataDiskApi
+from satori.apis.interfaces.model import ModelDataDiskApi, ModelDiskApi
+from satori.apis.interfaces.wallet import WalletDiskApi
 
 
 def safetify(path: str):

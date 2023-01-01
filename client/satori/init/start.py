@@ -1,21 +1,13 @@
 # todo create config if no config present, use config if config present
 import time
 import threading
-from itertools import product
-from functools import partial
-import pandas as pd
 import satori
-from satori import config
-from satori.apis.satori.pub import SatoriPubConn
-from satori.apis.satori.pubsub import SatoriPubSubConn
-from satori.apis.satori.sub import SatoriSubConn
-from satori.engine.structs import StreamId
-import satori.engine.model.metrics as metrics
-from satori.apis.wallet import Wallet
+from satori.concepts.structs import StreamId
 from satori.apis import disk
-from satori.apis import memory
+from satori.apis.wallet import Wallet
 from satori.apis.ipfs import ipfsCli
 from satori.apis.satori.server import SatoriServerClient
+from satori.apis.satori.pubsub import SatoriPubSubConn
 
 
 class StartupDag(object):

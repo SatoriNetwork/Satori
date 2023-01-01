@@ -3,7 +3,7 @@
 import base64
 import hashlib
 
-from satori.engine.structs import StreamId
+from satori.concepts.structs import StreamId
 
 
 def generatePathId(path: str = None, streamId: StreamId = None):

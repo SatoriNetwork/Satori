@@ -1,18 +1,21 @@
 ''' interface for a StableModel '''
 
-from satori.engine.structs import HyperParameter
+from satori.concepts.structs import HyperParameter
+
 
 class StableModelInterface:
 
     def __init__(self,
-        manager:'ModelManager',
-        hyperParameters:'list(HyperParameter)'=None, # used in pilot and manager
-        metrics:dict=None,
-        features:dict=None, # used in pilot and manager
-        chosenFeatures:'list(str)'=None, # used in pilot and manager
-        pinnedFeatures:'list(str)'=None, # used in pilot 
-        split:'int|float'=.2 # used in pilot 
-    ):
+                 manager: 'ModelManager',
+                 # used in pilot and manager
+                 hyperParameters: 'list(HyperParameter)' = None,
+                 metrics: dict = None,
+                 features: dict = None,  # used in pilot and manager
+                 # used in pilot and manager
+                 chosenFeatures: 'list(str)' = None,
+                 pinnedFeatures: 'list(str)' = None,  # used in pilot
+                 split: 'int|float' = .2  # used in pilot
+                 ):
         '''
         manager: parent object
         hyperParameters: a list of HyperParameter objects
@@ -27,7 +30,7 @@ class StableModelInterface:
         pinnedFeatures: list of feature names to keep in model
         split: train test split percentage or count
         '''
-        self.manager = manager # use a setter?
+        self.manager = manager  # use a setter?
         self.hyperParameters = hyperParameters or []
         self.chosenFeatures = chosenFeatures or []
         self.pinnedFeatures = pinnedFeatures or []
@@ -45,12 +48,12 @@ class StableModelInterface:
     def data(self):
         ''' gets data from the model manager '''
         return self.manager.data
-    
+
     @property
     def id(self):
         ''' gets id from the model manager '''
         return self.manager.id
-        
+
     ### FEATURES ####################################################################
 
     def _produceFeatureStructure(self):
@@ -63,7 +66,7 @@ class StableModelInterface:
         ''' returns the least valuable feaure '''
 
     ### FEATURE DATA ####################################################################
-    
+
     def showFeatureData(self):
         '''
         returns true raw feature importance
@@ -77,15 +80,8 @@ class StableModelInterface:
 
     def producePrediction(self):
         '''generates a prediction'''
-        
+
     ### MAIN PROCESSES #################################################################
 
     def build(self):
         '''builds stable model'''
-
-
-
-    
-
-
-

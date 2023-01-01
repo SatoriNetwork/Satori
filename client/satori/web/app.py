@@ -32,7 +32,7 @@ from flask import send_from_directory, session, request, flash, Markup, Response
 from waitress import serve
 import webbrowser
 from satori.web import forms
-from satori.engine.structs import Observation
+from satori.concepts.structs import Observation
 from satori.apis import wallet
 
 

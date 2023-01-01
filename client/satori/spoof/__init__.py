@@ -7,7 +7,7 @@ import datetime as dt
 import pandas as pd
 from satori import config
 from satori.apis import disk
-from satori.engine.structs import StreamId
+from satori.concepts.structs import StreamId
 
 
 class Streamr():

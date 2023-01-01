@@ -24,8 +24,7 @@ class SatoriPubSubConn(object):
         self.router = router
         self.ws = self.connect()
         self.listening = listening
-        self.ear = threading.Thread(
-            target=self.listen, daemon=True)
+        self.ear = threading.Thread(target=self.listen, daemon=True)
         self.ear.start()
         self.payload = payload
         self.checkin()
