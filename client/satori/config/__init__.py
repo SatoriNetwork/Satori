@@ -89,7 +89,10 @@ def defaultSource():
 
 
 def electrumxServers():
-    return get().get(verbose('electrumxServers'), ['rvn4lyfe.com:50002', 'moontree.com:50002'])
+    return get().get(verbose('electrumxServers'), [
+        'rvn4lyfe.com:50002', 'moontree.com:50002',
+        'ravennode-01.beep.pw:50002', 'ravennode-02.beep.pw:50002', # HyperPeek 
+        'electrum-rvn.dnsalias.net:50002'])
 
 
 def path(of='data'):

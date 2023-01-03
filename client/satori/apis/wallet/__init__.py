@@ -1,6 +1,7 @@
 import os
 import json
 import mnemonic
+from random import randrange
 import ravencoin.base58
 from ravencoin.wallet import P2PKHRavencoinAddress, CRavencoinSecret
 from satoriwallet.apis.ravencoin import Ravencoin
@@ -35,6 +36,7 @@ class Wallet():
         while x < 5:
             try:
                 self.init()
+                break
             except TimeoutError:
                 print('init wallet connection attempts', x)
                 x += 1
@@ -190,14 +192,80 @@ class Wallet():
 
     def get(self, allWalletInfo=False):
         ''' gets data from the blockchain, saves to attributes '''
-        x = Ravencoin(self.address, self.scripthash, config.electrumxServers())
+        # x = Ravencoin(self.address, self.scripthash, config.electrumxServers())
+        x = Ravencoin(self.address, self.scripthash, ['moontree.com:50002'])
+        # todo:
+        # on connect ask for peers, add each to our list of electrumxServers
+        # if unable to connect, remove that server from our list
         x.get(allWalletInfo)
+        self.conn = x
         self.balance = x.balance
         self.stats = x.stats
         self.banner = x.banner
         self.rvn = x.rvn
         self.transactionHistory = x.transactionHistory
         self.transactions = x.transactions
+        self.unspentRvn = x.unspentRvn
+        self.unspentAssets = x.unspentAssets
+        self.rvnVouts = x.rvnVouts
+        self.assetVouts = x.assetVouts
+
+    def satoriTransaction(self, amountByAddress: dict):
+        ''' creates a transaction '''
+
+        def estimatedFee(inputCount: int = 0):
+            # TODO: sub optimal, replace when we have a lot of users
+            feeRate = 150000  # 0.00150000 rvn per item as simple over-estimate
+            outputCount = len(amountByAddress)
+            return (inputCount + outputCount) * feeRate
+
+        assert (len(amountByAddress) > 0)
+        # sum total amounts and other variables
+        unspentRvn = [x for x in self.unspentRvn if x.get('value') > 0]
+        unspentSatori = [x for x in self.unspentAssets if x.get(
+            'name') == 'SATORI' and x.get('value') > 0]
+        haveRvn = sum([x.get('value') for x in unspentRvn])
+        haveSatori = sum([x.get('value') for x in unspentSatori])
+        sendSatori = sum(amountByAddress.values())
+        assert (haveSatori >= sendSatori > 0)
+        assert (haveRvn >= 300000000)  # maintain minimum 3 RVN at all times
+
+        # # TODO: sub optimal, if you're sending from one address (not HDWallet)
+        # # why not order by size, take the ones just big enough and minimize
+        # # the number of inputs, and therefore the fee? just replace the whole
+        # # thing with HD wallet and optimize everything eventually.
+        # loop until gathered > total
+        #   gather satori utxos at random
+        gatheredSatori = 0
+        gatheredSatoriUnspents = []
+        while gatheredSatori < sendSatori:
+            randomUnspent = unspentSatori.pop(randrange(len(unspentSatori)))
+            gatheredSatoriUnspents.append(randomUnspent)
+            gatheredSatori += randomUnspent.get('value')
+
+        # loop until estimated fee > sum rvn utxos
+        #   gather rvn utxos at random
+        #   estimate fee
+        gatheredRvn = 0
+        gatheredRvnUnspents = []
+        while (
+            gatheredRvn < estimatedFee(
+                inputCount=len(gatheredSatoriUnspents)+len(gatheredRvnUnspents))
+        ):
+            randomUnspent = unspentRvn.pop(randrange(len(unspentRvn)))
+            gatheredRvnUnspents.append(randomUnspent)
+            gatheredRvn += randomUnspent.get('value')
+
+        # add all inputs and outputs to transaction
+        # ?? txbuilder
+        # ?? see python-ravencoinlib examples
+        # sign all inputs
+        # ?? see python-ravencoinlib
+        # ?? if asset input use (get the self.assetVouts corresponding to the
+        # ?? unspent).vout.scriptPubKey.hex.hexBytes
+        # send
+        # ?? use blockchain.transaction.broadcast raw_tx put function in
+        # ?? Ravencoin object since that's our connection object
 
     def sign(self, message: str):
         return sign.signMessage(self._privateKeyObj, message)
