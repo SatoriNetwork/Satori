@@ -54,8 +54,9 @@ class fixtures():
             0: {},
             1: {'stream': fixtures.streams()[1], 'value': 1, 'time': 'time1'},
             2: {'stream': fixtures.streams()[2], 'value': 2, 'time': 'time2'},
-            3: {'stream': fixtures.streams()[3], 'value': 3, 'time': 'time3'},
+            3: {'stream': fixtures.streams()[3], 'value': 3, 'time': None},
             4: {'stream': fixtures.streams()[4], 'value': 4, 'time': 'time4'},
+            5: {'stream': {**fixtures.streams()[3], **{'source': 'SATORI', 'pubkey': '02a85fb71485c6d7c62a3784c5549bd3849d0afa3ee44ce3f9ea5541e4c56402d8', 'stream': 'stream3_p'}}, 'value': 3, 'time': None},
         }
 
 
@@ -222,6 +223,7 @@ if False:
     register_observations(2)
     register_observations(3)
     request_primary()
+    register_observations(5)
     get_streams(1)
     get_streams(2)
     get_streams(3)
