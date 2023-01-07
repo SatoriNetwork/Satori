@@ -28,17 +28,18 @@ import pandas as pd
 import datetime as dt
 from flask import Flask, url_for, render_template, redirect, jsonify, send_file
 from flask import send_from_directory, session, request, flash, Markup, Response
-#from flask_mobility import Mobility
+# from flask_mobility import Mobility
 from waitress import serve
 import webbrowser
 from satori.web import forms
 from satori.concepts.structs import Observation
 from satori.apis import wallet
-
+from satori.init.start import StartupDag
 
 ###############################################################################
 ## Helpers ####################################################################
 ###############################################################################
+
 
 def spoofStreamer():
     thread = threading.Thread(target=satori.spoof.Streamr(
@@ -57,28 +58,34 @@ def spoofStreamer():
 ###############################################################################
 
 
+# testing
+start = StartupDag()
+start.openWallet()
+
 # development flags
 full = False  # just web or everything
-debug = False
+debug = True
 
 # singletons
 IpfsDaemon = None
 Connection = None
 Engine = None
-Wallet = None
+Wallet = start.wallet
 nodeDetails = None
 publisherKey = None
 subscriberKey = None
 app = Flask(__name__)
 
+
 app.config['SECRET_KEY'] = secrets.token_urlsafe(16)
 if full:
-    startup_ipfs()
-    startup_wallet()
-    startup_checkin()
-    startup_sync()
-    startup_pubsub()
-    startup_engine()
+    start = StartupDag()
+    # startup_ipfs()
+    # startup_wallet()
+    # startup_checkin()
+    # startup_sync()
+    # startup_pubsub()
+    # startup_engine()
 
 ###############################################################################
 ## Startup ####################################################################
@@ -137,41 +144,6 @@ def startup_engine():
         raise Exception('no key provided by satori server')
 
 
-@app.route('/start/ipfs')
-def start_ipfs():
-    startup_ipfs()
-    return redirect(url_for('home'))
-
-
-@app.route('/start/wallet')
-def start_wallet():
-    startup_wallet()
-    return redirect(url_for('home'))
-
-
-@app.route('/start/checkin')
-def start_checkin():
-    startup_checkin()
-    return redirect(url_for('home'))
-
-
-@app.route('/start/sync')
-def start_sync():
-    startup_sync()
-    return redirect(url_for('home'))
-
-
-@app.route('/start/network')
-def start_pubsub():
-    startup_pubsub()
-    return redirect(url_for('home'))
-
-
-@app.route('/start/engine')
-def start_engine():
-    startup_engine()
-    return redirect(url_for('home'))
-
 ###############################################################################
 ## Functions ##################################################################
 ###############################################################################
@@ -179,7 +151,7 @@ def start_engine():
 
 def returnNone():
     r = Response()
-    #r.set_cookie("My important cookie", value=some_cool_value)
+    # r.set_cookie("My important cookie", value=some_cool_value)
     return r, 204
 
 
@@ -218,102 +190,73 @@ def send_generated(path):
     return send_from_directory('generated', path)
 
 
-@app.route('/')
-@app.route('/index')
-def index():
-    '''
-    index page is empty dashboard with scrim that shows flash messages in center
-    and upon load redirects the user to /home
-    '''
-    flash('Welcome to Satori', 'info')
-    return render_template('index.html')
-
-
-@app.route('/loading-progress')
-def loadingProgress():
-
-    def spoofIpfsDaemon():
-        global IpfsDaemon
-        time.sleep(3)
-        IpfsDaemon = 'something'
-
-    def spoofWallet():
-        global Wallet
-        time.sleep(3)
-        Wallet = 'something'
-
-    def spoofnodeDetails():
-        global nodeDetails
-        time.sleep(3)
-        nodeDetails = 'something'
-
-    def spoofkey():
-        global key
-        time.sleep(3)
-        key = 'something'
-
-    def spoofConnection():
-        global Connection
-        time.sleep(3)
-        Connection = 'something'
-
-    def spoofEngine():
-        global Engine
-        time.sleep(3)
-        Engine = 'something'
-
-    def update():
-        global IpfsDaemon
-        global Wallet
-        global nodeDetails
-        global key
-        global Connection
-        global Engine
-        for singleton, msg, function in [
-            (IpfsDaemon, 'starting local ipfs process', spoofIpfsDaemon),
-            (Wallet, 'opening wallet', spoofWallet),
-            (nodeDetails, 'checking in with satori server', spoofnodeDetails),
-            (key, 'syncing historic data', spoofkey),
-            (Connection, 'establishing connection with network', spoofConnection),
-            (Engine, 'starting engine', spoofEngine),
-            (None, 'close', lambda: None),
-        ]:
-            if singleton == None:
-                function()
-                yield f'data:{msg}\n\n'
-                print('doing something')
-
-    import time
-    return Response(update(), mimetype='text/event-stream')
-
-
-@app.route('/home')
-def home():
-    global IpfsDaemon
-    global Wallet
-    global nodeDetails
-    global key
-    global Connection
-    global Engine
-    if IpfsDaemon == None:
-        flash('Starting local ipfs process', 'info')
-        return redirect(url_for('start_ipfs'))
-    if Wallet == None:
-        flash('Opening wallet', 'info')
-        return redirect(url_for('start_wallet'))
-    if nodeDetails == None:
-        flash('Checking in with satori server', 'info')
-        return redirect(url_for('start_checkin'))
-    if key == None:
-        flash('Syncing historic data', 'info')
-        return redirect(url_for('start_sync'))
-    if Connection == None:
-        flash('Establishing connection with network', 'info')
-        return redirect(url_for('start_pubsub'))
-    if Engine == None:
-        flash('Starting engine', 'info')
-        return redirect(url_for('start_engine'))
-    return redirect(url_for('dashboard'))
+# remove loading process because the system doesn't need to load anymore.
+# @app.route('/index')
+# def index():
+#    '''
+#    index page is empty dashboard with scrim that shows flash messages in center
+#    and upon load redirects the user to /home
+#    '''
+#    flash('Welcome to Satori', 'info')
+#    return render_template('index.html')
+#
+#
+# @app.route('/loading-progress')
+# def loadingProgress():
+#
+#    def spoofIpfsDaemon():
+#        global IpfsDaemon
+#        time.sleep(3)
+#        IpfsDaemon = 'something'
+#
+#    def spoofWallet():
+#        global Wallet
+#        time.sleep(3)
+#        Wallet = 'something'
+#
+#    def spoofnodeDetails():
+#        global nodeDetails
+#        time.sleep(3)
+#        nodeDetails = 'something'
+#
+#    def spoofkey():
+#        global key
+#        time.sleep(3)
+#        key = 'something'
+#
+#    def spoofConnection():
+#        global Connection
+#        time.sleep(3)
+#        Connection = 'something'
+#
+#    def spoofEngine():
+#        global Engine
+#        time.sleep(3)
+#        Engine = 'something'
+#
+#    def update():
+#        global IpfsDaemon
+#        global Wallet
+#        global nodeDetails
+#        global key
+#        global Connection
+#        global Engine
+#        for singleton, msg, function in [
+#            (IpfsDaemon, 'starting local ipfs process', spoofIpfsDaemon),
+#            (Wallet, 'opening wallet', spoofWallet),
+#            (nodeDetails, 'checking in with satori server', spoofnodeDetails),
+#            (key, 'syncing historic data', spoofkey),
+#            (Connection, 'establishing connection with network', spoofConnection),
+#            (Engine, 'starting engine', spoofEngine),
+#            (None, 'close', lambda: None),
+#        ]:
+#            if singleton == None:
+#                function()
+#                yield f'data:{msg}\n\n'
+#                print('doing something')
+#
+#    import time
+#    return Response(update(), mimetype='text/event-stream')
 
 
 @app.route('/test')
@@ -341,6 +284,23 @@ def kwargs():
 def ping():
     from datetime import datetime
     return jsonify({'now': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+
+
+@app.route('/pause/<timeout>', methods=['GET'])
+def pause(timeout):
+    try:
+        timeout = int(timeout)
+        if timeout < 12:
+            start.pause(timeout*60*60)
+    except Exception as _:
+        flash('invalid pause timeout', 'error')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/unpause', methods=['GET'])
+def unpause():
+    start.unpause()
+    return redirect(url_for('dashboard'))
 
 ###############################################################################
 ## Routes - forms #############################################################
@@ -402,6 +362,8 @@ def edit_configuration():
 ###############################################################################
 
 
+@app.route('/')
+@app.route('/home')
 @app.route('/dashboard')
 def dashboard():
     ''' 
@@ -427,7 +389,8 @@ def dashboard():
         'title': 'Dashboard',
         'wallet': Wallet,
         'streamsOverview': streamsOverview,
-        'configOverrides': satori.config.get()}
+        'configOverrides': satori.config.get(),
+        'paused': start.paused, }
     return render_template('dashboard.html', **resp)
 
 
@@ -535,7 +498,7 @@ def update():
     so we can call .on_next() here to pass along the update got here from the 
     Streamr LightClient, and trigger a new prediction.
     '''
-    #print('POSTJSON:', request.json)
+    # print('POSTJSON:', request.json)
     print('POSTJSON...')
     x = Observation(request.json)
     Engine.data.newData.on_next(x)
@@ -572,12 +535,12 @@ if __name__ == '__main__':
     if full:
         spoofStreamer()
 
-    #serve(app, host='0.0.0.0', port=satori.config.get()['port'])
+    # serve(app, host='0.0.0.0', port=satori.config.get()['port'])
     if not debug:
         webbrowser.open('http://127.0.0.1:24685', new=0, autoraise=True)
     app.run(host='0.0.0.0', port=satori.config.flaskPort(),
             threaded=True, debug=debug)
-    #app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True)
+    # app.run(host='0.0.0.0', port=satori.config.get()['port'], threaded=True)
     # https://stackoverflow.com/questions/11150343/slow-requests-on-local-flask-server
     # did not help
 

@@ -16,10 +16,12 @@ class StartupDag(object):
     def __init__(self, *args):
         super(StartupDag, self).__init__(*args)
         self.full = True
-        self.ipfsDaemon
-        self.wallet
-        self.details
-        self.key
+        self.ipfsDaemon = None
+        self.paused = False
+        self.pauseThread = None
+        self.wallet = None
+        self.details = None
+        self.key = None
         self.connection: SatoriPubSubConn
         self.engine: satori.engine.Engine
         self.publications: list[StreamId] = []
@@ -96,3 +98,23 @@ class StartupDag(object):
                     hash=ipfs,
                     abspath=data.path(temp=True))
                 data.mergeTemp(time=now)
+
+    def pause(self, timeout: int = 60):
+        ''' pause the engine. '''
+        def pauseEngineFor():
+            # self.engine.pause()
+            self.paused = True
+            time.sleep(timeout)
+            # self.engine.unpause()
+            self.paused = False
+            self.pauseThread = None
+
+        thread = threading.Thread(target=pauseEngineFor, daemon=True)
+        thread.start()
+        self.pauseThread = thread
+
+    def unpause(self):
+        ''' pause the engine. '''
+        # self.engine.unpause()
+        self.paused = False
+        self.pauseThread = None

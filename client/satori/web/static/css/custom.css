@@ -431,3 +431,7 @@ td:last-child {
   /*position: absolute;*/
   top: 42%;
 }
+
+.pe-2 {
+    padding-right: 1rem !important;
+}
