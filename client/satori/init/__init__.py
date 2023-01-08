@@ -126,5 +126,6 @@ def getEngine(
         }
 
     return satori.Engine(
+        startup=starup,
         data=satori.engine.DataManager(disk=disk.Disk(), startup=starup),
         models=generateModelManager())

@@ -8,6 +8,7 @@ class Engine:
 
     def __init__(
         self,
+        startup=None,
         data:DataManager=None,
         model:ModelManager=None,
         models:'set(ModelManager)'=None,
@@ -19,6 +20,7 @@ class Engine:
         model - a ModelManager for the model
         models - a list of ModelManagers
         '''
+        self.startup = startup
         self.data = data
         self.models = models
         self.view = view
@@ -89,7 +91,8 @@ class Engine:
             ''' always looks for external data and compiles it '''
             while True:
                 time.sleep(1)
-                self.data.runScholar(self.models)
+                if not self.startup.paused:
+                    self.data.runScholar(self.models)
 
         def predictor(model:ModelManager):
             ''' produces predictions on demand '''
@@ -102,7 +105,8 @@ class Engine:
         def explorer(model:ModelManager):
             ''' always looks for a better model '''
             while True:
-                model.runExplorer()
+                if not self.startup.paused:
+                    model.runExplorer()
 
         def watcher(model:ModelManager):
             ''' for reactive views... '''
