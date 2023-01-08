@@ -439,7 +439,8 @@ def modelUpdates():
 
 @app.route('/wallet')
 def wallet():
-    Wallet.get(allWalletInfo=True)
+    # not handling buffering correctly, so getting a list of transactions gets cut off and kills the page.
+    Wallet.get(allWalletInfo=False)
     import io
     import qrcode
     from base64 import b64encode

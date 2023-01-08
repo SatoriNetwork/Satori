@@ -132,7 +132,7 @@
           <div class="col-lg-6 col-7">
             <h6>Predictions</h6>
             <p class="text-sm mb-0">
-              Streams published by this Satori Node 
+              Prediction data streams published by this Satori Node 
             </p>
           </div>
         </div>
@@ -268,6 +268,151 @@
       </div>
     </div>
   </div>
+</div>
+<div class="row mb-4" style="margin-bottom: 3rem !important;">
+	<div class="col-lg-12 col-md-12 mb-md-0 mb-4">
+	  <div class="card">
+		<div class="card-header pb-0">
+		  <div class="row">
+			<div class="col-lg-6 col-7">
+			  <h6>Data Streams</h6>
+			  <p class="text-sm mb-0">
+				Primary data streams published by this Satori Node 
+			  </p>
+			</div>
+		  </div>
+		</div>
+		<div class="card-body px-0 pb-2">
+		  <div class="table-responsive" style="padding-left:1rem;padding-right:1rem;">
+			<table class="table align-items-center mb-0">
+			  <thead>
+				<tr>
+				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Source</th>
+				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Stream</th>
+				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Target</th>
+				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Latest</th>
+				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prediction</th>
+				</tr>
+			  </thead>
+			  <tbody id="updating_table">
+				{% for streamOverview in streamsOverview %}
+				<tr class='yellow-hover' onmouseover="setData(chartOne,{{ streamOverview['predictions'] }});setData(chartTwo,[.5,.7,.8,.85,.87,.9,.91,.92,.93]);setData(chartThree,[4,3,2,1]);">
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">{{ streamOverview['source'] }}</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">{{ streamOverview['stream'] }}</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">{{ streamOverview['target'] }}</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">{{ streamOverview['value'] }}</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">{{ streamOverview['prediction'] }}</h6>
+					</div>
+				  </td>                                                                
+				  <!-- example
+				  <td>{{ streamOverview['accuracy'] }}</td>
+				<tr>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">Streamr</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">Gold-4hr</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">Close</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">2196</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">2192</h6>
+					</div>
+				  </td>
+				</tr>
+				<tr>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">Satori</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">BTC-10min-pred</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">High</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">36912</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">47681</h6>
+					</div>
+				  </td>
+				</tr>
+				<tr>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">Streamr</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">Montana-Weather-Daily</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">Average Temperature</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">68</h6>
+					</div>
+				  </td>
+				  <td>
+					<div class="d-flex px-3 py-1">
+					  <h6 class="mb-0 text-sm">71</h6>
+					</div>
+				  </td>
+				  -->
+				</tr> 
+				{% endfor %}
+			  </tbody>
+			</table>
+		  </div>
+		</div>
+	  </div>
+	</div>
 </div>
 
 <p id="learn_output"></p>

@@ -178,12 +178,12 @@ class Wallet():
             return (16 + 1) % (divisibility + 8 + 1)
 
         if rvn:
-            balance = self.rvn / int('1' + ('0'*8))
+            balance = (self.rvn or 0) / int('1' + ('0'*8))
         else:
             if self.balance == 'unknown':
                 return self.balance
-            balance = self.balance / \
-                int('1' + ('0'*invertDivisibility(int(self.stats.get('divisions', 8)))))
+            balance = (self.balance /
+                       int('1' + ('0'*invertDivisibility(int(self.stats.get('divisions', 8))))))
         headTail = str(balance).split('.')
         if headTail[1] == '0':
             return f"{int(headTail[0]):,}"
@@ -204,7 +204,7 @@ class Wallet():
         self.banner = x.banner
         self.rvn = x.rvn
         self.transactionHistory = x.transactionHistory
-        self.transactions = x.transactions
+        self.transactions = x.transactions or []
         self.unspentRvn = x.unspentRvn
         self.unspentAssets = x.unspentAssets
         self.rvnVouts = x.rvnVouts
