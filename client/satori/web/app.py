@@ -434,13 +434,16 @@ def dashboard():
         configuration for a stream in order to edit it.
         '''
         newRawStream = forms.EditConfigurationForm(formdata=request.form)
-        newRawStream.flaskPort.data = satori.config.flaskPort()
-        newRawStream.nodejsPort.data = satori.config.nodejsPort()
-        newRawStream.dataPath.data = satori.config.dataPath()
-        newRawStream.modelPath.data = satori.config.modelPath()
-        newRawStream.walletPath.data = satori.config.walletPath()
-        newRawStream.defaultSource.data = satori.config.defaultSource()
-        newRawStream.electrumxServers.data = satori.config.electrumxServers()
+        newRawStream.name.data = ''
+        newRawStream.target.data = ''
+        newRawStream.cadence.data = 60
+        newRawStream.offset.data = None
+        newRawStream.datatype.data = ''
+        newRawStream.description.data = ''
+        newRawStream.tag.data = ''
+        newRawStream.url.data = ''
+        newRawStream.uri.data = ''
+        newRawStream.hook.data = ''
         return newRawStream
 
     resp = {

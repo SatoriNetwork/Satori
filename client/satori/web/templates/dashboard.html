@@ -304,24 +304,29 @@
 				<tr class='yellow-hover'>
 					<td>
 					  <div class="d-flex px-3 py-1">
-						  <h6 class="mb-0 text-sm">{{ rawStreamOverview['stream'] }}</h6>
+						  <h6 class="mb-0 text-sm">{{ rawStreamOverview['name'] }}</h6>
 					  </div>
 					</td>
+					<td>
+			  <div class="d-flex px-3 py-1">
+				<h6 class="mb-0 text-sm">{{ rawStreamOverview['target'] }}</h6>
+			  </div>
+		  </td>
 				  <td>
             <div class="d-flex px-3 py-1">
               <h6 class="mb-0 text-sm">{{ rawStreamOverview['cadence'] }}</h6>
             </div>
 				  </td>
-				  <td>
-            <div class="d-flex px-3 py-1">
-              <h6 class="mb-0 text-sm">{{ rawStreamOverview['target'] }}</h6>
+		<td>
+			<div class="d-flex px-3 py-1">
+				<h6 class="mb-0 text-sm">{{ rawStreamOverview['offset'] }}</h6>
             </div>
-				  </td>
-				  <td>
-            <div class="d-flex px-3 py-1">
-              <h6 class="mb-0 text-sm">{{ rawStreamOverview['offset'] }}</h6>
-            </div>
-				  </td>
+		</td>
+		<td>
+			<div class="d-flex px-3 py-1">
+				<h6 class="mb-0 text-sm">{{ rawStreamOverview['datatype'] }}</h6>
+			</div>
+		  </td>
 				  <td>
             <div class="d-flex px-3 py-1">
               <h6 class="mb-0 text-sm">{{ rawStreamOverview['description'] }}</h6>
@@ -334,12 +339,12 @@
 				  </td>
 				  <td>
             <div class="d-flex px-3 py-1">
-              <h6 class="mb-0 text-sm">{{ rawStreamOverview['uri'] }}</h6>
+              <h6 class="mb-0 text-sm">{{ rawStreamOverview['url'] }}</h6>
             </div>
 				  </td>
 				  <td>
             <div class="d-flex px-3 py-1">
-              <h6 class="mb-0 text-sm">{{ rawStreamOverview['url'] }}</h6>
+              <h6 class="mb-0 text-sm">{{ rawStreamOverview['uri'] }}</h6>
             </div>
 				  </td>
 				  <td>
@@ -352,72 +357,72 @@
         <div class="text-center pt-1">
           {{ newRawStream.hidden_tag() }}
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
           <td>
-					  <div class="d-flex px-3 py-1">
+					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
               <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="form-control") }}
+                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
               </div>
 					  </div>
 					</td>
