@@ -357,6 +357,44 @@ def edit_configuration():
         return accept_submittion(edit_configuration)
     return present_form(edit_configuration)
 
+
+@app.route('/new-stream', methods=['POST'])
+def new_stream():
+    import importlib
+    global forms
+    forms = importlib.reload(forms)
+
+    def accept_submittion(newRawStream):
+        data = {}
+        if newRawStream.flaskPort.data not in ['', None, satori.config.flaskPort()]:
+            data = {
+                **data, **{satori.config.verbose('flaskPort'): newRawStream.flaskPort.data}}
+        if newRawStream.nodejsPort.data not in ['', None, satori.config.nodejsPort()]:
+            data = {
+                **data, **{satori.config.verbose('nodejsPort'): newRawStream.nodejsPort.data}}
+        if newRawStream.dataPath.data not in ['', None, satori.config.dataPath()]:
+            data = {
+                **data, **{satori.config.verbose('dataPath'): newRawStream.dataPath.data}}
+        if newRawStream.modelPath.data not in ['', None, satori.config.modelPath()]:
+            data = {
+                **data, **{satori.config.verbose('modelPath'): newRawStream.modelPath.data}}
+        if newRawStream.walletPath.data not in ['', None, satori.config.walletPath()]:
+            data = {
+                **data, **{satori.config.verbose('walletPath'): newRawStream.walletPath.data}}
+        if newRawStream.defaultSource.data not in ['', None, satori.config.defaultSource()]:
+            data = {
+                **data, **{satori.config.verbose('defaultSource'): newRawStream.defaultSource.data}}
+        if newRawStream.electrumxServers.data not in ['', None, satori.config.electrumxServers()]:
+            data = {**data, **{satori.config.verbose('electrumxServers'): [
+                newRawStream.electrumxServers.data]}}
+        satori.config.modify(data=data)
+        return redirect('/dashboard')
+
+    newRawStream = forms.EditConfigurationForm(formdata=request.form)
+    if request.method == 'POST':
+        return accept_submittion(newRawStream)
+
+
 ###############################################################################
 ## Routes - dashboard #########################################################
 ###############################################################################
@@ -385,12 +423,33 @@ def dashboard():
                             'accuracy': '97.062 %', 'prediction': '3621.00', 'value': '3548.00', 'predictions': [2, 3, 1]}]
     else:
         streamsOverview = [model.overview() for model in Engine.models]
+
+    import importlib
+    global forms
+    forms = importlib.reload(forms)
+
+    def present_stream_form():
+        ''' 
+        this function could be used to fill a form with the current 
+        configuration for a stream in order to edit it.
+        '''
+        newRawStream = forms.EditConfigurationForm(formdata=request.form)
+        newRawStream.flaskPort.data = satori.config.flaskPort()
+        newRawStream.nodejsPort.data = satori.config.nodejsPort()
+        newRawStream.dataPath.data = satori.config.dataPath()
+        newRawStream.modelPath.data = satori.config.modelPath()
+        newRawStream.walletPath.data = satori.config.walletPath()
+        newRawStream.defaultSource.data = satori.config.defaultSource()
+        newRawStream.electrumxServers.data = satori.config.electrumxServers()
+        return newRawStream
+
     resp = {
         'title': 'Dashboard',
         'wallet': Wallet,
         'streamsOverview': streamsOverview,
         'configOverrides': satori.config.get(),
-        'paused': start.paused, }
+        'paused': start.paused,
+        'newRawStream': present_stream_form()}
     return render_template('dashboard.html', **resp)
 
 
