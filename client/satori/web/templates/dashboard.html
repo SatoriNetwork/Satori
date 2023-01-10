@@ -270,173 +270,245 @@
   </div>
 </div>
 <div class="row mb-4" style="margin-bottom: 3rem !important;">
-	<div class="col-lg-12 col-md-12 mb-md-0 mb-4">
-	  <div class="card">
-		<div class="card-header pb-0">
-		  <div class="row">
-			<div class="col-lg-6 col-7">
-			  <h6>Data Streams</h6>
-			  <p class="text-sm mb-0">
-				Primary data streams published by this Satori Node 
-			  </p>
-			</div>
-		  </div>
-		</div>
-		<div class="card-body px-0 pb-2">
-		  <div class="table-responsive" style="padding-left:1rem;padding-right:1rem;">
-			<table class="table align-items-center mb-0">
-			  <thead>
-				<tr>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Target</th>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cadence</th>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Offset</th>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tags</th>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Url</th>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Uri</th>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Headers</th>
-				  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hook</th>
-				</tr>
-			  </thead>
-			  <tbody id="updating_table">
-				{% for rawStreamOverview in rawStreamsOverview %}
-				<tr class='yellow-hover'>
-					<td>
-					  <div class="d-flex px-3 py-1">
-						  <h6 class="mb-0 text-sm">{{ rawStreamOverview['name'] }}</h6>
-					  </div>
-					</td>
-					<td>
-			  <div class="d-flex px-3 py-1">
-				<h6 class="mb-0 text-sm">{{ rawStreamOverview['target'] }}</h6>
-			  </div>
-		  </td>
-				  <td>
+  <div class="col-lg-12 col-md-12 mb-md-0 mb-4">
+    <div class="card">
+    <div class="card-header pb-0">
+      <div class="row">
+      <div class="col-lg-6 col-7">
+        <h6>Data Streams</h6>
+        <p class="text-sm mb-0">
+        Primary data streams published by this Satori Node 
+        </p>
+      </div>
+      </div>
+    </div>
+    <div class="card-body px-0 pb-2">
+      <div class="table-responsive" style="padding-left:1rem;padding-right:1rem;">
+      <table class="table align-items-center mb-0" style="min-width: 1200px;">
+        
+        <thead>
+        <tr>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Name</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Target</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cadence</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Offset</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Datatype</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tags</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Url</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Uri</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Headers</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Hook</th>
+          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"></th>
+        </tr>
+        </thead>
+        <tbody id="updating_table">
+        {% for rawStreamOverview in rawStreamsOverview %}
+        <tr class='yellow-hover'>
+          <td>
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">{{ rawStreamOverview['name'] }}</h6>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1">
+            <h6 class="mb-0 text-sm">{{ rawStreamOverview['target'] }}</h6>
+            </div>
+          </td>
+          <td>
             <div class="d-flex px-3 py-1">
               <h6 class="mb-0 text-sm">{{ rawStreamOverview['cadence'] }}</h6>
             </div>
-				  </td>
-		<td>
-			<div class="d-flex px-3 py-1">
-				<h6 class="mb-0 text-sm">{{ rawStreamOverview['offset'] }}</h6>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">{{ rawStreamOverview['offset'] }}</h6>
+                  </div>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">{{ rawStreamOverview['datatype'] }}</h6>
             </div>
-		</td>
-		<td>
-			<div class="d-flex px-3 py-1">
-				<h6 class="mb-0 text-sm">{{ rawStreamOverview['datatype'] }}</h6>
-			</div>
-		  </td>
-				  <td>
+          </td>
+          <td>
             <div class="d-flex px-3 py-1">
               <h6 class="mb-0 text-sm">{{ rawStreamOverview['description'] }}</h6>
             </div>
-				  </td>
-				  <td>
+          </td>
+          <td>
             <div class="d-flex px-3 py-1">
               <h6 class="mb-0 text-sm">{{ rawStreamOverview['tag'] }}</h6>
             </div>
-				  </td>
-				  <td>
+          </td>
+          <td>
             <div class="d-flex px-3 py-1">
               <h6 class="mb-0 text-sm">{{ rawStreamOverview['url'] }}</h6>
             </div>
-				  </td>
-				  <td>
+          </td>
+          <td>
             <div class="d-flex px-3 py-1">
               <h6 class="mb-0 text-sm">{{ rawStreamOverview['uri'] }}</h6>
             </div>
-				  </td>
-				  <td>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">{{ rawStreamOverview['headers'] }}</h6>
+            </div>
+          </td>
+          <td >
             <div class="d-flex px-3 py-1">
               <h6 class="mb-0 text-sm">{{ rawStreamOverview['hook'] }}</h6>
             </div>
-				  </td>
-				</tr> 
-				{% endfor %}
+          </td>
+          <td >
+            <div class="d-flex px-3 py-1">
+              <h6 class="mb-0 text-sm">status, edit, remove</h6>
+            </div>
+          </td>
+        </tr> 
+        {% endfor %}
         <div class="text-center pt-1">
           {{ newRawStream.hidden_tag() }}
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="nameDescription();">
+                {{ newRawStream.name(size=32, class_="tight form-control", placeholder="BTC1HR") }}
               </div>
-					  </div>
-					</td>
+            </div>
+          </td>
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="targetDescription();">
+                {{ newRawStream.target(size=32, class_="tight form-control", placeholder="Close") }}
               </div>
-					  </div>
-					</td>
+            </div>
+          </td>
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="cadenceDescription();">
+                {{ newRawStream.cadence(size=32, class_="tight form-control", placeholder="3600") }}
               </div>
-					  </div>
-					</td>
+            </div>
+          </td>
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="offsetDescription();">
+                {{ newRawStream.offset(size=32, class_="tight form-control", placeholder="108000") }}
               </div>
-					  </div>
-					</td>
+            </div>
+          </td>
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="datatypeDescription();">
+                {{ newRawStream.datatype(size=32, class_="tight form-control", placeholder="float") }}
               </div>
-					  </div>
-					</td>
+            </div>
+          </td>
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="descriptionDescription();">
+                {{ newRawStream.description(size=32, class_="tight form-control", placeholder="Price (OHLC) of Bitcoin at 1 hour intervals, offset from UTC time by 3 hours.") }}
               </div>
-					  </div>
-					</td>
+            </div>
+          </td>
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="tagDescription();">
+                {{ newRawStream.tag(size=32, class_="tight form-control", placeholder="bitcoin, 1hr") }}
               </div>
-					  </div>
-					</td>
+            </div>
+          </td>
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="urlDescription();">
+                {{ newRawStream.url(size=32, class_="tight form-control", placeholder="https://finance.yahoo.com/bitcoin") }}
               </div>
-					  </div>
-					</td>
+            </div>
+          </td>
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="uriDescription();">
+                {{ newRawStream.uri(size=32, class_="tight form-control", placeholder="https://finance.yahoo.com/bitcoin?key=supersecretkey") }}
               </div>
-					  </div>
-					</td>
+            </div>
+          </td>
           <td>
-					  <div class="d-flex px-3 py-1" style="padding: 1px !important;">
-              <div class="input-group input-group-outline">
-                {{ newRawStream.flaskPort(size=32, class_="tight form-control") }}
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="headersDescription();">
+                {{ newRawStream.headers(size=32, class_="tight form-control", placeholder="Accept: application/json") }}
               </div>
-					  </div>
-					</td>
-			  </tbody>
-			</table>
-		  </div>
-		</div>
-	  </div>
-	</div>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="hookDescription();">
+                {{ newRawStream.hook(size=32, class_="tight form-control", placeholder="def postRequestHook(r): return -1.0 if r.status_code != 200 else float(r.json['Close'])") }}
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex px-3 py-1" style="padding: 1px !important;">
+              <div class="input-group input-group-outline" onmouseover="submitDescription();">
+                {{ newRawStream.submit(size=32, class_="tight form-control") }}
+              </div>
+            </div>
+          </td>
+        </tbody>
+      </table>
+      <div class="pt-1">
+        <p id="helpArea" class="mb-0 text-sm"></p>
+      </div>
+      </div>
+    </div>
+    </div>
+  </div>
 </div>
 
 <p id="learn_output"></p>
 <p id="learn_output2"></p>
 <p id="learn_output3"></p>
+
+<script>
+  function defaultMessage() {
+    document.getElementById("helpArea").innerHTML = ""; 
+  }
+  defaultMessage();
+  function nameDescription() {
+    document.getElementById("helpArea").innerHTML = "Name of the data stream.";
+  }
+  function targetDescription() {
+    document.getElementById("helpArea").innerHTML = "Target, or key of the data stream if that data stream is in the form of a json object with keys and values.";
+  }
+  function cadenceDescription() {
+    document.getElementById("helpArea").innerHTML = "The interval in seconds between data points. How often should the endpoint be called and the data collected?";
+  }
+  function offsetDescription() {
+    document.getElementById("helpArea").innerHTML = "The offset in seconds from UTC time. For example, if the data is collected at 1 hour intervals, and the offset is 3 hours, then the data will be collected at 1 hour intervals starting at 3 hours after midnight UTC.";
+  }
+  function datatypeDescription() {
+    document.getElementById("helpArea").innerHTML = "The datatype of the target, or stream. For example, 'float' or 'int', or even 'json' if the target data is in the form of a json object.";
+  }
+  function descriptionDescription() {
+    document.getElementById("helpArea").innerHTML = "A short human-readable description of the data stream.";
+  }
+  function tagDescription() {
+    document.getElementById("helpArea").innerHTML = "List of tags, separated by commas, that describe the data stream.";
+  }  
+  function urlDescription() {
+    document.getElementById("helpArea").innerHTML = "The base URL of the data stream. For example https://finance.yahoo.com/bitcoin";
+  }  
+  function uriDescription() {
+    document.getElementById("helpArea").innerHTML = "The full URI of the data stream. For example https://finance.yahoo.com/bitcoin?key=supersecretkey. The information input into this field never leaves this device.";
+  }  
+  function headersDescription() {
+    document.getElementById("helpArea").innerHTML = "The headers of the request. The information input into this field never leaves this device.";
+  }  
+  function hookDescription() {
+    document.getElementById("helpArea").innerHTML = "A python function that intercepts the response before broadcasting. This can be used to filter the data down to a specific key known as the target. The information input into this field never leaves this device. <br />WARNING: Since this code is executed by the interpreter without any security measures, you should know exactly the code does before you submit this form.";
+  }  
+</script>
+
+
 <script src="{{ url_for('static', filename='js/plugins/chartjs.min.js') }}"></script>
 <script>
   function addData(chart, label, data) {

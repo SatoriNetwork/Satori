@@ -358,8 +358,8 @@ def edit_configuration():
     return present_form(edit_configuration)
 
 
-@app.route('/new-stream', methods=['POST'])
-def new_stream():
+@app.route('/dashboard', methods=['POST'])
+def dashboardFormSubmit():
     import importlib
     global forms
     forms = importlib.reload(forms)
@@ -390,9 +390,10 @@ def new_stream():
         satori.config.modify(data=data)
         return redirect('/dashboard')
 
-    newRawStream = forms.EditConfigurationForm(formdata=request.form)
-    if request.method == 'POST':
-        return accept_submittion(newRawStream)
+    newRawStream = forms.RawStreamForm(formdata=request.form)
+    print('SUBMITTED')
+    # return accept_submittion(newRawStream)
+    return redirect('/dashboard')
 
 
 ###############################################################################
@@ -400,9 +401,9 @@ def new_stream():
 ###############################################################################
 
 
-@app.route('/')
-@app.route('/home')
-@app.route('/dashboard')
+@app.route('/', methods=['GET'])
+@app.route('/home', methods=['GET'])
+@app.route('/dashboard', methods=['GET'])
 def dashboard():
     ''' 
     UI
@@ -433,21 +434,22 @@ def dashboard():
         this function could be used to fill a form with the current 
         configuration for a stream in order to edit it.
         '''
-        newRawStream = forms.EditConfigurationForm(formdata=request.form)
+        newRawStream = forms.RawStreamForm(formdata=request.form)
         newRawStream.name.data = ''
         newRawStream.target.data = ''
-        newRawStream.cadence.data = 60
+        newRawStream.cadence.data = None
         newRawStream.offset.data = None
         newRawStream.datatype.data = ''
         newRawStream.description.data = ''
         newRawStream.tag.data = ''
         newRawStream.url.data = ''
         newRawStream.uri.data = ''
+        newRawStream.headers.data = ''
         newRawStream.hook.data = ''
         return newRawStream
 
     resp = {
-        'title': 'Dashboard',
+        'title': 'Satori',
         'wallet': Wallet,
         'streamsOverview': streamsOverview,
         'configOverrides': satori.config.get(),
